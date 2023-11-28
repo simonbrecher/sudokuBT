@@ -1,3 +1,6 @@
+/**
+ * Class that performs graphical tests (user needs to check validity of generated HTML)
+ */
 class GraphicsTests {
     /**
      * Test that these features of classes: Cell and Frame work
@@ -55,5 +58,35 @@ class GraphicsTests {
             cell.setText([]);
             cell.setText("1");
         }
+    }
+
+    /**
+     * Test that regions can be rendered correctly.
+     */
+    public static testRegionsClass(): void {
+        let rectangleHeight = 2;
+        let rectangleWidth = 3;
+        let size = rectangleHeight * rectangleWidth;
+        let frame = new Frame(size, size, 35, "container");
+        let sudoku = new Sudoku(size);
+        sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
+        Renderer.renderer.render(sudoku, frame);
+
+        size = 5;
+        frame = new Frame(size, size, 35, "container");
+        sudoku = new Sudoku(size);
+        sudoku.regions.setJigsaw([
+            [0, 1, 2, 5, 6],
+            [3, 7, 8, 12, 13],
+            [4, 9, 14, 19, 18, 17],
+            [10, 11, 15, 16, 20],
+            [17, 21, 22, 23, 24],
+        ]);
+        Renderer.renderer.render(sudoku, frame);
+
+        size = 5;
+        frame = new Frame(size, size, 35, "container");
+        sudoku = new Sudoku(size);
+        Renderer.renderer.render(sudoku, frame);
     }
 }
