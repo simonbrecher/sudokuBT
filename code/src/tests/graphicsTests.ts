@@ -70,7 +70,7 @@ class GraphicsTests {
         let frame = new Frame(size, size, 35, "container");
         let sudoku = new Sudoku(size);
         sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
-        Renderer.renderer.render(sudoku, frame);
+        Renderer.renderer.render(sudoku.solution, frame);
 
         size = 5;
         frame = new Frame(size, size, 35, "container");
@@ -82,11 +82,53 @@ class GraphicsTests {
             [10, 11, 15, 16, 20],
             [17, 21, 22, 23, 24],
         ]);
-        Renderer.renderer.render(sudoku, frame);
+        Renderer.renderer.render(sudoku.solution, frame);
 
         size = 5;
         frame = new Frame(size, size, 35, "container");
         sudoku = new Sudoku(size);
-        Renderer.renderer.render(sudoku, frame);
+        Renderer.renderer.render(sudoku.solution, frame);
+    }
+
+    public static testSolver(): void {
+        let rectangleHeight = 2;
+        let rectangleWidth = 3;
+        let size = rectangleHeight * rectangleWidth;
+        let sudoku = new Sudoku(size);
+        sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
+
+        let state = sudoku.solution.deepcopy();
+        state.setBoardByText([
+            "61---2",
+            "------",
+            "3-4-2-",
+            "-2-4-3",
+            "------",
+            "2---31",
+        ]);
+        Renderer.renderer.renderNew(state);
+        Solver.solver.solve(state);
+        Renderer.renderer.renderNew(state);
+
+        state = sudoku.solution.deepcopy();
+        state.sudoku.regions.setRegionsByText([
+            "000111",
+            "023311",
+            "023314",
+            "022334",
+            "552244",
+            "555544",
+        ]);
+        state.setBoardByText([
+            "------",
+            "4--6--",
+            "13----",
+            "----12",
+            "--2--1",
+            "------",
+        ]);
+        Renderer.renderer.renderNew(state);
+        Solver.solver.solve(state);
+        Renderer.renderer.renderNew(state);
     }
 }

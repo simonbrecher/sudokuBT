@@ -54,7 +54,7 @@ class Regions {
     }
     private _extraRegions: number[][] | null = null;
     public hasExtraRegions(): boolean {
-        return this._regions !== null;
+        return this._extraRegions !== null;
     }
     public get extraRegions(): number[][] {
         Regions.throwAccessErrorIf(this._extraRegions === null, "Regions.extraRegions", "Regions._extraRegions === null");
@@ -138,5 +138,43 @@ class Regions {
      */
     public getRegionsMatrix(): number[] {
         return PositionUtils.regionsToMatrix(this.sudoku.size * this.sudoku.size, this._regions ?? []);
+    }
+
+    /**
+     * Get array of all regions. It is possible to choose only some types.
+     */
+    public getAllRegions(rows: boolean, columns: boolean, regions: boolean, diagonals: boolean, extraRegions: boolean): number[][] {
+        let output: number[][] = [];
+        if (this.hasLines) {
+            if (rows) {
+                ArrayUtils.add1d(output, this._rows);
+            }
+            if (columns) {
+                ArrayUtils.add1d(output, this._columns);
+            }
+        }
+        if (this.hasRegions() && regions) {
+            ArrayUtils.add1d(output, this._regions!);
+        }
+        if (this.hasDiagonals && diagonals) {
+            ArrayUtils.add1d(output, this._diagonals);
+        }
+        if (this.hasExtraRegions() && extraRegions) {
+            ArrayUtils.add1d(output, this._extraRegions!);
+        }
+        return output;
+    }
+
+    /**
+     * Add jigsaw regions by text, for example: ["0011", "0012", "3312", "3322"]
+     */
+    public setRegionsByText(text: string[]): void { // TODO: validate correctness
+        let regions = ArrayUtils.createArray2d(this.sudoku.size, 0, null);
+        for (let y = 0; y < this.sudoku.size; y++) {
+            for (let x = 0; x < this.sudoku.size; x++) {
+                regions[parseInt(text[y][x])].push(y * this.sudoku.size + x);
+            }
+        }
+        this.setJigsaw(regions);
     }
 }

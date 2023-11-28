@@ -20,20 +20,23 @@ class ArrayUtils {
 
     public static deepcopyArray1d(array: any[]): any[] {
         let copy = [];
-        for (let i = 0; i < array.length; i++) {
-            copy.push(array[i]);
+        for (let value of array) {
+            copy.push(value);
         }
         return copy;
     }
 
     public static deepcopyArray2d(array: any[][]): any[][] {
         let copy: any[][] = [];
-        for (let y = 0; y < array.length; y++) {
-            copy.push([]);
-            for (let x = 0; x < array[y].length; x++) {
-                copy[y].push(array[y][x]);
-            }
+        for (let row of array) {
+            copy.push(this.deepcopyArray1d(row));
         }
         return copy;
+    }
+
+    public static add1d(output: any[], add: any[]): void {
+        for (let value of add) {
+            output.push(value);
+        }
     }
 }

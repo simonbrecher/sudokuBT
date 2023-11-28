@@ -5,10 +5,29 @@ class Renderer {
 
     }
 
-    private renderBasic(sudoku: Sudoku, frame: Frame): void {
+    /**
+     * Convert binary representation of a cell to array of characters, that should be rendered in the cell.
+     */
+    private binaryToCharacters(binary: number, fullBinary: number): string | string[] {
+        if (binary === 0) {
+            return "!";
+        } else if (binary === fullBinary) {
+            return [];
+        }
+
+        let shifts = BinaryUtils.binaryToShifts32(binary);
+        let characters = [];
+        for (let shift of shifts) {
+            characters.push(`${shift + 1}`);
+        }
+        return characters.length !== 1 ? characters : characters[0];
+    }
+
+    private renderBasic(state: State, sudoku: Sudoku, frame: Frame): void {
         for (let y = 0; y < sudoku.size; y++) {
             for (let x = 0; x < sudoku.size; x++) {
                 let cell = frame.getCell(y, x);
+                cell.setText(this.binaryToCharacters(state.board[y * sudoku.size + x], sudoku.fullBinary));
                 cell.setBorder("normal", Cell.DIRECTIONS.all);
             }
         }
@@ -29,7 +48,20 @@ class Renderer {
         }
     }
 
-    public render(sudoku: Sudoku, frame: Frame): void {
-        this.renderBasic(sudoku, frame);
+    /**
+     * Render state inside already existing Frame.
+     */
+    public render(state: State, frame: Frame): void {
+        this.renderBasic(state, state.sudoku, frame);
+        frame.update();
+    }
+
+    /**
+     * Create new Frame and render state in it.
+     */
+    public renderNew(state: State, containerId: string = "container"): Frame {
+        let frame = new Frame(state.sudoku.size, state.sudoku.size, 35, containerId);
+        this.render(state, frame);
+        return frame;
     }
 }

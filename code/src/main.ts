@@ -6,6 +6,8 @@ class Main {
         // let frame = GraphicsTests.testBasicGraphicOfCell(10, 9, 2, 3);
         // GraphicsTests.testTextWrapperRemoval(frame, 10*/*00*/1000);
 
-        GraphicsTests.testRegionsClass();
+        // GraphicsTests.testRegionsClass();
+
+        GraphicsTests.testSolver();
     }
 }
