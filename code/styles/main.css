@@ -1,0 +1,54 @@
+@media not print {
+    body { background-color: #E5E5E5; }
+}
+
+.puzzle {
+    cursor: default; user-select: none;
+    font-family: monospace; background-color: #FFF; border-collapse: collapse;
+    margin-top: 2px;
+}
+
+/* --height and --width refer to size of td */
+.puzzle td {
+    --height: 0; --width: 0;
+    height: var(--height); width: var(--width);
+    box-sizing: border-box; padding: 0;
+}
+
+.border-top-none { border-top: none; }
+.border-bottom-none { border-bottom: none; }
+.border-left-none { border-left: none; }
+.border-right-none { border-right: none; }
+.border-top-normal { border-top: 1px solid #000; }
+.border-bottom-normal { border-bottom: 1px solid #000; }
+.border-left-normal { border-left: 1px solid #000; }
+.border-right-normal { border-right: 1px solid #000; }
+.border-top-strong { border-top: 3px solid #000; }
+.border-bottom-strong { border-bottom: 3px solid #000; }
+.border-left-strong { border-left: 3px solid #000; }
+.border-right-strong { border-right: 3px solid #000; }
+
+/* --height and --width refers to size of .cell, it is used by child elements to count styles */
+.cell {
+    --height: 0; --width: 0; --background-color: #FFF;
+    height: 100%; width: 100%; background-color: var(--background-color);
+}
+
+.text-wrapper { position: absolute; height: var(--height); width: var(--width); }
+
+.text-wrapper { --inner-count-1d: 0; --relative-font-size-single: 0.8; --relative-font-size-multiple: 1; }
+.text-wrapper > div { --font-color: #000; color: var(--font-color); }
+.text-wrapper.single-text > div {
+    font-size: calc(var(--relative-font-size-single) * var(--height)); height: 100%; width: 100%;
+    display: flex; justify-content: center; align-items: center;
+}
+.text-wrapper.multiple-text {
+    height: calc(var(--height) - 2px); width: calc(var(--width) - 2px); margin-top: 1px; margin-left: 1px;
+    display: flex; flex-wrap: wrap; align-content: flex-start;
+}
+.text-wrapper.multiple-text > div {
+    --font-color: #999;
+    font-size: calc(var(--relative-font-size-multiple) * (var(--height) - 2px) / var(--inner-count-1d));
+    height: calc(100% / var(--inner-count-1d)); width: calc(100% / var(--inner-count-1d));
+    display: flex; justify-content: center; align-items: center;
+}
