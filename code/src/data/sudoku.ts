@@ -8,6 +8,9 @@ class Sudoku {
 
     public readonly regions: Regions;
 
+    public hasSolution = false;
+    public hasTask = false;
+
     public solution: State;
     public task: State;
 

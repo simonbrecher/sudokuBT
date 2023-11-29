@@ -131,4 +131,19 @@ class GraphicsTests {
         Solver.solver.solve(state);
         Renderer.renderer.renderNew(state);
     }
+
+    /**
+     * Test creating sudoku solution
+     */
+    public static testBuildSolution(): void {
+        let rectangleHeight = 3;
+        let rectangleWidth = 3;
+        let size = rectangleHeight * rectangleWidth;
+        let sudoku = new Sudoku(size);
+        for (let i = 0; i < 1; i++) {
+            sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
+            Builder.builder.createSolution(sudoku);
+            Renderer.renderer.renderNew(sudoku.solution);
+        }
+    }
 }

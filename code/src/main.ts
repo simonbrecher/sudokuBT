@@ -8,6 +8,7 @@ class Main {
 
         // GraphicsTests.testRegionsClass();
 
-        GraphicsTests.testSolver();
+        // GraphicsTests.testSolver();
+        GraphicsTests.testBuildSolution();
     }
 }

@@ -36,4 +36,40 @@ class BinaryUtils {
         }
         return shifts;
     }
+
+    /**
+     * Choose position with least bits with value 1, from positions that have at least two bits with value 1.
+     */
+    public static getIndexWithLeastBitsButAtLeast2(binaries: number[]): number {
+        let output = null;
+        let leastBitsCount = 33;
+        for (let i = 0; i < binaries.length; i++) {
+            let bitCount = BinaryUtils.countBits32(binaries[i]);
+            if (bitCount > 1 && bitCount < leastBitsCount) {
+                leastBitsCount = bitCount;
+                output = i;
+            }
+        }
+        if (output === null) {
+            throw "ERROR: No index with more than one 1-bit.";
+        }
+        return output;
+    }
+
+    /**
+     * Create 32b integer that has 1 on random position, where there was 1 in binary
+     * If binary === 0, return 0
+     */
+    public static chooseRandomBit(binary: number): number {
+        if (binary === 0) {
+            return 0;
+        }
+        let bits = [];
+        while (binary !== 0) {
+            let lastBit = binary & ~ (binary - 1);
+            bits.push(lastBit);
+            binary &= ~ lastBit;
+        }
+        return bits[Math.floor(Math.random() * bits.length)];
+    }
 }
