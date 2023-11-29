@@ -48,11 +48,20 @@ class Renderer {
         }
     }
 
+    private renderDiagonals(sudoku: Sudoku, frame: Frame): void {
+        for (let diagonal of sudoku.regions.diagonals) {
+            frame.canvas.addLine1d(diagonal, LineStyle.styles.diagonals, 0, 0, sudoku.size);
+        }
+    }
+
     /**
      * Render state inside already existing Frame.
      */
     public render(state: State, frame: Frame): void {
         this.renderBasic(state, state.sudoku, frame);
+        if (state.sudoku.regions.hasDiagonals) {
+            this.renderDiagonals(state.sudoku, frame);
+        }
         frame.update();
     }
 

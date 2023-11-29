@@ -10,6 +10,8 @@ class Main {
 
         // GraphicsTests.testSolver();
         // GraphicsTests.testBuildSolution();
-        GraphicsTests.testBuildTask();
+        // GraphicsTests.testBuildTask();
+
+        GraphicsTests.testCanvas();
     }
 }

@@ -5,11 +5,12 @@ class Frame {
     public readonly height: number; // number of rows
     public readonly width: number; // number of columns
 
-    private readonly cellSize: number; // size of td element
+    public readonly cellSize: number; // size of td element
 
     private readonly table: HTMLElement;
 
     private readonly cells: Cell[][];
+    public readonly canvas: Canvas;
 
     /**
      * @param height Number of rows
@@ -38,6 +39,8 @@ class Frame {
                 this.cells[y].push(cell);
             }
         }
+
+        this.canvas = new Canvas(this, this.table);
     }
 
     public getCell(y: number, x: number): Cell {
@@ -54,5 +57,6 @@ class Frame {
                 this.cells[y][x].updateCellSize();
             }
         }
+        this.canvas.update();
     }
 }

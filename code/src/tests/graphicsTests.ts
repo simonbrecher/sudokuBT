@@ -168,4 +168,27 @@ class GraphicsTests {
             Renderer.renderer.renderNew(sudoku.task);
         }
     }
+
+    /**
+     * Test drawing lines to canvas + test drawing lines for diagonal sudoku
+     */
+    public static testCanvas(): void {
+        let rectangleHeight = 3;
+        let rectangleWidth = 3;
+        let size = rectangleHeight * rectangleWidth;
+        let sudoku = new Sudoku(size);
+        sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
+
+        Builder.builder.build(sudoku);
+        let frame = Renderer.renderer.renderNew(sudoku.task);
+
+        frame.canvas.addLine([{ y: 0, x: 0 }, { y: 1, x: 1 }, { y: 1, x: 2 }], LineStyle.styles.red);
+        frame.canvas.addLine([{ y: 5, x: 0 }, { y: 5, x: 1 }, { y: 5, x: 5 }], LineStyle.styles.orange);
+        frame.canvas.update();
+
+        sudoku.regions.hasDiagonals = true;
+        Builder.builder.build(sudoku);
+        Renderer.renderer.renderNew(sudoku.solution);
+        Renderer.renderer.renderNew(sudoku.task);
+    }
 }

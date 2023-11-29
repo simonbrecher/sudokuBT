@@ -7,7 +7,7 @@
 .puzzle {
     cursor: default; user-select: none;
     font-family: monospace; background-color: #FFF; border-collapse: collapse;
-    margin-top: 2px;
+    position: relative; margin-top: 2px;
 }
 
 /* --height and --width refer to size of td */
@@ -54,3 +54,9 @@
     height: calc(100% / var(--inner-count-1d)); width: calc(100% / var(--inner-count-1d));
     display: flex; justify-content: center; align-items: center;
 }
+
+.canvas {
+    position: absolute; height: calc(100% + 1px); width: calc(100% + 2px); margin-left: -1px; box-sizing: border-box;
+}
+
+.display-none { display: none; }
