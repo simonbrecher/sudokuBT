@@ -87,4 +87,17 @@ class Solver {
             progress = state.getExtraBitCount();
         }
     }
+
+    /**
+     * Count number of solutions in unsolved state
+     * @return
+     * - 0: 0 solutions exist
+     * - 1: 1 solution exists               (unlike State.countSolutions() we know it cannot be 0)
+     * - 2: 0, 1 or more solutions exist
+     */
+    public countSolutionsUnsolved(state: State): number {
+        let copy = state.deepcopy();
+        this.solve(copy);
+        return copy.countSolutions();
+    }
 }

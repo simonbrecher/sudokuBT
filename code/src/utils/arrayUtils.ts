@@ -39,4 +39,13 @@ class ArrayUtils {
             output.push(value);
         }
     }
+
+    public static shuffle1d(array: any[]): void {
+        for (let i = 1; i < array.length; i++) {
+            let randomNumber = Math.floor(Math.random() * (i + 1));
+            let temp = array[i];
+            array[i] = array[randomNumber];
+            array[randomNumber] = temp;
+        }
+    }
 }

@@ -140,10 +140,32 @@ class GraphicsTests {
         let rectangleWidth = 3;
         let size = rectangleHeight * rectangleWidth;
         let sudoku = new Sudoku(size);
+        sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
         for (let i = 0; i < 1; i++) {
-            sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
             Builder.builder.createSolution(sudoku);
             Renderer.renderer.renderNew(sudoku.solution);
+        }
+    }
+
+    /**
+     * Test creating sudoku solution and task
+     */
+    public static testBuildTask(): void {
+        let rectangleHeight = 3;
+        let rectangleWidth = 3;
+        let size = rectangleHeight * rectangleWidth;
+        let sudoku = new Sudoku(size);
+        sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
+        for (let i = 0; i < 1; i++) {
+            Builder.builder.createSolution(sudoku);
+            Builder.builder.createTask(sudoku);
+            Renderer.renderer.renderNew(sudoku.solution);
+            Renderer.renderer.renderNew(sudoku.task);
+        }
+        for (let i = 0; i < 1; i++) {
+            Builder.builder.build(sudoku);
+            Renderer.renderer.renderNew(sudoku.solution);
+            Renderer.renderer.renderNew(sudoku.task);
         }
     }
 }

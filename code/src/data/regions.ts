@@ -87,7 +87,7 @@ class Regions {
         this._diagonals = [[], []];
         for (let i = 0; i < this.sudoku.size; i++) {
             this._diagonals[0].push(i * (this.sudoku.size + 1));
-            this._diagonals[1].push(i * (this.sudoku.size + 1));
+            this._diagonals[1].push((i + 1) * (this.sudoku.size - 1));
         }
     }
 
