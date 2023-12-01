@@ -35,14 +35,14 @@
 <body>
 
 <div id="page-wrapper">
-    <div id="left-menu" class="menu">
+    <div class="menu">
         <div id="menu-button-resize" class="menu-button" onclick="EditorMain.pressedResizeButton();">Resize</div>
         <div id="menu-button-clear" class="menu-button" onclick="EditorMain.pressedClearButton();">Clear</div>
         <div id="menu-button-regions" class="menu-button" onclick="EditorMain.pressedRegionsButton();">Regions</div>
         <div id="menu-button-view" class="menu-button" onclick="EditorMain.pressedViewButton();">View</div>
     </div>
     <div id="container"></div>
-    <div id="right-menu" class="menu">
+    <div class="menu">
         <section id="menu-section-regions" class="menu-section">
             <div id="menu-button-regions-rectangular" class="menu-button" onclick="EditorMain.pressedRegionsRectangularButton();">Rectangular</div>
             <div id="menu-button-regions-none" class="menu-button" onclick="EditorMain.pressedRegionsNoneButton();">None</div>
@@ -55,7 +55,24 @@
     </div>
 </div>
 
+<div id="confirm-window-resize" class="confirm-window">
+    <div class="confirm-text">Choose size of new sudoku</div>
+    <div class="confirm-input-wrapper">
+        <input type="number" id="resize-value" class="confirm-input-number" value="9" oninput="validateInputLength(this, 2);">
+    </div>
+    <div class="confirm-window-button-wrapper">
+        <div class="confirm" onclick="EditorMain.confirmResize();">Confirm</div>
+        <div class="cancel" onclick="EditorMain.cancelResize();">Cancel</div>
+    </div>
+</div>
+
 <script>
+    function validateInputLength(input, maximum) {
+        if (input.value.length > maximum) {
+            input.value = input.value.slice(0, maximum);
+        }
+    }
+
     EditorMain.main();
 </script>
 

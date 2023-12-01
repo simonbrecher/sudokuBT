@@ -1,4 +1,9 @@
 class EditorMain {
+    private static readonly MIN_SIZE = 3;
+    private static readonly MAX_SIZE = 25;
+    private static readonly MAX_BOARD_SIZE = 600;
+    private static readonly MAX_CELL_SIZE = 70;
+
     private static size: number = 9; // size of sudoku
 
     private static frame: Frame = null!;
@@ -11,7 +16,12 @@ class EditorMain {
      * Create Frame object which will be used to render sudoku
      */
     private static createFrame(): void {
-        let cellSize = Math.min(70, 600 / Math.floor(this.size));
+        if (this.frame !== null) {
+            this.frame.delete();
+            this.frame = null!;
+        }
+
+        let cellSize = Math.min(this.MAX_CELL_SIZE, this.MAX_BOARD_SIZE / this.size);
         this.frame = new Frame(this.size, this.size, cellSize, "container");
 
         this.emptySudoku = new Sudoku(this.size);
@@ -69,11 +79,42 @@ class EditorMain {
         return isUpdated;
     }
 
+    public static viewConfirmWindow(windowName: string): void {
+        let confirmWindow = document.getElementById(`confirm-window-${windowName}`);
+        confirmWindow?.classList.add("selected");
+    }
+
+    public static hideConfirmWindow(windowName: string): void {
+        let confirmWindow = document.getElementById(`confirm-window-${windowName}`);
+        confirmWindow?.classList.remove("selected");
+    }
+
     public static pressedResizeButton(): void {
         let isClicked = this.setSelectedMenuButton("resize", true, true);
         if (isClicked) {
+            this.viewConfirmWindow("resize");
             console.log("resize");
         }
+    }
+
+    public static confirmResize(): void {
+        let resizeInput = <HTMLInputElement>document.getElementById("resize-value");
+        if (resizeInput !== null) {
+            let newSize = parseInt(resizeInput.value);
+            this.size = Math.max(this.MIN_SIZE, Math.min(this.MAX_SIZE, newSize));
+            if (newSize === this.size) {
+                console.log("resize-confirm");
+                this.hideConfirmWindow("resize");
+                this.createFrame();
+            } else {
+                resizeInput.value = `${this.size}`;
+            }
+        }
+    }
+
+    public static cancelResize(): void {
+        this.hideConfirmWindow("resize");
+        console.log("resize-cancel");
     }
 
     public static pressedClearButton(): void {

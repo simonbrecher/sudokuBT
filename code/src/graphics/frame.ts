@@ -59,4 +59,8 @@ class Frame {
         }
         this.canvas.update();
     }
+
+    public delete(): void {
+        this.table.remove();
+    }
 }
