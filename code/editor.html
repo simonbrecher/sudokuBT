@@ -34,7 +34,18 @@
 
 <body>
 
-<div id="container" class="puzzle-container"></div>
+<div id="page-wrapper">
+    <div id="left-menu" class="menu">
+        <div id="menu-button-resize" onclick="EditorMain.pressedResizeButton();">Resize</div>
+        <div id="menu-button-clear" onclick="EditorMain.pressedClearButton();">Clear</div>
+        <div id="menu-button-regions" onclick="EditorMain.pressedRegionsButton();">Regions</div>
+        <div id="menu-button-view" onclick="EditorMain.pressedViewButton();">View</div>
+    </div>
+    <div id="container"></div>
+    <div id="right-menu" class="menu">
+
+    </div>
+</div>
 
 <script>
     EditorMain.main();
