@@ -36,14 +36,22 @@
 
 <div id="page-wrapper">
     <div id="left-menu" class="menu">
-        <div id="menu-button-resize" onclick="EditorMain.pressedResizeButton();">Resize</div>
-        <div id="menu-button-clear" onclick="EditorMain.pressedClearButton();">Clear</div>
-        <div id="menu-button-regions" onclick="EditorMain.pressedRegionsButton();">Regions</div>
-        <div id="menu-button-view" onclick="EditorMain.pressedViewButton();">View</div>
+        <div id="menu-button-resize" class="menu-button" onclick="EditorMain.pressedResizeButton();">Resize</div>
+        <div id="menu-button-clear" class="menu-button" onclick="EditorMain.pressedClearButton();">Clear</div>
+        <div id="menu-button-regions" class="menu-button" onclick="EditorMain.pressedRegionsButton();">Regions</div>
+        <div id="menu-button-view" class="menu-button" onclick="EditorMain.pressedViewButton();">View</div>
     </div>
     <div id="container"></div>
     <div id="right-menu" class="menu">
-
+        <section id="menu-section-regions" class="menu-section">
+            <div id="menu-button-regions-rectangular" class="menu-button" onclick="EditorMain.pressedRegionsRectangularButton();">Rectangular</div>
+            <div id="menu-button-regions-none" class="menu-button" onclick="EditorMain.pressedRegionsNoneButton();">None</div>
+            <div id="menu-button-regions-jigsaw" class="menu-button" onclick="EditorMain.pressedRegionsJigsawButton();">Jigsaw</div>
+            <div id="menu-button-regions-view" class="menu-button" onclick="EditorMain.pressedRegionsViewButton();">View</div>
+        </section>
+        <section id="menu-section-view" class="menu-section">
+            <div id="menu-button-view-nothing" class="menu-button">...</div>
+        </section>
     </div>
 </div>
 
