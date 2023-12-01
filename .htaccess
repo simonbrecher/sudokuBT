@@ -1,2 +1,4 @@
 RewriteEngine On
 RewriteRule ^((?!code/)(\w+/)*\w+\.\w+) code/$1 [L]
+RewriteRule ^$ code/index.html [L]
+RewriteRule ^(index|debug|editor)$ code/$1.html [L]

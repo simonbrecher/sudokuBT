@@ -1,0 +1,5 @@
+@media not print {
+    body { background-color: #E5E5E5; }
+}
+
+.puzzle-container { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 5px; }

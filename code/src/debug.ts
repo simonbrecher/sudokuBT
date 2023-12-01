@@ -1,6 +1,6 @@
-class Main {
+class Debug {
     /**
-     * This method is called by <script><script/> in index.html
+     * This method is called by <script><script/> in debug.html
      */
     public static main(): void {
         // let frame = GraphicsTests.testBasicGraphicOfCell(10, 9, 2, 3);
