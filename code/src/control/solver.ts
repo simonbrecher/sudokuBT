@@ -13,12 +13,12 @@ class Solver {
         let once = 0;
         for (let i = 0; i < binaries.length; i++) {
             binaries[i] &= ~ once;
-            if (BinaryUtils.countBits32(binaries[i]) === 1) {
+            if (BinaryUtils.has1bit32(binaries[i])) {
                 once |= binaries[i];
             }
         }
         for (let i = 0; i < binaries.length; i++) {
-            if (BinaryUtils.countBits32(binaries[i]) !== 1) {
+            if (! BinaryUtils.has1bit32(binaries[i])) {
                 binaries[i] &= ~ once;
             }
         }
