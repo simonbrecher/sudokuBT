@@ -29,6 +29,7 @@ class Renderer {
                 let cell = frame.getCell(y, x);
                 cell.setText(this.binaryToCharacters(state.board[y * sudoku.size + x], sudoku.fullBinary));
                 cell.setBorder("normal", Cell.DIRECTIONS.all);
+                cell.setBackgroundColor("#FFF");
             }
         }
 

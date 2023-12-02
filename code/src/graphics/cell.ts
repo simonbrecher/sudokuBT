@@ -15,6 +15,7 @@ class Cell {
     private readonly cellElement: HTMLElement;
         private cellHeight: string = "";
         private cellWidth: string = "";
+        private backgroundColor: string = "";
     private textWrapperElement: HTMLElement | null = null;
         private textWrapperCount: string = "";
         private textElements: HTMLElement[] = [];
@@ -131,6 +132,16 @@ class Cell {
                 let textWrapperCount = isBig ? "single-text" : "multiple-text";
                 this.textWrapperCount = GraphicsUtils.updateCssClass(this.textWrapperElement, this.textWrapperCount, textWrapperCount);
             }
+        }
+    }
+
+    /**
+     * Set background color to cell element
+     */
+    public setBackgroundColor(backgroundColor: string): void {
+        if (backgroundColor !== this.backgroundColor) {
+            this.cellElement.style.setProperty("--background-color", backgroundColor);
+            this.backgroundColor = backgroundColor;
         }
     }
 }
