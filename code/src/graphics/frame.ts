@@ -7,7 +7,7 @@ class Frame {
 
     public readonly cellSize: number; // size of td element
 
-    private readonly table: HTMLElement;
+    public readonly table: HTMLElement;
 
     private readonly cells: Cell[][];
     public readonly canvas: Canvas;

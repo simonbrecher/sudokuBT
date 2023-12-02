@@ -27,6 +27,51 @@ class PositionUtils {
     }
 
     /**
+     * Does opposite to what method PositionUtils.regionsToMatrix() does
+     */
+    public static matrixToRegions(matrix: number[]): number[][] {
+        let regions = ArrayUtils.createArray2d(Math.max(...matrix) + 1, 0, null);
+        for (let i = 0; i < matrix.length; i++) {
+            if (matrix[i] !== -1) {
+                regions[matrix[i]].push([i]);
+            }
+        }
+        return regions;
+    }
+
+    /**
+     * Convert regions matrix into regions matrix where every region is one area of connectivity.
+     * Indexes have ids 0, 1 ... ; -1 is value for no region
+     */
+    public static countConnectedAreas(matrix: number[], height: number, width: number, directions: { y: number, x: number }[]): number[] {
+        let output = ArrayUtils.createArray1d(height * width, -1);
+        let regionIndex = 0;
+        for (let startY = 0; startY < height; startY++) {
+            for (let startX = 0; startX < width; startX++) {
+                if (matrix[startY * width + startX] !== -1 && output[startY * width + startX] === -1) {
+                    let stack = [{ y: startY, x: startX }];
+                    while (stack.length > 0) {
+                        let start = stack.pop();
+                        let startIndex = start!.y * width + start!.x;
+                        if (output[startIndex] === -1) {
+                            output[startIndex] = regionIndex;
+                            for (let direction of directions) {
+                                let next = { y: start!.y + direction.y, x: start!.x + direction.x };
+                                let nextIndex = next.y * width + next.x;
+                                if (PositionUtils.isInside(next.y, next.x, height, width) && matrix[startIndex] === matrix[nextIndex]) {
+                                    stack.push(next);
+                                }
+                            }
+                        }
+                    }
+                    regionIndex ++;
+                }
+            }
+        }
+        return output;
+    }
+
+    /**
      * return if value in matrix on positions (y1 * width + x1) and (y2 * width + x2) is same
      * (y1 * width + x1) MUST BE INSIDE THE MATRIX.
      * return false if (y2 * width + x2) is outside the matrix
