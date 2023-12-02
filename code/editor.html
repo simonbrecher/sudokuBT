@@ -44,9 +44,18 @@
     <div id="container"></div>
     <div class="menu">
         <section id="menu-section-regions" class="menu-section">
-            <div id="menu-button-regions-rectangular" class="menu-button" onclick="EditorMain.pressedRegionsRectangularButton();">Rectangular</div>
-            <div id="menu-button-regions-none" class="menu-button" onclick="EditorMain.pressedRegionsNoneButton();">None</div>
-            <div id="menu-button-regions-jigsaw" class="menu-button" onclick="EditorMain.pressedRegionsJigsawButton();">Jigsaw</div>
+            <div id="menu-button-regions-rectangular" class="menu-button" onclick="EditorMain.pressedRegionsRectangularButton();">
+                <div>Rectangular</div>
+                <div id="check-regions-rectangular" class="check"></div>
+            </div>
+            <div id="menu-button-regions-none" class="menu-button" onclick="EditorMain.pressedRegionsNoneButton();">
+                <div>None</div>
+                <div id="check-regions-none" class="check"></div>
+            </div>
+            <div id="menu-button-regions-jigsaw" class="menu-button" onclick="EditorMain.pressedRegionsJigsawButton();">
+                <div>Jigsaw</div>
+                <div id="check-regions-jigsaw" class="check"></div>
+            </div>
             <div id="menu-button-regions-view" class="menu-button" onclick="EditorMain.pressedRegionsViewButton();">View</div>
         </section>
         <section id="menu-section-view" class="menu-section">
@@ -58,11 +67,22 @@
 <div id="confirm-window-resize" class="confirm-window">
     <div class="confirm-text">Choose size of new sudoku</div>
     <div class="confirm-input-wrapper">
-        <input type="number" id="resize-value" class="confirm-input-number" value="9" oninput="validateInputLength(this, 2);">
+        <input type="number" id="resize-value" value="9" oninput="validateInputLength(this, 2);">
     </div>
     <div class="confirm-window-button-wrapper">
         <div class="confirm" onclick="EditorMain.confirmResize();">Confirm</div>
         <div class="cancel" onclick="EditorMain.cancelResize();">Cancel</div>
+    </div>
+</div>
+
+<div id="confirm-window-regions-rectangular" class="confirm-window">
+    <div class="confirm-text">Choose size of rectangles</div>
+    <div class="confirm-input-wrapper">
+        <select id="regions-rectangular-value"></select>
+    </div>
+    <div class="confirm-window-button-wrapper">
+        <div class="confirm" onclick="EditorMain.confirmRegionsRectangular();">Confirm</div>
+        <div class="cancel" onclick="EditorMain.cancelRegionsRectangular();">Cancel</div>
     </div>
 </div>
 

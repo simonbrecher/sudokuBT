@@ -8,9 +8,13 @@ class EditorMain {
 
     private static frame: Frame = null!;
 
-    private static emptySudoku: Sudoku; // sudoku without regions with graphic and with both empty states
+    private static sudoku: Sudoku;
 
     private static selectedMenuButton: [string | null, string | null] = [null, null];
+
+    private static renderSudoku(): void {
+        Renderer.renderer.render(this.sudoku.solution, this.frame);
+    }
 
     /**
      * Create Frame object which will be used to render sudoku
@@ -24,9 +28,11 @@ class EditorMain {
         let cellSize = Math.min(this.MAX_CELL_SIZE, this.MAX_BOARD_SIZE / this.size);
         this.frame = new Frame(this.size, this.size, cellSize, "container");
 
-        this.emptySudoku = new Sudoku(this.size);
+        this.sudoku = new Sudoku(this.size);
 
-        Renderer.renderer.render(this.emptySudoku.solution, this.frame);
+        this.renderSudoku();
+
+        this.refreshRegionsChecks();
     }
 
     /**
@@ -35,6 +41,7 @@ class EditorMain {
     public static main(): void {
         this.createFrame();
         this.setSelectedMenuButton("view", true, false);
+        this.maybeRemoveRectangularRegionsButton();
     }
 
     /**
@@ -79,7 +86,26 @@ class EditorMain {
         return isUpdated;
     }
 
-    public static viewConfirmWindow(windowName: string): void {
+    private static setCheckValue(checkName: string, value: boolean): void {
+        let check = document.getElementById(`check-${checkName}`);
+        if (value) {
+            check?.classList.add("selected");
+        } else {
+            check?.classList.remove("selected");
+        }
+    }
+
+    private static refreshRegionsChecks(): void {
+        let isNone = ! this.sudoku.regions.hasRegions();
+        let isRectangular = this.sudoku.regions.isRectangular();
+        let isJigsaw = false;
+
+        this.setCheckValue("regions-none", isNone);
+        this.setCheckValue("regions-rectangular", isRectangular);
+        this.setCheckValue("regions-jigsaw", isJigsaw);
+    }
+
+    public static showConfirmWindow(windowName: string): void {
         let confirmWindow = document.getElementById(`confirm-window-${windowName}`);
         confirmWindow?.classList.add("selected");
     }
@@ -92,7 +118,7 @@ class EditorMain {
     public static pressedResizeButton(): void {
         let isClicked = this.setSelectedMenuButton("resize", true, true);
         if (isClicked) {
-            this.viewConfirmWindow("resize");
+            this.showConfirmWindow("resize");
             console.log("resize");
         }
     }
@@ -106,6 +132,7 @@ class EditorMain {
                 console.log("resize-confirm");
                 this.hideConfirmWindow("resize");
                 this.createFrame();
+                this.maybeRemoveRectangularRegionsButton();
             } else {
                 resizeInput.value = `${this.size}`;
             }
@@ -124,11 +151,49 @@ class EditorMain {
         }
     }
 
+    private static maybeRemoveRectangularRegionsButton(): void {
+        let isPrime = true;
+        for (let i = 2; i * i <= this.size; i++) {
+            if (Math.floor(this.size / i) * i === this.size) {
+                isPrime = false;
+                break;
+            }
+        }
+        console.log("maybe remove", this.size, isPrime);
+        let button = document.getElementById("menu-button-regions-rectangular");
+        if (isPrime) {
+            button?.classList.add("display-none");
+        } else {
+            button?.classList.remove("display-none");
+        }
+    }
+
     public static pressedRegionsButton(): void {
         let isClicked = this.setSelectedMenuButton("regions", true, false);
         this.setSelectedMenuButton("regions-view", false, false);
+        this.setRegionsNoneToSudoku();
         if (isClicked) {
             console.log("regions");
+        }
+    }
+
+    private static setRegionsRectangularSelectOptions(): void {
+        let select = <HTMLSelectElement>document.getElementById("regions-rectangular-value");
+        while (select.options.length > 0) {
+            select.options.remove(0);
+        }
+
+        for (let rectangleHeight = 2; rectangleHeight < this.size; rectangleHeight++) {
+            let rectangleWidth = Math.floor(this.size / rectangleHeight);
+            if (rectangleHeight * rectangleWidth === this.size) {
+                let option = document.createElement("option");
+                option.value = `${rectangleHeight}`;
+                option.text = `${rectangleHeight}x${rectangleWidth}`;
+                select.appendChild(option);
+                if (rectangleHeight <= rectangleWidth) {
+                    select.value = `${rectangleHeight}`;
+                }
+            }
         }
     }
 
@@ -136,8 +201,35 @@ class EditorMain {
         let isClicked = this.setSelectedMenuButton("regions-rectangular", false, true);
         this.setSelectedMenuButton("regions-view", false, false);
         if (isClicked) {
+            this.setRegionsRectangularSelectOptions();
+            this.showConfirmWindow("regions-rectangular");
             console.log("regions-rectangular");
         }
+    }
+
+    private static setRegionsRectangularToSudoku(): void {
+        let select = <HTMLSelectElement>document.getElementById("regions-rectangular-value");
+        let rectangleHeight = parseInt(select.value);
+        let rectangleWidth = this.size / rectangleHeight;
+        this.sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
+        this.refreshRegionsChecks();
+    }
+
+    public static confirmRegionsRectangular(): void {
+        this.hideConfirmWindow("regions-rectangular");
+        this.setRegionsRectangularToSudoku();
+        this.renderSudoku();
+        console.log("regions-rectangular-confirm");
+    }
+
+    public static cancelRegionsRectangular(): void {
+        this.hideConfirmWindow("regions-rectangular");
+        console.log("regions-rectangular-cancel");
+    }
+
+    private static setRegionsNoneToSudoku(): void {
+        this.sudoku.regions.setNoRegions();
+        this.refreshRegionsChecks();
     }
 
     public static pressedRegionsNoneButton(): void {
@@ -146,6 +238,8 @@ class EditorMain {
         if (isClicked) {
             console.log("regions-none");
         }
+        this.setRegionsNoneToSudoku();
+        this.renderSudoku();
     }
 
     public static pressedRegionsJigsawButton(): void {

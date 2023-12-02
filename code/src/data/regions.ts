@@ -34,7 +34,7 @@ class Regions {
     }
     private _rectangles: { height: number, width: number } | null = null;
     public isRectangular(): boolean {
-        return this._rectangles !== null;
+        return this._regions !== null && this._rectangles !== null;
     }
     public get rectangleHeight(): number {
         Regions.throwAccessErrorIf(this._rectangles === null, "Regions.rectangleHeight", "Regions._rectangles === null");
