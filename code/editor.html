@@ -13,6 +13,8 @@
 
     <script src="src/editor.js"></script>
 
+    <script src="src/editor/jigsawEditor.js"></script>
+
     <script src="src/control/builder.js"></script>
     <script src="src/control/renderer.js"></script>
     <script src="src/control/solver.js"></script>
@@ -36,27 +38,27 @@
 
 <div id="page-wrapper">
     <div class="menu">
-        <div id="menu-button-resize" class="menu-button" onclick="EditorMain.pressedResizeButton();">Resize</div>
-        <div id="menu-button-clear" class="menu-button" onclick="EditorMain.pressedClearButton();">Clear</div>
-        <div id="menu-button-regions" class="menu-button" onclick="EditorMain.pressedRegionsButton();">Regions</div>
-        <div id="menu-button-view" class="menu-button" onclick="EditorMain.pressedViewButton();">View</div>
+        <div id="menu-button-resize" class="menu-button" onclick="MainEditor.pressedResizeButton();">Resize</div>
+        <div id="menu-button-clear" class="menu-button" onclick="MainEditor.pressedClearButton();">Clear</div>
+        <div id="menu-button-regions" class="menu-button" onclick="MainEditor.pressedRegionsButton();">Regions</div>
+        <div id="menu-button-view" class="menu-button" onclick="MainEditor.pressedViewButton();">View</div>
     </div>
     <div id="container"></div>
     <div class="menu">
         <section id="menu-section-regions" class="menu-section">
-            <div id="menu-button-regions-rectangular" class="menu-button" onclick="EditorMain.pressedRegionsRectangularButton();">
+            <div id="menu-button-regions-rectangular" class="menu-button" onclick="MainEditor.pressedRegionsRectangularButton();">
                 <div>Rectangular</div>
                 <div id="check-regions-rectangular" class="check"></div>
             </div>
-            <div id="menu-button-regions-none" class="menu-button" onclick="EditorMain.pressedRegionsNoneButton();">
+            <div id="menu-button-regions-none" class="menu-button" onclick="MainEditor.pressedRegionsNoneButton();">
                 <div>None</div>
                 <div id="check-regions-none" class="check"></div>
             </div>
-            <div id="menu-button-regions-jigsaw" class="menu-button" onclick="EditorMain.pressedRegionsJigsawButton();">
+            <div id="menu-button-regions-jigsaw" class="menu-button" onclick="MainEditor.pressedRegionsJigsawButton();">
                 <div>Jigsaw</div>
                 <div id="check-regions-jigsaw" class="check"></div>
             </div>
-            <div id="menu-button-regions-view" class="menu-button" onclick="EditorMain.pressedRegionsViewButton();">View</div>
+            <div id="menu-button-regions-view" class="menu-button" onclick="MainEditor.pressedRegionsViewButton();">View</div>
         </section>
         <section id="menu-section-view" class="menu-section">
             <div id="menu-button-view-nothing" class="menu-button">...</div>
@@ -70,8 +72,8 @@
         <input type="number" id="resize-value" value="9" oninput="validateInputLength(this, 2);">
     </div>
     <div class="confirm-window-button-wrapper">
-        <div class="confirm" onclick="EditorMain.confirmResize();">Confirm</div>
-        <div class="cancel" onclick="EditorMain.cancelResize();">Cancel</div>
+        <div class="confirm" onclick="MainEditor.confirmResize();">Confirm</div>
+        <div class="cancel" onclick="MainEditor.cancelResize();">Cancel</div>
     </div>
 </div>
 
@@ -81,8 +83,8 @@
         <select id="regions-rectangular-value"></select>
     </div>
     <div class="confirm-window-button-wrapper">
-        <div class="confirm" onclick="EditorMain.confirmRegionsRectangular();">Confirm</div>
-        <div class="cancel" onclick="EditorMain.cancelRegionsRectangular();">Cancel</div>
+        <div class="confirm" onclick="MainEditor.confirmRegionsRectangular();">Confirm</div>
+        <div class="cancel" onclick="MainEditor.cancelRegionsRectangular();">Cancel</div>
     </div>
 </div>
 
@@ -93,7 +95,7 @@
         }
     }
 
-    EditorMain.main();
+    MainEditor.main();
 </script>
 
 </body>

@@ -1,47 +1,43 @@
-type JigsawMouseEventType = "mousedown" | "mouseup" | "mousemove" | "mouseleave" | "contextmenu";
-
-class EditorMain {
+class MainEditor {
     private static readonly MIN_SIZE = 3;
     private static readonly MAX_SIZE = 25;
     private static readonly MAX_BOARD_SIZE = 600;
     private static readonly MAX_CELL_SIZE = 70;
 
-    private static readonly jigsawColor = {
-        inRegion: "#FFF",
-        inNextRegion: "#FA0",
-        inNoRegion: "#CCC",
+    public static size: number = 9; // size of sudoku
+
+    public static frame: Frame = null!;
+
+    public static sudoku: Sudoku;
+
+    private static menuPosition: [string | null, string | null] = [null, null];
+
+    /**
+     * This method is called by <script><script/> in editor.html
+     */
+    public static main(): void {
+        this.createFrame();
+        this.render();
+        this.changeMenuPosition("view", null);
     }
 
-    private static size: number = 9; // size of sudoku
-
-    private static frame: Frame = null!;
-
-    private static sudoku: Sudoku;
-
-    private static jigsawRegionsSudoku: Sudoku;
-    private static regionsMatrix: number[];
-    private static nextRegion: Set<number> = new Set<number>();
-
-    private static jigsawEventListeners: [JigsawMouseEventType, (event: MouseEvent) => void][] = [
-        ["mousedown", (event: MouseEvent) => this.jigsawMouseDownEventListener(event)],
-        ["mouseup", (event: MouseEvent) => this.jigsawMouseUpEventListener(event)],
-        ["mousemove", (event: MouseEvent) => this.jigsawMouseMoveEventListener(event)],
-        ["mouseleave", (event: MouseEvent) => this.jigsawMouseUpEventListener(event)],
-        ["contextmenu", (event: MouseEvent) => event.preventDefault()],
-    ];
-
-    private static selectedMenuButton: [string | null, string | null] = [null, null];
-
+    /**
+     * Render sudoku normally
+     */
     private static renderSudoku(): void {
         Renderer.renderer.render(this.sudoku.solution, this.frame);
     }
 
+    /**
+     * Render sudoku
+     */
     private static render(): void {
-        if (this.selectedMenuButton[1] === "menu-button-regions-jigsaw") {
-            this.renderJigsaw();
+        if (this.menuPosition[1] === "regions-jigsaw") {
+            JigsawEditor.renderSudoku();
         } else {
             this.renderSudoku();
         }
+        this.updateChecks();
     }
 
     /**
@@ -58,108 +54,85 @@ class EditorMain {
 
         this.sudoku = new Sudoku(this.size);
 
-        this.jigsawRegionsSudoku = new Sudoku(this.size);
-        this.regionsMatrix = this.jigsawRegionsSudoku.regions.getRegionsMatrix();
+        JigsawEditor.onCreateFrame();
 
-        this.render();
-        this.refreshRegionsChecks();
-        if (this.selectedMenuButton[1] === "menu-button-regions-jigsaw") {
-            this.addRegionsJigsawEventListeners();
+        this.checkHideButtons();
+        this.setRegionsRectangularSelectOptions();
+
+        if (this.menuPosition[1] === "regions-jigsaw") {
+            JigsawEditor.addEventListeners();
         }
     }
 
     /**
-     * This method is called by <script><script/> in editor.html
+     * Add temporary .selected class to menu button
      */
-    public static main(): void {
-        this.createFrame();
-        this.setSelectedMenuButton("view", true, false);
-        this.maybeRemoveRectangularRegionsButton();
+    private static addTemporaryButtonFocus(buttonName: string): void {
+        let button = document.getElementById(`menu-button-${buttonName}`);
+        button?.classList.add("selected");
+        setTimeout(() => {
+            button?.classList.remove("selected");
+        }, 220);
     }
 
     /**
-     * Control .selected CSS class for menu buttons
-     * @param buttonName HTML id = `menu-button-${buttonName}`
-     * @param isLeft is it in the left menu
-     * @param isTemporary Is the change temporary?
+     * Update graphics for moving in menu to different button.
+     * @param leftPosition new position in left menu
+     * @param rightPosition new position in right menu
      */
-    private static setSelectedMenuButton(buttonName: string, isLeft: boolean, isTemporary: boolean): boolean {
-        if (buttonName === "regions-jigsaw") { // TODO: figure out better organization of code
-            this.addRegionsJigsawEventListeners();
-        } else {
-            this.removeRegionsJigsawEventListeners();
+    private static changeMenuPosition(leftPosition: string, rightPosition: string | null): boolean {
+        let [previousLeftPosition, previousRightPosition] = this.menuPosition;
+
+        if (leftPosition !== previousLeftPosition) {
+            if (previousLeftPosition !== null) {
+                GraphicsUtils.removeClass(`menu-button-${previousLeftPosition}`, "selected");
+                GraphicsUtils.removeClass(`menu-section-${previousLeftPosition}`, "selected");
+            }
+            GraphicsUtils.addClass(`menu-button-${leftPosition}`, "selected");
+            GraphicsUtils.addClass(`menu-section-${leftPosition}`, "selected");
         }
-
-        let buttonId = `menu-button-${buttonName}`;
-        let menuId = isLeft ? 0 : 1;
-        let isUpdated = this.selectedMenuButton[menuId] !== buttonId;
-
-        if (isUpdated) {
-            if (this.selectedMenuButton[menuId] !== null && ! isTemporary) {
-                let button = document.getElementById(this.selectedMenuButton[menuId]!);
-                button?.classList.remove("selected");
+        if (rightPosition !== previousRightPosition) {
+            if (previousRightPosition !== null) {
+                GraphicsUtils.removeClass(`menu-button-${previousRightPosition}`, "selected");
             }
-            let button = document.getElementById(buttonId);
-            button?.classList.add("selected");
-
-            if (! isTemporary) {
-                if (this.selectedMenuButton[menuId] !== null) {
-                    let oldSectionId = this.selectedMenuButton[menuId]!.replace("menu-button", "menu-section");
-                    let section = document.getElementById(oldSectionId);
-                    section?.classList.remove("selected");
-                }
-                let sectionId = `menu-section-${buttonName}`;
-                let section = document.getElementById(sectionId);
-                section?.classList.add("selected");
-            }
-
-            if (isTemporary) {
-                setTimeout(() => {
-                    button?.classList.remove("selected");
-                }, 220);
-            } else {
-                this.selectedMenuButton[menuId] = buttonId;
+            if (rightPosition !== null) {
+                GraphicsUtils.addClass(`menu-button-${rightPosition}`, "selected");
             }
         }
 
-        return isUpdated;
+        if (leftPosition !== previousLeftPosition) {
+
+        }
+
+        if (rightPosition !== previousRightPosition) {
+            if (rightPosition === "regions-jigsaw") {
+                JigsawEditor.addEventListeners();
+            } else if (previousRightPosition === "regions-jigsaw") {
+                JigsawEditor.removeEventListeners();
+            }
+        }
+
+        this.menuPosition = [leftPosition, rightPosition];
+
+        return leftPosition !== previousLeftPosition || rightPosition !== previousRightPosition;
     }
 
-    private static setCheckValue(checkName: string, value: boolean): void {
-        let check = document.getElementById(`check-${checkName}`);
-        if (value) {
-            check?.classList.add("selected");
-        } else {
-            check?.classList.remove("selected");
-        }
-    }
-
-    private static refreshRegionsChecks(): void {
+    /**
+     * Add or remove .selected class for all checks
+     */
+    public static updateChecks(): void {
         let isNone = ! this.sudoku.regions.hasRegions();
         let isRectangular = this.sudoku.regions.isRectangular();
         let isJigsaw = ! (isNone || isRectangular);
-
-        this.setCheckValue("regions-none", isNone);
-        this.setCheckValue("regions-rectangular", isRectangular);
-        this.setCheckValue("regions-jigsaw", isJigsaw);
-    }
-
-    public static showConfirmWindow(windowName: string): void {
-        let confirmWindow = document.getElementById(`confirm-window-${windowName}`);
-        confirmWindow?.classList.add("selected");
-    }
-
-    public static hideConfirmWindow(windowName: string): void {
-        let confirmWindow = document.getElementById(`confirm-window-${windowName}`);
-        confirmWindow?.classList.remove("selected");
+        GraphicsUtils.addOrRemoveClass("check-regions-none", "selected", isNone);
+        GraphicsUtils.addOrRemoveClass("check-regions-rectangular", "selected", isRectangular);
+        GraphicsUtils.addOrRemoveClass("check-regions-jigsaw", "selected", isJigsaw);
     }
 
     public static pressedResizeButton(): void {
-        let isClicked = this.setSelectedMenuButton("resize", true, true);
-        if (isClicked) {
-            this.showConfirmWindow("resize");
-            console.log("resize");
-        }
+        this.addTemporaryButtonFocus("resize");
+        GraphicsUtils.addClass("confirm-window-resize", "selected");
+        console.log("resize");
     }
 
     public static confirmResize(): void {
@@ -169,9 +142,9 @@ class EditorMain {
             this.size = Math.max(this.MIN_SIZE, Math.min(this.MAX_SIZE, newSize));
             if (newSize === this.size) {
                 console.log("resize-confirm");
-                this.hideConfirmWindow("resize");
+                GraphicsUtils.removeClass("confirm-window-resize", "selected");
                 this.createFrame();
-                this.maybeRemoveRectangularRegionsButton();
+                this.render();
             } else {
                 resizeInput.value = `${this.size}`;
             }
@@ -179,18 +152,19 @@ class EditorMain {
     }
 
     public static cancelResize(): void {
-        this.hideConfirmWindow("resize");
+        GraphicsUtils.removeClass("confirm-window-resize", "selected");
         console.log("resize-cancel");
     }
 
     public static pressedClearButton(): void {
-        let isClicked = this.setSelectedMenuButton("clear", true, true);
-        if (isClicked) {
-            console.log("clear");
-        }
+        this.addTemporaryButtonFocus("clear");
+        console.log("clear");
     }
 
-    private static maybeRemoveRectangularRegionsButton(): void {
+    /**
+     * Hide/show all buttons, that should be hidden
+     */
+    private static checkHideButtons(): void {
         let isPrime = true;
         for (let i = 2; i * i <= this.size; i++) {
             if (Math.floor(this.size / i) * i === this.size) {
@@ -198,21 +172,16 @@ class EditorMain {
                 break;
             }
         }
-        let button = document.getElementById("menu-button-regions-rectangular");
-        if (isPrime) {
-            button?.classList.add("display-none");
-        } else {
-            button?.classList.remove("display-none");
-        }
+        GraphicsUtils.addOrRemoveClass("menu-button-regions-rectangular", "display-none", isPrime);
     }
 
     public static pressedRegionsButton(): void {
-        let isClicked = this.setSelectedMenuButton("regions", true, false);
-        this.setSelectedMenuButton("regions-view", false, false);
+        let isClicked = this.changeMenuPosition("regions", "regions-view");
         this.setRegionsNoneToSudoku();
         if (isClicked) {
             console.log("regions");
         }
+        this.render();
     }
 
     private static setRegionsRectangularSelectOptions(): void {
@@ -236,13 +205,10 @@ class EditorMain {
     }
 
     public static pressedRegionsRectangularButton(): void {
-        let isClicked = this.setSelectedMenuButton("regions-rectangular", false, true);
-        this.setSelectedMenuButton("regions-view", false, false);
-        if (isClicked) {
-            this.setRegionsRectangularSelectOptions();
-            this.showConfirmWindow("regions-rectangular");
-            console.log("regions-rectangular");
-        }
+        this.addTemporaryButtonFocus("regions-rectangular");
+        this.changeMenuPosition("regions", "regions-view");
+        GraphicsUtils.addClass("confirm-window-regions-rectangular", "selected");
+        console.log("regions-rectangular");
     }
 
     private static setRegionsRectangularToSudoku(): void {
@@ -250,51 +216,34 @@ class EditorMain {
         let rectangleHeight = parseInt(select.value);
         let rectangleWidth = this.size / rectangleHeight;
         this.sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
-        this.refreshRegionsChecks();
     }
 
     public static confirmRegionsRectangular(): void {
-        this.hideConfirmWindow("regions-rectangular");
+        GraphicsUtils.removeClass("confirm-window-regions-rectangular", "selected");
+        this.changeMenuPosition("regions", "regions-view");
         this.setRegionsRectangularToSudoku();
-        this.render();
         console.log("regions-rectangular-confirm");
+        this.render();
     }
 
     public static cancelRegionsRectangular(): void {
-        this.hideConfirmWindow("regions-rectangular");
+        GraphicsUtils.removeClass("confirm-window-regions-rectangular", "selected");
         console.log("regions-rectangular-cancel");
     }
 
     private static setRegionsNoneToSudoku(): void {
         this.sudoku.regions.setNoRegions();
-        this.refreshRegionsChecks();
     }
 
     public static pressedRegionsNoneButton(): void {
-        let isClicked = this.setSelectedMenuButton("regions-none", false, true);
-        this.setSelectedMenuButton("regions-view", false, false);
-        if (isClicked) {
-            console.log("regions-none");
-        }
+        this.addTemporaryButtonFocus("regions-none");
+        this.changeMenuPosition("regions", "regions-view");
         this.setRegionsNoneToSudoku();
+        console.log("regions-none");
         this.render();
     }
 
-    private static renderJigsaw(): void {
-        Renderer.renderer.render(this.jigsawRegionsSudoku.solution, this.frame);
-
-        for (let y = 0; y < this.size; y++) {
-            for (let x = 0; x < this.size; x++) {
-                let value = this.regionsMatrix[y * this.size + x]
-                let backgroundColor = value === -1 ? this.jigsawColor.inNoRegion : this.jigsawColor.inRegion;
-
-                let cell = this.frame.getCell(y, x);
-                cell.setBackgroundColor(backgroundColor);
-            }
-        }
-    }
-
-    private static mouseCoordinatesToCellCoordinates(mouseY: number, mouseX: number): { y: number, x: number } {
+    public static mouseCoordinatesToCellCoordinates(mouseY: number, mouseX: number): { y: number, x: number } {
         let bound = this.frame.table.getBoundingClientRect();
         let y = Math.floor((mouseY - bound.top) / bound.height * this.size);
         let x = Math.floor((mouseX - bound.left) / bound.width * this.size);
@@ -303,102 +252,17 @@ class EditorMain {
         return { y: y, x: x };
     }
 
-    private static jigsawAddCellToRegion(y: number, x: number): void {
-        if (this.regionsMatrix[y * this.size + x] === -1) {
-            let cell = this.frame.getCell(y, x);
-            cell.setText("+");
-
-            this.nextRegion.add(y * this.size + x);
-        }
-    }
-
-    private static jigsawRemoveRegion(y: number, x: number): void {
-        let regionIndex = this.regionsMatrix[y * this.size + x];
-        if (regionIndex !== -1) {
-            for (let i = 0; i < this.size * this.size; i++) {
-                if (this.regionsMatrix[i] === regionIndex) {
-                    this.regionsMatrix[i] = -1;
-                }
-            }
-        }
-        this.regionsMatrix = PositionUtils.countConnectedAreas(this.regionsMatrix, this.size, this.size, PositionUtils.DIRECTIONS_4);
-        this.render();
-    }
-
-    private static jigsawMouseDownEventListener(event: MouseEvent): void {
-        let cell = this.mouseCoordinatesToCellCoordinates(event.y, event.x);
-        if ((event.buttons & 1) !== 0) {
-            this.jigsawAddCellToRegion(cell.y, cell.x);
-        } else if ((event.buttons & 2) !== 0) {
-            this.jigsawRemoveRegion(cell.y, cell.x);
-        }
-    }
-
-    private static jigsawCheckRegionsAreAll(): void {
-        if (Math.max(...this.regionsMatrix) === this.size - 1) {
-            this.sudoku.regions.setJigsaw(PositionUtils.matrixToRegions(this.regionsMatrix));
-            this.refreshRegionsChecks();
-        }
-    }
-
-    private static jigsawAddRegion(): void {
-        let newRegionsMatrix = ArrayUtils.deepcopyArray1d(this.regionsMatrix);
-        if (this.nextRegion.size === this.size) {
-            let regionIndex = Math.max(...newRegionsMatrix) + 1;
-            let nextRegion = Array.from(this.nextRegion);
-            for (let index of nextRegion) {
-                newRegionsMatrix[index] = regionIndex;
-            }
-        }
-        newRegionsMatrix = PositionUtils.countConnectedAreas(newRegionsMatrix, this.size, this.size, PositionUtils.DIRECTIONS_4);
-        if (Math.max(...newRegionsMatrix) === Math.max(...this.regionsMatrix) + 1) {
-            this.regionsMatrix = newRegionsMatrix;
-            this.jigsawCheckRegionsAreAll();
-        }
-        this.nextRegion = new Set<number>();
-        this.jigsawRegionsSudoku.regions.setJigsaw(PositionUtils.matrixToRegions(this.regionsMatrix));
-        this.render();
-    }
-
-    private static jigsawMouseUpEventListener(event: MouseEvent): void {
-        this.jigsawAddRegion();
-        this.nextRegion = new Set<number>();
-    }
-
-    private static jigsawMouseMoveEventListener(event: MouseEvent): void {
-        if ((event.buttons & 1) !== 0) {
-            if (this.nextRegion.size < this.size) {
-                let cell = this.mouseCoordinatesToCellCoordinates(event.y, event.x);
-                this.jigsawAddCellToRegion(cell.y, cell.x);
-            }
-        } else {
-            this.jigsawAddRegion();
-        }
-    }
-
-    private static addRegionsJigsawEventListeners(): void {
-        for (let [name, method] of this.jigsawEventListeners) {
-            this.frame.table.addEventListener(name, method);
-        }
-    }
-
-    private static removeRegionsJigsawEventListeners(): void {
-        for (let [name, method] of this.jigsawEventListeners) {
-            this.frame.table.removeEventListener(name, method);
-        }
-    }
-
     public static pressedRegionsJigsawButton(): void {
-        let isClicked = this.setSelectedMenuButton("regions-jigsaw", false, false);
+        let isClicked = this.changeMenuPosition("regions", "regions-jigsaw");
         if (isClicked) {
             console.log("regions-jigsaw");
         }
-        this.jigsawCheckRegionsAreAll();
+        JigsawEditor.checkIfRegionsAreAll();
         this.render();
     }
 
     public static pressedRegionsViewButton(): void {
-        let isClicked = this.setSelectedMenuButton("regions-view", false, false);
+        let isClicked = this.changeMenuPosition("regions", "regions-view");
         if (isClicked) {
             console.log("regions-view");
         }
@@ -406,7 +270,7 @@ class EditorMain {
     }
 
     public static pressedViewButton(): void {
-        let isClicked = this.setSelectedMenuButton("view", true, false);
+        let isClicked = this.changeMenuPosition("view", null);
         if (isClicked) {
             console.log("view");
         }

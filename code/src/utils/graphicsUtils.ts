@@ -31,4 +31,38 @@ class GraphicsUtils {
     public static updateCssClass(element: HTMLElement, oldClass: string, newClass: string): string {
         return GraphicsUtils.updateCssClasses(element, oldClass.split(" "), newClass.split(" ")).join(" ");
     }
+
+    /**
+     * Add css class to HTML element by id
+     * @param id id of HTML element
+     * @param cssClass class to be added
+     */
+    public static addClass(id: string, cssClass: string): void {
+        let element = document.getElementById(id);
+        element?.classList.add(cssClass);
+    }
+
+    /**
+     * Remove css class to HTML element by id
+     * @param id id of HTML element
+     * @param cssClass class to be removed
+     */
+    public static removeClass(id: string, cssClass: string): void {
+        let element = document.getElementById(id);
+        element?.classList.remove(cssClass);
+    }
+
+    /**
+     * Add or remove css class to HTML element by id
+     * @param id id of HTML element
+     * @param cssClass class to be added or removed
+     * @param isAdd true: class is added ; false: class is removed
+     */
+    public static addOrRemoveClass(id: string, cssClass: string, isAdd: boolean): void {
+        if (isAdd) {
+            this.addClass(id, cssClass);
+        } else {
+            this.removeClass(id, cssClass);
+        }
+    }
 }
