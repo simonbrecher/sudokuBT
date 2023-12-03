@@ -1,6 +1,12 @@
 class Renderer {
     public static renderer: Renderer = new Renderer();
 
+    public doRenderNumbers: boolean = true;
+    public doRenderBackgroundColor: boolean = true;
+    public doRenderRegions: boolean = true;
+    public doRenderCellBorders: boolean = true;
+    public doRenderDiagonals: boolean = true;
+
     constructor() {
 
     }
@@ -27,13 +33,19 @@ class Renderer {
         for (let y = 0; y < sudoku.size; y++) {
             for (let x = 0; x < sudoku.size; x++) {
                 let cell = frame.getCell(y, x);
-                cell.setText(this.binaryToCharacters(state.board[y * sudoku.size + x], sudoku.fullBinary));
-                cell.setBorder("normal", Cell.DIRECTIONS.all);
-                cell.setBackgroundColor("#FFF");
+                if (this.doRenderNumbers) {
+                    cell.setText(this.binaryToCharacters(state.board[y * sudoku.size + x], sudoku.fullBinary));
+                }
+                if (this.doRenderCellBorders) {
+                    cell.setBorder("normal", Cell.DIRECTIONS.all);
+                }
+                if (this.doRenderBackgroundColor) {
+                    cell.setBackgroundColor("#FFF");
+                }
             }
         }
 
-        let regionsMatrix = sudoku.regions.getRegionsMatrix();
+        let regionsMatrix = this.doRenderRegions ? sudoku.regions.getRegionsMatrix() : ArrayUtils.createArray1d(sudoku.size * sudoku.size, 0);
         for (let y = 0; y < sudoku.size; y++) {
             for (let x = 0; x < sudoku.size; x++) {
                 let borderDirections = 0;
@@ -60,7 +72,7 @@ class Renderer {
      */
     public render(state: State, frame: Frame): void {
         this.renderBasic(state, state.sudoku, frame);
-        if (state.sudoku.regions.hasDiagonals) {
+        if (state.sudoku.regions.hasDiagonals && this.doRenderDiagonals) {
             this.renderDiagonals(state.sudoku, frame);
         }
         frame.update();
