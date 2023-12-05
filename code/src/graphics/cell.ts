@@ -144,4 +144,22 @@ class Cell {
             this.backgroundColor = backgroundColor;
         }
     }
+
+    /**
+     * Return width of border in pixels
+     */
+    public getBorderWidth(direction: number): number {
+        switch (direction) {
+            case Cell.DIRECTIONS.top:
+                return parseInt(getComputedStyle(this.tdElement).borderTopWidth.slice(0, -2));
+            case Cell.DIRECTIONS.bottom:
+                return parseInt(getComputedStyle(this.tdElement).borderBottomWidth.slice(0, -2));
+            case Cell.DIRECTIONS.left:
+                return parseInt(getComputedStyle(this.tdElement).borderLeftWidth.slice(0, -2));
+            case Cell.DIRECTIONS.right:
+                return parseInt(getComputedStyle(this.tdElement).borderRightWidth.slice(0, -2));
+            default:
+                throw `ERROR: Cell.getBorderWidth got invalid direction=${direction}`;
+        }
+    }
 }

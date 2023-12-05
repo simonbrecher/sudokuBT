@@ -1,28 +1,30 @@
 .puzzle {
     cursor: default; user-select: none;
     font-family: monospace; background-color: #FFF; border-collapse: collapse;
-    position: relative; margin-top: 2px;
+    position: relative;
 }
 
+#container { width: 1060px; }
+
+.puzzle-wrapper { position: relative; }
+
+.puzzle-wrapper { --strong-border-width: 3px; --normal-border-width: 1px; }
+
 /* --height and --width refer to size of td */
-.puzzle td {
-    --height: 0; --width: 0;
-    height: var(--height); width: var(--width);
-    box-sizing: border-box; padding: 0;
-}
+.puzzle td { --height: 0; --width: 0; height: var(--height); width: var(--width); box-sizing: border-box; padding: 0; }
 
 .border-top-none { border-top: none; }
 .border-bottom-none { border-bottom: none; }
 .border-left-none { border-left: none; }
 .border-right-none { border-right: none; }
-.border-top-normal { border-top: 1px solid #000; }
-.border-bottom-normal { border-bottom: 1px solid #000; }
-.border-left-normal { border-left: 1px solid #000; }
-.border-right-normal { border-right: 1px solid #000; }
-.border-top-strong { border-top: 3px solid #000; }
-.border-bottom-strong { border-bottom: 3px solid #000; }
-.border-left-strong { border-left: 3px solid #000; }
-.border-right-strong { border-right: 3px solid #000; }
+.border-top-normal { border-top: var(--normal-border-width) solid #000; }
+.border-bottom-normal { border-bottom: var(--normal-border-width) solid #000; }
+.border-left-normal { border-left: var(--normal-border-width) solid #000; }
+.border-right-normal { border-right: var(--normal-border-width) solid #000; }
+.border-top-strong { border-top: var(--strong-border-width) solid #000; }
+.border-bottom-strong { border-bottom: var(--strong-border-width) solid #000; }
+.border-left-strong { border-left: var(--strong-border-width) solid #000; }
+.border-right-strong { border-right: var(--strong-border-width) solid #000; }
 
 /* --height and --width refers to size of .cell, it is used by child elements to count styles */
 .cell {
@@ -50,7 +52,8 @@
 }
 
 .canvas {
-    position: absolute; height: calc(100% + 1px); width: calc(100% + 2px); margin-left: -1px; box-sizing: border-box;
+    position: absolute; height: calc(100% - var(--strong-border-width)); width: calc(100% - var(--strong-border-width));
+    margin-top: calc(-100% + var(--strong-border-width) / 2); margin-left: calc(var(--strong-border-width) / 2);
 }
 
 .display-none { display: none; }

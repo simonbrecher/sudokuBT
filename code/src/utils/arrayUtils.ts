@@ -48,4 +48,20 @@ class ArrayUtils {
             array[randomNumber] = temp;
         }
     }
+
+    public static scale2dArray(array: number[], height: number, width: number, factorY: number, factorX: number): number[] {
+        let output = ArrayUtils.createArray1d(factorY * height * factorX * width, undefined);
+        for (let mainY = 0; mainY < height; mainY++) {
+            for (let mainX = 0; mainX < width; mainX++) {
+                for (let subY = 0; subY < factorY; subY++) {
+                    for (let subX = 0; subX < factorX; subX++) {
+                        let y = mainY * factorY + subY;
+                        let x = mainX * factorX + subX;
+                        output[y * (width * factorX) + x] = array[mainY * width + mainX];
+                    }
+                }
+            }
+        }
+        return output;
+    }
 }

@@ -60,6 +60,17 @@ class Regions {
         Regions.throwAccessErrorIf(this._extraRegions === null, "Regions.extraRegions", "Regions._extraRegions === null");
         return this._extraRegions!;
     }
+    public removeExtraRegions(): void {
+        this._extraRegions = null;
+    }
+    public addExtraRegions(regions: number[][]): void {
+        if (this._extraRegions === null) {
+            this._extraRegions = [];
+        }
+        for (let region of regions) { // TODO: validate this
+            this._extraRegions.push(region);
+        }
+    }
 
     constructor(sudoku: Sudoku) {
         this.sudoku = sudoku;
@@ -169,7 +180,7 @@ class Regions {
      * Add jigsaw regions by text, for example: ["0011", "0012", "3312", "3322"]
      */
     public setRegionsByText(text: string[]): void { // TODO: validate correctness
-        let regions = ArrayUtils.createArray2d(this.sudoku.size, 0, null);
+        let regions = ArrayUtils.createArray2d(this.sudoku.size, 0, undefined);
         for (let y = 0; y < this.sudoku.size; y++) {
             for (let x = 0; x < this.sudoku.size; x++) {
                 regions[parseInt(text[y][x])].push(y * this.sudoku.size + x);

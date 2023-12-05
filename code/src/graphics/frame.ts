@@ -7,6 +7,7 @@ class Frame {
 
     public readonly cellSize: number; // size of td element
 
+    private readonly puzzleWrapper: HTMLElement;
     public readonly table: HTMLElement;
 
     private readonly cells: Cell[][];
@@ -24,9 +25,15 @@ class Frame {
         this.cellSize = cellSize;
 
         let container = document.getElementById(containerId)!;
+
+        this.puzzleWrapper = document.createElement("div");
+        container.appendChild(this.puzzleWrapper)
+        this.puzzleWrapper.classList.add("puzzle-wrapper");
+
         this.table = document.createElement("table");
-        container.appendChild(this.table);
+        this.puzzleWrapper.appendChild(this.table);
         this.table.classList.add("puzzle");
+
         this.cells = [];
         for (let y = 0; y < this.height; y++) {
             let row = document.createElement("tr");
@@ -40,7 +47,7 @@ class Frame {
             }
         }
 
-        this.canvas = new Canvas(this, this.table);
+        this.canvas = new Canvas(this, this.puzzleWrapper);
     }
 
     public getCell(y: number, x: number): Cell {

@@ -191,4 +191,43 @@ class GraphicsTests {
         Renderer.renderer.renderNew(sudoku.solution);
         Renderer.renderer.renderNew(sudoku.task);
     }
+
+    public static testBasketBorders(): void {
+        let rectangleHeight = 3;
+        let rectangleWidth = 3;
+        let size = rectangleHeight * rectangleWidth;
+        let regionsMatrix = [];
+        for (let i = 0; i < size * size; i++) {
+            regionsMatrix.push(Math.floor(Math.random() * 3));
+        }
+        let baskets = PositionUtils.countConnectedAreas(regionsMatrix, size, size, PositionUtils.DIRECTIONS_4);
+
+
+        let sudoku = new Sudoku(size);
+        sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
+        Builder.builder.build(sudoku);
+        sudoku.regions.addExtraRegions(PositionUtils.matrixToRegions(baskets));
+        Renderer.renderer.renderNew(sudoku.task);
+        BasketBorderStyle.styles.extraRegions = BasketBorderStyle.styles.killer;
+        Renderer.renderer.renderNew(sudoku.task);
+        BasketBorderStyle.styles.extraRegions = new BasketBorderStyle("#000B", null, "round");
+
+        sudoku = new Sudoku(size);
+        sudoku.regions.setRegionsByText([
+            "000112223",
+            "000112423",
+            "001112433",
+            "011222433",
+            "544444433",
+            "555555553",
+            "667778888",
+            "666777888",
+            "666677788",
+        ]);
+        Builder.builder.build(sudoku);
+        sudoku.regions.addExtraRegions(PositionUtils.matrixToRegions(baskets));
+        Renderer.renderer.renderNew(sudoku.task);
+        BasketBorderStyle.styles.extraRegions = BasketBorderStyle.styles.killer;
+        Renderer.renderer.renderNew(sudoku.task);
+    }
 }

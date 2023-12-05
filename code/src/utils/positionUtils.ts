@@ -30,7 +30,7 @@ class PositionUtils {
      * Does opposite to what method PositionUtils.regionsToMatrix() does
      */
     public static matrixToRegions(matrix: number[]): number[][] {
-        let regions = ArrayUtils.createArray2d(Math.max(...matrix) + 1, 0, null);
+        let regions = ArrayUtils.createArray2d(Math.max(...matrix) + 1, 0, undefined);
         for (let i = 0; i < matrix.length; i++) {
             if (matrix[i] !== -1) {
                 regions[matrix[i]].push([i]);
@@ -79,5 +79,65 @@ class PositionUtils {
      */
     public static areMatrixValuesSame(height: number, width: number, y1: number, x1: number, y2: number, x2: number, matrix: number[]): boolean {
         return this.isInside(y2, x2, height, width) && matrix[y1 * width + x1] === matrix[y2 * width + x2];
+    }
+
+    /**
+     * Check if there is a corner, calculate in what directions the corner is pointing.
+     * If there is no corner, return all false.
+     */
+    private static isCorner(matrix: number[], height: number, width: number, y: number, x: number): boolean {
+        if (matrix[y * width + x] === -1) {
+            return false;
+        }
+
+        let dy = (y % 2) * 2 - 1;
+        let dx = (x % 2) * 2 - 1;
+
+        let isSameEdge1 = this.areMatrixValuesSame(height, width, y, x, y + dy, x, matrix);
+        let isSameEdge2 = this.areMatrixValuesSame(height, width, y, x, y, x + dx, matrix);
+
+        if (! isSameEdge1 && ! isSameEdge2) {
+            return true;
+        } else if (isSameEdge1 && isSameEdge2) {
+            return ! this.areMatrixValuesSame(height, width, y, x, y + dy, x + dx, matrix);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Count coordinates of all graphical lines, that go around all regions.
+     * @param regionsMatrix for every cell, id of region that it belongs to ; -1 if it belongs to no region
+     * @param height height of regionsMatrix
+     * @param width width of regionsMatrix
+     */
+    public static getRegionBorderLines(regionsMatrix: number[], height: number, width: number): BasketBorder[] {
+        // scale every cell to 2x2 cells
+        let matrix = ArrayUtils.scale2dArray(regionsMatrix, height, width, 2, 2);
+
+        // find all corners, order them primarily both by x and y coordinates
+        let cornersY = ArrayUtils.createArray2d(2 * height, 0, undefined);
+        let cornersX = ArrayUtils.createArray2d(2 * width, 0, undefined);
+        for (let y = 0; y < height * 2; y++) {
+            for (let x = 0; x < width * 2; x++) {
+                if (this.isCorner(matrix, height * 2, width * 2, y, x)) {
+                    let corner = { mainY: Math.floor(y / 2), mainX: Math.floor(x / 2), subY: y % 2, subX: x % 2 };
+                    cornersY[y].push(corner);
+                    cornersX[x].push(corner);
+                }
+            }
+        }
+
+        // join corners into lines
+        let lines = [];
+        for (let corners2d of [cornersY, cornersX]) {
+            for (let corners of corners2d) {
+                for (let i = 0; i < corners.length; i+=2) {
+                    lines.push({ start: corners[i], end: corners[i + 1] });
+                }
+            }
+        }
+
+        return lines;
     }
 }

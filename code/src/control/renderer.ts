@@ -6,6 +6,7 @@ class Renderer {
     public doRenderRegions: boolean = true;
     public doRenderCellBorders: boolean = true;
     public doRenderDiagonals: boolean = true;
+    public doRenderExtraRegions: boolean = true;
 
     constructor() {
 
@@ -67,6 +68,14 @@ class Renderer {
         }
     }
 
+    private renderExtraRegions(sudoku: Sudoku, frame: Frame): void {
+        let regionsMatrix = PositionUtils.regionsToMatrix(sudoku.size * sudoku.size, sudoku.regions.extraRegions);
+        let lines = PositionUtils.getRegionBorderLines(regionsMatrix, sudoku.size, sudoku.size);
+        for (let line of lines) {
+            frame.canvas.addBasketLine(line, BasketBorderStyle.styles.extraRegions);
+        }
+    }
+
     /**
      * Render state inside already existing Frame.
      */
@@ -75,6 +84,9 @@ class Renderer {
         if (state.sudoku.regions.hasDiagonals && this.doRenderDiagonals) {
             this.renderDiagonals(state.sudoku, frame);
         }
+        if (state.sudoku.regions.hasExtraRegions() && this.doRenderExtraRegions) {
+            this.renderExtraRegions(state.sudoku, frame);
+        }
         frame.update();
     }
 
@@ -82,7 +94,7 @@ class Renderer {
      * Create new Frame and render state in it.
      */
     public renderNew(state: State, containerId: string = "container"): Frame {
-        let frame = new Frame(state.sudoku.size, state.sudoku.size, 35, containerId);
+        let frame = new Frame(state.sudoku.size, state.sudoku.size, 55, containerId);
         this.render(state, frame);
         return frame;
     }
