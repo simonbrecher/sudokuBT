@@ -198,19 +198,20 @@ class GraphicsTests {
         let size = rectangleHeight * rectangleWidth;
         let regionsMatrix = [];
         for (let i = 0; i < size * size; i++) {
-            regionsMatrix.push(Math.floor(Math.random() * 3));
+            regionsMatrix.push(Math.floor(Math.random() * 3) - 1);
         }
         let baskets = PositionUtils.countConnectedAreas(regionsMatrix, size, size, PositionUtils.DIRECTIONS_4);
 
+        let killerRenderer = new Renderer();
+        killerRenderer.doRenderExtraRegionsBackgroundColor = false;
+        killerRenderer.extraRegionsBorderStyle = BasketBorderStyle.styles.killer;
 
         let sudoku = new Sudoku(size);
         sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
         Builder.builder.build(sudoku);
         sudoku.regions.addExtraRegions(PositionUtils.matrixToRegions(baskets));
         Renderer.renderer.renderNew(sudoku.task);
-        BasketBorderStyle.styles.extraRegions = BasketBorderStyle.styles.killer;
-        Renderer.renderer.renderNew(sudoku.task);
-        BasketBorderStyle.styles.extraRegions = new BasketBorderStyle("#000B", null, "round");
+        killerRenderer.renderNew(sudoku.task);
 
         sudoku = new Sudoku(size);
         sudoku.regions.setRegionsByText([
@@ -227,7 +228,6 @@ class GraphicsTests {
         Builder.builder.build(sudoku);
         sudoku.regions.addExtraRegions(PositionUtils.matrixToRegions(baskets));
         Renderer.renderer.renderNew(sudoku.task);
-        BasketBorderStyle.styles.extraRegions = BasketBorderStyle.styles.killer;
-        Renderer.renderer.renderNew(sudoku.task);
+        killerRenderer.renderNew(sudoku.task);
     }
 }

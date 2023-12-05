@@ -3,10 +3,17 @@ class Renderer {
 
     public doRenderNumbers: boolean = true;
     public doRenderBackgroundColor: boolean = true;
+        public backgroundColor: string = "#FFF";
     public doRenderRegions: boolean = true;
+        public regionBordersStyle: string = "strong";
     public doRenderCellBorders: boolean = true;
+        public cellBordersStyle: string = "normal";
     public doRenderDiagonals: boolean = true;
-    public doRenderExtraRegions: boolean = true;
+        public diagonalsLineStyle: LineStyle = LineStyle.styles.diagonals;
+    public doRenderExtraRegionsBorder: boolean = true;
+        public extraRegionsBorderStyle: BasketBorderStyle = BasketBorderStyle.styles.extraRegions;
+    public doRenderExtraRegionsBackgroundColor: boolean = true;
+        public extraRegionsBackgroundColor: string = "#CCC";
 
     constructor() {
 
@@ -38,10 +45,10 @@ class Renderer {
                     cell.setText(this.binaryToCharacters(state.board[y * sudoku.size + x], sudoku.fullBinary));
                 }
                 if (this.doRenderCellBorders) {
-                    cell.setBorder("normal", Cell.DIRECTIONS.all);
+                    cell.setBorder(this.cellBordersStyle, Cell.DIRECTIONS.all);
                 }
                 if (this.doRenderBackgroundColor) {
-                    cell.setBackgroundColor("#FFF");
+                    cell.setBackgroundColor(this.backgroundColor);
                 }
             }
         }
@@ -57,22 +64,33 @@ class Renderer {
                     }
                 }
                 let cell = frame.getCell(y, x);
-                cell.setBorder("strong", borderDirections);
+                cell.setBorder(this.regionBordersStyle, borderDirections);
             }
         }
     }
 
     private renderDiagonals(sudoku: Sudoku, frame: Frame): void {
         for (let diagonal of sudoku.regions.diagonals) {
-            frame.canvas.addLine1d(diagonal, LineStyle.styles.diagonals, 0, 0, sudoku.size);
+            frame.canvas.addLine1d(diagonal, this.diagonalsLineStyle, 0, 0, sudoku.size);
         }
     }
 
     private renderExtraRegions(sudoku: Sudoku, frame: Frame): void {
         let regionsMatrix = PositionUtils.regionsToMatrix(sudoku.size * sudoku.size, sudoku.regions.extraRegions);
-        let lines = PositionUtils.getRegionBorderLines(regionsMatrix, sudoku.size, sudoku.size);
-        for (let line of lines) {
-            frame.canvas.addBasketLine(line, BasketBorderStyle.styles.extraRegions);
+        if (this.doRenderExtraRegionsBackgroundColor) {
+            for (let y = 0; y < sudoku.size; y++) {
+                for (let x = 0; x < sudoku.size; x++) {
+                    if (regionsMatrix[y * sudoku.size + x] !== -1) {
+                        frame.getCell(y, x).setBackgroundColor(this.extraRegionsBackgroundColor);
+                    }
+                }
+            }
+        }
+        if (this.doRenderExtraRegionsBorder) {
+            let lines = PositionUtils.getRegionBorderLines(regionsMatrix, sudoku.size, sudoku.size);
+            for (let line of lines) {
+                frame.canvas.addBasketLine(line, this.extraRegionsBorderStyle);
+            }
         }
     }
 
@@ -84,7 +102,7 @@ class Renderer {
         if (state.sudoku.regions.hasDiagonals && this.doRenderDiagonals) {
             this.renderDiagonals(state.sudoku, frame);
         }
-        if (state.sudoku.regions.hasExtraRegions() && this.doRenderExtraRegions) {
+        if (state.sudoku.regions.hasExtraRegions()) {
             this.renderExtraRegions(state.sudoku, frame);
         }
         frame.update();
