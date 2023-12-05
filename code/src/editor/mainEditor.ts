@@ -33,7 +33,7 @@ class MainEditor {
      */
     private static render(): void {
         if (this.menuPosition[1] === "regions-jigsaw") {
-            JigsawEditor.renderSudoku();
+            RegionEditor.renderSudoku();
         } else {
             this.renderSudoku();
         }
@@ -54,13 +54,13 @@ class MainEditor {
 
         this.sudoku = new Sudoku(this.size);
 
-        JigsawEditor.onCreateFrame();
+        RegionEditor.onCreateFrame();
 
         this.checkHideButtons();
         this.setRegionsRectangularSelectOptions();
 
         if (this.menuPosition[1] === "regions-jigsaw") {
-            JigsawEditor.addEventListeners();
+            RegionEditor.addEventListeners();
         }
     }
 
@@ -106,9 +106,9 @@ class MainEditor {
 
         if (rightPosition !== previousRightPosition) {
             if (rightPosition === "regions-jigsaw") {
-                JigsawEditor.addEventListeners();
+                RegionEditor.addEventListeners();
             } else if (previousRightPosition === "regions-jigsaw") {
-                JigsawEditor.removeEventListeners();
+                RegionEditor.removeEventListeners();
             }
         }
 
@@ -257,7 +257,7 @@ class MainEditor {
         if (isClicked) {
             console.log("regions-jigsaw");
         }
-        JigsawEditor.checkIfRegionsAreAll();
+        RegionEditor.checkIfRegionsAreAll();
         this.render();
     }
 

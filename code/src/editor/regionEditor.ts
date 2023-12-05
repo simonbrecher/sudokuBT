@@ -1,6 +1,6 @@
 type JigsawMouseEventType = "mousedown" | "mouseup" | "mousemove" | "mouseleave" | "contextmenu";
 
-class JigsawEditor {
+class RegionEditor {
     private static readonly backgroundColors = {
         inRegion: "#FFF",
         inNextRegion: "#FA0",
