@@ -38,28 +38,56 @@
 <body>
 
 <div id="page-wrapper">
-    <div class="menu">
+    <div id="left-menu" class="menu">
         <div id="menu-button-resize" class="menu-button" onclick="MainEditor.pressedResizeButton();">Resize</div>
         <div id="menu-button-clear" class="menu-button" onclick="MainEditor.pressedClearButton();">Clear</div>
         <div id="menu-button-regions" class="menu-button" onclick="MainEditor.pressedRegionsButton();">Regions</div>
         <div id="menu-button-view" class="menu-button" onclick="MainEditor.pressedViewButton();">View</div>
     </div>
     <div id="container"></div>
-    <div class="menu">
+    <div id="right-menu" class="menu">
         <section id="menu-section-regions" class="menu-section">
-            <div id="menu-button-regions-rectangular" class="menu-button" onclick="MainEditor.pressedRegionsRectangularButton();">
-                <div>Rectangular</div>
-                <div id="check-regions-rectangular" class="check"></div>
-            </div>
-            <div id="menu-button-regions-none" class="menu-button" onclick="MainEditor.pressedRegionsNoneButton();">
-                <div>None</div>
-                <div id="check-regions-none" class="check"></div>
-            </div>
-            <div id="menu-button-regions-jigsaw" class="menu-button" onclick="MainEditor.pressedRegionsJigsawButton();">
-                <div>Jigsaw</div>
-                <div id="check-regions-jigsaw" class="check"></div>
-            </div>
-            <div id="menu-button-regions-view" class="menu-button" onclick="MainEditor.pressedRegionsViewButton();">View</div>
+            <section class="menu-subsection">
+                <div class="menu-title">Regions</div>
+                <div id="menu-button-regions-none" class="menu-button" onclick="MainEditor.pressedRegionsNoneButton();">
+                    <div>None</div>
+                    <div id="check-regions-none" class="check"></div>
+                </div>
+                <div id="menu-button-regions-rectangular" class="menu-button" onclick="MainEditor.pressedRegionsRectangularButton();">
+                    <div>Rectangular</div>
+                    <div id="check-regions-rectangular" class="check"></div>
+                </div>
+                <div id="menu-button-regions-jigsaw" class="menu-button" onclick="MainEditor.pressedRegionsJigsawButton();">
+                    <div>Jigsaw</div>
+                    <div id="check-regions-jigsaw" class="check"></div>
+                </div>
+            </section>
+            <section class="menu-subsection">
+                <div class="menu-title">Diagonals</div>
+                <div id="menu-button-regions-diagonal" class="menu-button" onclick="MainEditor.pressedRegionsDiagonalButton();">
+                    <div>Diagonal</div>
+                    <div id="check-regions-diagonal" class="check"></div>
+                </div>
+            </section>
+            <section class="menu-subsection">
+                <div class="menu-title">Extra regions</div>
+                <div id="menu-button-regions-noextraregions" class="menu-button" onclick="MainEditor.pressedRegionsNoextraregionsButton();">
+                    <div>None</div>
+                    <div id="check-regions-noextraregions" class="check"></div>
+                </div>
+                <div id="menu-button-regions-windoku" class="menu-button" onclick="MainEditor.pressedRegionsWindokuButton();">
+                    <div>Windoku</div>
+                    <div id="check-regions-windoku" class="check"></div>
+                </div>
+                <div id="menu-button-regions-extraregions" class="menu-button" onclick="MainEditor.pressedRegionsExtraregionsButton();">
+                    <div>Custom</div>
+                    <div id="check-regions-extraregions" class="check"></div>
+                </div>
+            </section>
+            <section class="menu-subsection">
+                <div class="menu-title">View</div>
+                <div id="menu-button-regions-view" class="menu-button" onclick="MainEditor.pressedRegionsViewButton();">View</div>
+            </section>
         </section>
         <section id="menu-section-view" class="menu-section">
             <div id="menu-button-view-nothing" class="menu-button">...</div>

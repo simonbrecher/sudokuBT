@@ -10,7 +10,7 @@ class MainEditor {
 
     public static sudoku: Sudoku;
 
-    private static menuPosition: [string | null, string | null] = [null, null];
+    public static menuPosition: [string | null, string | null] = [null, null];
 
     /**
      * This method is called by <script><script/> in editor.html
@@ -32,7 +32,7 @@ class MainEditor {
      * Render sudoku
      */
     private static render(): void {
-        if (this.menuPosition[1] === "regions-jigsaw") {
+        if (this.menuPosition[1] === "regions-jigsaw" || this.menuPosition[1] === "regions-extraregions") {
             RegionEditor.renderSudoku();
         } else {
             this.renderSudoku();
@@ -59,7 +59,7 @@ class MainEditor {
         this.checkHideButtons();
         this.setRegionsRectangularSelectOptions();
 
-        if (this.menuPosition[1] === "regions-jigsaw") {
+        if (this.menuPosition[1] === "regions-jigsaw" || this.menuPosition[1] === "regions-extraregions") {
             RegionEditor.addEventListeners();
         }
     }
@@ -105,9 +105,11 @@ class MainEditor {
         }
 
         if (rightPosition !== previousRightPosition) {
-            if (rightPosition === "regions-jigsaw") {
+            let hadRegionsListeners = previousRightPosition === "regions-jigsaw" || previousRightPosition === "regions-extraregions";
+            let willHaveRegionsListeners = rightPosition === "regions-jigsaw" || rightPosition === "regions-extraregions";
+            if (willHaveRegionsListeners && ! hadRegionsListeners) {
                 RegionEditor.addEventListeners();
-            } else if (previousRightPosition === "regions-jigsaw") {
+            } else if (hadRegionsListeners && ! willHaveRegionsListeners) {
                 RegionEditor.removeEventListeners();
             }
         }
@@ -124,9 +126,17 @@ class MainEditor {
         let isNone = ! this.sudoku.regions.hasRegions();
         let isRectangular = this.sudoku.regions.isRectangular();
         let isJigsaw = ! (isNone || isRectangular);
+        let isDiagonal = this.sudoku.regions.hasDiagonals;
+        let isNoneExtra = ! this.sudoku.regions.hasExtraRegions();
+        let isWindoku = this.sudoku.regions.isWindoku();
+        let isExtraRegions = ! (isNoneExtra || isWindoku);
         GraphicsUtils.addOrRemoveClass("check-regions-none", "selected", isNone);
         GraphicsUtils.addOrRemoveClass("check-regions-rectangular", "selected", isRectangular);
         GraphicsUtils.addOrRemoveClass("check-regions-jigsaw", "selected", isJigsaw);
+        GraphicsUtils.addOrRemoveClass("check-regions-diagonal", "selected", isDiagonal);
+        GraphicsUtils.addOrRemoveClass("check-regions-noextraregions", "selected", isNoneExtra);
+        GraphicsUtils.addOrRemoveClass("check-regions-windoku", "selected", isWindoku);
+        GraphicsUtils.addOrRemoveClass("check-regions-extraregions", "selected", isExtraRegions);
     }
 
     public static pressedResizeButton(): void {
@@ -173,6 +183,8 @@ class MainEditor {
             }
         }
         GraphicsUtils.addOrRemoveClass("menu-button-regions-rectangular", "display-none", isPrime);
+
+        GraphicsUtils.addOrRemoveClass("menu-button-regions-windoku", "display-none", this.size !== 9);
     }
 
     public static pressedRegionsButton(): void {
@@ -243,19 +255,51 @@ class MainEditor {
         this.render();
     }
 
-    public static mouseCoordinatesToCellCoordinates(mouseY: number, mouseX: number): { y: number, x: number } {
-        let bound = this.frame.table.getBoundingClientRect();
-        let y = Math.floor((mouseY - bound.top) / bound.height * this.size);
-        let x = Math.floor((mouseX - bound.left) / bound.width * this.size);
-        y = Math.min(this.size - 1, Math.max(0, y));
-        x = Math.min(this.size - 1, Math.max(0, x));
-        return { y: y, x: x };
-    }
-
     public static pressedRegionsJigsawButton(): void {
         let isClicked = this.changeMenuPosition("regions", "regions-jigsaw");
         if (isClicked) {
             console.log("regions-jigsaw");
+        }
+        RegionEditor.checkIfRegionsAreAll();
+        this.render();
+    }
+
+    public static pressedRegionsDiagonalButton(): void {
+        this.addTemporaryButtonFocus("regions-diagonal");
+        this.changeMenuPosition("regions", "regions-view");
+        console.log("regions-diagonal");
+        this.sudoku.regions.hasDiagonals = ! this.sudoku.regions.hasDiagonals;
+        this.render();
+    }
+
+    private static setRegionsNoextraregionsToSudoku(): void {
+        this.sudoku.regions.setExtraRegions(null);
+    }
+
+    public static pressedRegionsNoextraregionsButton(): void {
+        this.addTemporaryButtonFocus("regions-noextraregions");
+        this.changeMenuPosition("regions", "regions-view");
+        this.setRegionsNoextraregionsToSudoku();
+        console.log("regions-noextraregions");
+        this.render();
+    }
+
+    private static setRegionsWindokuToSudoku(): void {
+        this.sudoku.regions.setWindoku();
+    }
+
+    public static pressedRegionsWindokuButton(): void {
+        this.addTemporaryButtonFocus("regions-windoku");
+        this.changeMenuPosition("regions", "regions-view");
+        this.setRegionsWindokuToSudoku();
+        console.log("regions-windoku");
+        this.render();
+    }
+
+    public static pressedRegionsExtraregionsButton(): void {
+        let isClicked = this.changeMenuPosition("regions", "regions-extraregions");
+        if (isClicked) {
+            console.log("regions-extraregions");
         }
         RegionEditor.checkIfRegionsAreAll();
         this.render();

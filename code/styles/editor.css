@@ -15,12 +15,20 @@ body { margin: 10px 0; }
 
 .menu { border: 3px solid #000; width: 200px; min-height: 500px; padding: 2px; }
 
-.menu-button {
-    font-size: 25px; border: 3px solid #000; margin-bottom: 2px;
-    display: flex; justify-content: center; gap: 3px; align-items: center;
-}
+#left-menu, #right-menu .menu-section,  #right-menu .menu-subsection { display: flex; flex-direction: column; }
+#left-menu, #right-menu .menu-subsection { gap: 2px; }
+#right-menu .menu-section { gap: 6px; }
+
+.menu-button, .menu-title { display: flex; justify-content: center; align-items: center; }
+
+.menu-title { font-size: 30px; }
+
+.menu-button { border: 3px solid #000; gap: 3px; }
 .menu-button:hover { background-color: #D5D5D5; }
 .menu-button.selected { background-color: #BBB; }
+
+#left-menu .menu-button { font-size: 27px; }
+#right-menu .menu-button { font-size: 23px; }
 
 .check { height: 17px; width: 17px; border: 3px solid #000; }
 .check.selected::before {
@@ -28,7 +36,7 @@ body { margin: 10px 0; }
     font-size: 17px; line-height: 17px; height: 17px; width: 17px;
 }
 
-.menu-section:not(.selected), .confirm-window:not(.selected) { display: none; }
+#right-menu .menu-section:not(.selected), .confirm-window:not(.selected) { display: none; }
 
 .confirm-window {
     z-index: 10; position: fixed; width: 50%; top: 25%; left: 25%;

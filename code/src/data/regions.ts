@@ -2,6 +2,14 @@
  * Class representing list of all regions in sudoku. (Regions that use default sudoku rules)
  */
 class Regions {
+    private static readonly WINDOKU_REGIONS = [
+        [10, 11, 12, 19, 20, 21, 28, 29, 30],
+        [14, 15, 16, 23, 24, 25, 32, 33, 34],
+        [46, 47, 48, 55, 56, 57, 64, 65, 66],
+        [50, 51, 52, 59, 60, 61, 68, 69, 70],
+    ];
+    private static readonly WINDOKU_REGIONS_MATRIX = PositionUtils.regionsToMatrix(81, this.WINDOKU_REGIONS);
+
     private static throwAccessErrorIf(condition: boolean, accessName: string, conditionString: string): void {
         if (condition) {
             throw `ACCESS ERROR: cannot access ${accessName} if ${conditionString}`;
@@ -70,6 +78,20 @@ class Regions {
         for (let region of regions) { // TODO: validate this
             this._extraRegions.push(region);
         }
+    }
+    public setExtraRegions(regions: number[][] | null): void {
+        this._extraRegions = null;
+        if (regions !== null) {
+            this.addExtraRegions(regions);
+        }
+    }
+    public isWindoku(): boolean {
+        if (this.sudoku.size !== 9 || ! this.sudoku.regions.hasExtraRegions()) {
+            return false;
+        }
+        let regionsMatrix = PositionUtils.regionsToMatrix(81, this.sudoku.regions.extraRegions);
+        regionsMatrix = PositionUtils.countConnectedAreas(regionsMatrix, this.sudoku.size, this.sudoku.size, PositionUtils.DIRECTIONS_4);
+        return ArrayUtils.equals1d(regionsMatrix, Regions.WINDOKU_REGIONS_MATRIX);
     }
 
     constructor(sudoku: Sudoku) {
@@ -141,6 +163,17 @@ class Regions {
     public setJigsaw(regions: number[][]): void { // TODO: check validity of regions
         this._rectangles = null
         this._regions = regions;
+    }
+
+    /**
+     * Set extra regions to be windoku. Works only if size=9
+     */
+    public setWindoku(): void {
+        if (this.sudoku.size !== 9) {
+            throw `ERROR: Windoku sudoku cannot exist on size=${this.sudoku.size}`;
+        }
+
+        this.sudoku.regions.setExtraRegions(Regions.WINDOKU_REGIONS);
     }
 
     /**
