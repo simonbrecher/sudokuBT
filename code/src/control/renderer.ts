@@ -13,7 +13,7 @@ class Renderer {
     public doRenderExtraRegionsBorder: boolean = true;
         public extraRegionsBorderStyle: BasketBorderStyle = BasketBorderStyle.styles.extraRegions;
     public doRenderExtraRegionsBackgroundColor: boolean = true;
-        public extraRegionsBackgroundColor: string = "#CCC";
+        public extraRegionsBackgroundColor: string = "#EEE";
 
     constructor() {
 
@@ -89,7 +89,7 @@ class Renderer {
         if (this.doRenderExtraRegionsBorder) {
             let lines = PositionUtils.getRegionBorderLines(regionsMatrix, sudoku.size, sudoku.size);
             for (let line of lines) {
-                frame.canvas.addBasketLine(line, this.extraRegionsBorderStyle);
+                frame.canvas.addBasketBorder(line, this.extraRegionsBorderStyle);
             }
         }
     }
@@ -98,6 +98,9 @@ class Renderer {
      * Render state inside already existing Frame.
      */
     public render(state: State, frame: Frame): void {
+        frame.canvas.removeLines();
+        frame.canvas.removeBasketBorders();
+
         this.renderBasic(state, state.sudoku, frame);
         if (state.sudoku.regions.hasDiagonals && this.doRenderDiagonals) {
             this.renderDiagonals(state.sudoku, frame);

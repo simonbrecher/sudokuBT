@@ -4,11 +4,7 @@
     position: relative;
 }
 
-#container { width: 1060px; }
-
-.puzzle-wrapper { position: relative; }
-
-.puzzle-wrapper { --strong-border-width: 3px; --normal-border-width: 1px; }
+.puzzle-wrapper { --strong-border-width: 3px; --normal-border-width: 1px; position: relative; page-break-inside: avoid; }
 
 /* --height and --width refer to size of td */
 .puzzle td { --height: 0; --width: 0; height: var(--height); width: var(--width); box-sizing: border-box; padding: 0; }

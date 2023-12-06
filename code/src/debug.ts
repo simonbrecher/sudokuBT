@@ -14,7 +14,7 @@ class Debug {
         // GraphicsTests.testBuildSolution();
         // GraphicsTests.testBuildTask();
 
-        // GraphicsTests.testCanvas();
+        GraphicsTests.testCanvas();
         GraphicsTests.testBasketBorders();
 
         let now = (new Date()).getMilliseconds();

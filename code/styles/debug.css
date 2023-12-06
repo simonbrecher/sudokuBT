@@ -2,4 +2,4 @@
     body { background-color: #E5E5E5; }
 }
 
-.puzzle-container { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 5px; }
+#container { width: 1060px; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 5px; }

@@ -53,6 +53,14 @@ class Canvas {
     }
 
     /**
+     * Remove all lines
+     */
+    public removeLines(): void {
+        this.lines = [];
+        this.linesStyle = [];
+    }
+
+    /**
      * Add line to list of lines (does not redraw lines)
      */
     public addLine(line: { y: number, x: number }[], style: LineStyle): void {
@@ -74,7 +82,7 @@ class Canvas {
     }
 
     private roundCanvasCoordinate(coordinate: number): number {
-        return Math.round( coordinate / Canvas.CANVAS_SCALE) * Canvas.CANVAS_SCALE + 0.5;
+        return Math.floor( coordinate / Canvas.CANVAS_SCALE) * Canvas.CANVAS_SCALE + 0.5;
     }
 
     /**
@@ -88,7 +96,7 @@ class Canvas {
         let context = this.lineCanvas.context;
 
         canvas.classList.remove("display-none");
-        context.clearRect(0, 0, canvas.height, canvas.width);
+        context.clearRect(0, 0, canvas.width, canvas.height);
 
         for (let i = 0; i < this.lines.length; i++) {
             let line = this.lines[i];
@@ -108,14 +116,22 @@ class Canvas {
                 let x2 = (line[i + 1].x + 0.5) * canvas.width / this.width;
 
                 context.moveTo(this.roundCanvasCoordinate(x1), this.roundCanvasCoordinate(y1));
-                context.moveTo(this.roundCanvasCoordinate(x2), this.roundCanvasCoordinate(y2));
+                context.lineTo(this.roundCanvasCoordinate(x2), this.roundCanvasCoordinate(y2));
             }
 
             context.stroke();
         }
     }
 
-    public addBasketLine(line: BasketBorder, style: BasketBorderStyle): void {
+    /**
+     * Remove all basket lines
+     */
+    public removeBasketBorders(): void {
+        this.basketBorders = [];
+        this.basketBorderStyles = [];
+    }
+
+    public addBasketBorder(line: BasketBorder, style: BasketBorderStyle): void {
         this.basketBorders.push(line);
         this.basketBorderStyles.push(style);
     }
@@ -171,6 +187,9 @@ class Canvas {
         }
         let canvas = this.basketCanvas.canvas;
         let context = this.basketCanvas.context;
+
+        canvas.classList.remove("display-none");
+        context.clearRect(0, 0, canvas.width, canvas.height);
 
         let borderSizes = this.getBasketBordersCoordinates();
 

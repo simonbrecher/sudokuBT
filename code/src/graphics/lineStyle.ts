@@ -4,7 +4,7 @@ class LineStyle {
     public cap: CanvasLineCap;
 
     public static readonly styles = {
-        diagonals: new LineStyle(0.25, "#0004", "round"),
+        diagonals: new LineStyle(0.2, "#0002", "round"),
 
         red: new LineStyle(0.25, "#F009", "round"),
         orange: new LineStyle(0.35, "#FA09", "round"),

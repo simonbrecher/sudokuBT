@@ -5,7 +5,7 @@ class BasketBorderStyle {
 
     public static readonly styles = {
         killer: new BasketBorderStyle("#000", [4, 6], "square"),
-        extraRegions: new BasketBorderStyle("#0009", null, "round"),
+        extraRegions: new BasketBorderStyle("#0006", null, "round"),
     }
 
     constructor(color: string, dash: [number, number] | null, cap: CanvasLineCap) {
