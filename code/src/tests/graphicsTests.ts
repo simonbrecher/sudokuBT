@@ -230,4 +230,30 @@ class GraphicsTests {
         Renderer.renderer.renderNew(sudoku.task);
         killerRenderer.renderNew(sudoku.task);
     }
+
+    /**
+     * Test changing background color of text.
+     */
+    public static testTextBackgroundColor(): void {
+        let sudoku = new Sudoku(9);
+
+        let renderer = new Renderer();
+        renderer.doSmallNumbersOnFullBinary = true;
+        let frame = renderer.renderNew(sudoku.solution)
+
+        for (let y = 0; y < 4; y++) {
+            frame.getCell(y, 0).setText(["1", "2", "3", "3"]);
+            frame.getCell(y, 1).setText(["1", "1", "2", "3"]);
+            frame.getCell(y, 2).setText(["1", "1", "2"]);
+        }
+
+        for (let x = 0; x < 4; x++) {
+            frame.getCell(1, x).setTextBackgroundColor("3", "background-removed", false);
+            frame.getCell(2, x).setTextBackgroundColor("3", "background-removed", true);
+            frame.getCell(3, x).setTextBackgroundColorByPosition(2, "background-removed");
+
+            frame.getCell(4, x).setTextBackgroundColorByPosition(2, "background-removed");
+            frame.getCell(4, x).removeTextsBackgroundColor();
+        }
+    }
 }

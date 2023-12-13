@@ -2,6 +2,8 @@ class Renderer {
     public static renderer: Renderer = new Renderer();
 
     public doRenderNumbers: boolean = true;
+        public doSmallNumbersOnFullBinary = false;
+        public doSmallNumbersOnOneNumber = false;
     public doRenderBackgroundColor: boolean = true;
         public backgroundColor: string = "#FFF";
     public doRenderRegions: boolean = true;
@@ -14,6 +16,7 @@ class Renderer {
         public extraRegionsBorderStyle: BasketBorderStyle = BasketBorderStyle.styles.extraRegions;
     public doRenderExtraRegionsBackgroundColor: boolean = true;
         public extraRegionsBackgroundColor: string = "#EEE";
+    public doRemoveBackgroundTextsBackgroundColor = true;
 
     constructor() {
 
@@ -25,7 +28,7 @@ class Renderer {
     private binaryToCharacters(binary: number, fullBinary: number): string | string[] {
         if (binary === 0) {
             return "!";
-        } else if (binary === fullBinary) {
+        } else if (binary === fullBinary && ! this.doSmallNumbersOnFullBinary) {
             return [];
         }
 
@@ -34,13 +37,16 @@ class Renderer {
         for (let shift of shifts) {
             characters.push(`${shift + 1}`);
         }
-        return characters.length !== 1 ? characters : characters[0];
+        return (characters.length !== 1 || this.doSmallNumbersOnOneNumber) ? characters : characters[0];
     }
 
     private renderBasic(state: State, sudoku: Sudoku, frame: Frame): void {
         for (let y = 0; y < sudoku.size; y++) {
             for (let x = 0; x < sudoku.size; x++) {
                 let cell = frame.getCell(y, x);
+                if (this.doRemoveBackgroundTextsBackgroundColor) {
+                    cell.removeTextsBackgroundColor();
+                }
                 if (this.doRenderNumbers) {
                     cell.setText(this.binaryToCharacters(state.board[y * sudoku.size + x], sudoku.fullBinary));
                 }

@@ -47,6 +47,8 @@
     display: flex; justify-content: center; align-items: center;
 }
 
+.text-wrapper > .background-removed { background-color: #FF0; }
+
 .canvas {
     position: absolute; height: calc(100% - var(--strong-border-width)); width: calc(100% - var(--strong-border-width));
     margin-top: calc(-100% + var(--strong-border-width) / 2); margin-left: calc(var(--strong-border-width) / 2);

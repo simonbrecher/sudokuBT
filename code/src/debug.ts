@@ -14,8 +14,10 @@ class Debug {
         // GraphicsTests.testBuildSolution();
         // GraphicsTests.testBuildTask();
 
-        GraphicsTests.testCanvas();
-        GraphicsTests.testBasketBorders();
+        // GraphicsTests.testCanvas();
+        // GraphicsTests.testBasketBorders();
+
+        GraphicsTests.testTextBackgroundColor();
 
         let now = (new Date()).getMilliseconds();
         console.log(`TIME: ${(now - then) / 1000}s`);

@@ -146,6 +146,50 @@ class Cell {
     }
 
     /**
+     * Change background color of text, by text position.
+     * @param position Index of text in this.textElements[]
+     * @param color CSS class of the background color
+     */
+    public setTextBackgroundColorByPosition(position: number, color: string): void {
+        if (this.textColors[position] !== color) {
+            this.textColors[position] = GraphicsUtils.updateCssClass(this.textElements[position], this.textColors[position], color);
+        }
+    }
+
+    /**
+     * Change background color of text.
+     * @param text Text, whose background color should change
+     * @param color CSS class of the background color
+     * @param changeAll true if for all equal texts, false if only for the first
+     * @return false only if: changeAll == false and no equal text was found
+     */
+    public setTextBackgroundColor(text: string, color: string, changeAll: boolean): boolean {
+        let wasChanged = false;
+        for (let i = 0; i < this.texts.length; i++) {
+            if (this.texts[i] === text) {
+                this.setTextBackgroundColorByPosition(i, color);
+                if (! changeAll) {
+                    wasChanged = true;
+                    break;
+                }
+            }
+        }
+        return wasChanged;
+    }
+
+    /**
+     * Remove all text background colors.
+     */
+    public removeTextsBackgroundColor(): void {
+        for (let i = 0; i < this.texts.length; i++) {
+            if (this.textColors[i] !== "") {
+                this.textElements[i].classList.remove(this.textColors[i]);
+                this.textColors[i] = "";
+            }
+        }
+    }
+
+    /**
      * Return width of border in pixels
      */
     public getBorderWidth(direction: number): number {
