@@ -2,8 +2,8 @@ class Renderer {
     public static renderer: Renderer = new Renderer();
 
     public doRenderNumbers: boolean = true;
-        public doSmallNumbersOnFullBinary = false;
-        public doSmallNumbersOnOneNumber = false;
+        public doSmallNumbersOnFullBinary: boolean = false;
+        public doSmallNumbersOnOneNumber: boolean = false;
     public doRenderBackgroundColor: boolean = true;
         public backgroundColor: string = "#FFF";
     public doRenderRegions: boolean = true;
@@ -16,7 +16,7 @@ class Renderer {
         public extraRegionsBorderStyle: BasketBorderStyle = BasketBorderStyle.styles.extraRegions;
     public doRenderExtraRegionsBackgroundColor: boolean = true;
         public extraRegionsBackgroundColor: string = "#EEE";
-    public doRemoveBackgroundTextsBackgroundColor = true;
+    public doRemoveBackgroundTextsBackgroundColor: boolean = true;
 
     constructor() {
 

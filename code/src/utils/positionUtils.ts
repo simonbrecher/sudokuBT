@@ -41,7 +41,7 @@ class PositionUtils {
 
     /**
      * Convert regions matrix into regions matrix where every region is one area of connectivity.
-     * Indexes have ids 0, 1 ... ; -1 is value for no region
+     * Indices have ids 0, 1 ... ; -1 is value for no region
      */
     public static countConnectedAreas(matrix: number[], height: number, width: number, directions: { y: number, x: number }[]): number[] {
         let output = ArrayUtils.createArray1d(height * width, -1);

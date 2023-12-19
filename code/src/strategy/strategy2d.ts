@@ -55,16 +55,16 @@ class Strategy2d {
     /**
      * Convert 1d array of 1d indices (y * width + x) into 1d array of 2d indices ( { y: y, x: x } )
      */
-    private indexToCoordinates2dArray1d(indexes: number[]): StrategyCoordinates2d[] {
+    private indexToCoordinates2dArray1d(indices: number[]): StrategyCoordinates2d[] {
         let output = [];
-        for (let index of indexes) {
+        for (let index of indices) {
             output.push(this.indexToCoordinates2d(index));
         }
         return output;
     }
 
     /**
-     * Conver 1d index (y * width + x) and shift into 3d index ( { y: y, x: x, shift: shift } )
+     * Convert 1d index (y * width + x) and shift into 3d index ( { y: y, x: x, shift: shift } )
      * @param index (y * width + x)
      * @param shift third coordinate
      */
