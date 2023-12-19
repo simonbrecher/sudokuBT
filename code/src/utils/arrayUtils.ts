@@ -52,6 +52,22 @@ class ArrayUtils {
         }
     }
 
+    public static range1d(start: number, end: number, step: number = 1): number[] {
+        let output = [];
+        if (step > 0) {
+            for (let i = start; i < end; i+=step) {
+                output.push(i);
+            }
+        } else if (step < 0) {
+            for (let i = start; i > end; i+=step) {
+                output.push(i);
+            }
+        } else {
+            throw "ArrayUtils.range1d(), step cannot be 0.";
+        }
+        return output
+    }
+
     public static shuffle1d(array: any[]): void {
         for (let i = 1; i < array.length; i++) {
             let randomNumber = Math.floor(Math.random() * (i + 1));

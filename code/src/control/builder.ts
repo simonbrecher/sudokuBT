@@ -61,10 +61,7 @@ class Builder {
      * @param size sudoku.size
      */
     private createRemoveOrder(size: number): number[] {
-        let removeOrder = [];
-        for (let i = 0; i < size * size; i++) {
-            removeOrder.push(i);
-        }
+        let removeOrder = ArrayUtils.range1d(0, size * size);
         ArrayUtils.shuffle1d(removeOrder);
         return removeOrder;
     }

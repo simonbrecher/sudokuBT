@@ -48,6 +48,8 @@
 }
 
 .text-wrapper > .background-removed { background-color: #FF0; }
+.text-wrapper > .background-error { background-color: #F30; }
+.text-wrapper > .background-region { background-color: #0FF; }
 
 .canvas {
     position: absolute; height: calc(100% - var(--strong-border-width)); width: calc(100% - var(--strong-border-width));

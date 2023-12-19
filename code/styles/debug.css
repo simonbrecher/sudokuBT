@@ -3,3 +3,9 @@
 }
 
 #container { width: 1060px; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 5px; }
+
+.strategy-test-wrapper-outer { padding: 5px; border: 1px solid #000; background-color: #F5F5F5; }
+
+.strategy-test-wrapper-inner { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 5px; }
+
+.test-text { text-align: center; }
