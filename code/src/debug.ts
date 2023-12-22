@@ -19,7 +19,8 @@ class Debug {
 
         // GraphicsTests.testTextBackgroundColor();
 
-        StrategyTests.testNakedSingle();
+        // StrategyTests.testNakedSingle();
+        StrategyTests.testHiddenSingle();
 
         let now = (new Date()).getMilliseconds();
         console.log(`TIME: ${(now - then) / 1000}s`);

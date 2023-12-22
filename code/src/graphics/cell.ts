@@ -163,10 +163,10 @@ class Cell {
      * @param changeAll true if for all equal texts, false if only for the first
      * @return false only if: changeAll == false and no equal text was found
      */
-    public setTextBackgroundColor(text: string, color: string, changeAll: boolean): boolean {
+    public setTextBackgroundColor(text: string | null, color: string, changeAll: boolean): boolean {
         let wasChanged = false;
         for (let i = 0; i < this.texts.length; i++) {
-            if (this.texts[i] === text) {
+            if (text === null || this.texts[i] === text) {
                 this.setTextBackgroundColorByPosition(i, color);
                 if (! changeAll) {
                     wasChanged = true;

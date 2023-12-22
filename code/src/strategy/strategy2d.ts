@@ -1,5 +1,6 @@
 type StrategyCoordinates2d = { y: number, x: number };
 type StrategyCoordinates3d = { y: number, x: number, shift: number };
+type StrategyRegionCoordinates2d = { index: number, shift: number };
 type StrategyColors = {
     removed?: StrategyCoordinates3d[], // numbers that will be removed
     reason?: StrategyCoordinates3d[],  // numbers that are the reason for other numbers being removed
@@ -70,6 +71,69 @@ class Strategy2d {
      */
     private indexToCoordinates3d(index: number, shift: number): StrategyCoordinates3d {
         return { y: Math.floor(index / this.sudoku.size), x: index % this.sudoku.size, shift: shift };
+    }
+
+    /**
+     * Convert 1d array of 1d indices (y * width + x) and shift into 3d indices ( { y: y, x: x, shift: shift } )
+     */
+    private indexToCoordinates3dArray1dIndices(indices: number[], shift: number): StrategyCoordinates3d[] {
+        let output = [];
+        for (let index of indices) {
+            output.push(this.indexToCoordinates3d(index, shift));
+        }
+        return output;
+    }
+
+    /**
+     * Convert 1d index (y * width + x) and 1d array of shifts into 3d indices ( { y: y, x: x, shift: shift } )
+     */
+    private indexToCoordinates3dArray1dShifts(index: number, shifts: number[]): StrategyCoordinates3d[] {
+        let output = [];
+        for (let shift of shifts) {
+            output.push(this.indexToCoordinates3d(index, shift));
+        }
+        return output;
+    }
+
+    /**
+     * Convert StrategyRegionCoordinates2d[] to StrategyCoordinates3d[]
+     */
+    private regionCoordinates2dTo3dArray1d(regionIndices: StrategyRegionCoordinates2d[], region: number[]): StrategyCoordinates3d[] {
+        let output = [];
+        for (let regionIndex of regionIndices) {
+            output.push(this.indexToCoordinates3d(region[regionIndex.index], regionIndex.shift));
+        }
+        return output;
+    }
+
+    /**
+     * Convert StrategyRegionCoordinates2d[] to index[]
+     */
+    private regionCoordinates2dToShiftArray1d(regionIndices: StrategyRegionCoordinates2d[], region: number[]): number[] {
+        let output = [];
+        for (let regionIndex of regionIndices) {
+            output.push(regionIndex.shift);
+        }
+        return output;
+    }
+
+    private joinShiftsToText(shifts: number[]): string {
+        let copyShifts = ArrayUtils.deepcopyArray1d(shifts);
+        copyShifts.sort((a, b) => a - b);
+        switch (copyShifts.length) {
+            case 0:
+                throw "ERROR: Strategy2d.joinShiftsToText : shifts=[]";
+            case 1:
+                return `${copyShifts[0] + 1}`;
+            default:
+                let texts = [];
+                for (let shift of copyShifts) {
+                    texts.push(`${shift + 1}`);
+                }
+                let last = texts.pop();
+                let text = texts.join(", ");
+                return `${text} and ${last}`;
+        }
     }
 
     /**
@@ -162,6 +226,131 @@ class Strategy2d {
                 removed: removed,
             },
             message: `Naked single: Removed ${removed.length} numbers.`,
+            isUpdated: true,
+            isValid: true,
+        }
+    }
+
+    /**
+     * Apply the strategy Naked single on one region.
+     * @param binaries 1d array with binary representations of cells in region
+     * @return reason:      all values that caused any other value to be removed
+     * @return removed:     all values that will be removed
+     * @return multiple:    cell and all shifts that can not be in any other cell
+     * @return missing:     all shifts that can not be in any cell
+     * @return isUpdated:   true if any progress was made, or isValid==false
+     * @return isValid:     false if region is known to have no solution
+     */
+    private _hiddenSingle(binaries: number[]): {
+        reason?: StrategyRegionCoordinates2d[], removed?: StrategyRegionCoordinates2d[],
+        multiple?: { cell: number, shifts: number[] }, missing?: number[],
+        isUpdated: boolean, isValid: boolean,
+    } {
+        // find all values that are in one/multiple/zero cells
+        let once = 0;
+        let twice = 0;
+        for (let binary of binaries) {
+            twice |= once & binary;
+            once |= binary;
+        }
+        once &= ~ twice;
+        let zero = BinaryUtils.createFullBinary(binaries.length) & ~ (once | twice);
+
+        // number(s) cannot be in any cell
+        if (zero !== 0) {
+            return { missing: BinaryUtils.binaryToShifts32(zero), isUpdated: true, isValid: false };
+        }
+
+        // check what values can be removed
+        let isUpdated = false;
+        let reason = [];
+        let removed = [];
+        for (let i = 0; i < binaries.length; i++) {
+            if ((binaries[i] & once) !== 0) {
+
+                // multiple numbers have to be in one cell
+                if (! BinaryUtils.has1bit32(binaries[i] & once)) {
+                    let multiple = { cell: i, shifts: BinaryUtils.binaryToShifts32(binaries[i] & once) };
+                    return { multiple: multiple, isUpdated: true, isValid: false };
+                }
+
+                reason.push({ index: i, shift: BinaryUtils.binaryToShifts32(binaries[i] & once)[0] });
+                for (let shift of BinaryUtils.binaryToShifts32(binaries[i] & ~ once)) {
+                    removed.push({ index: i, shift: shift });
+                }
+                isUpdated = true;
+            }
+            binaries[i] &= ~ once;
+        }
+
+        return { reason: reason, removed: removed, isUpdated: isUpdated, isValid: true };
+    }
+
+    /**
+     * Apply the strategy hidden naked on all regions.
+     * If any region is invalid, return error for first invalid region.
+     * If all region are valid and any region can be progressed, return progress for first progressed region.
+     * Otherwise, nothing is changed.
+     */
+    public hiddenSingle(board: number[]): StrategyResult {
+        let regions = this.sudoku.regions.getAllRegions(true, true, true, true, true);
+        let result = null;
+        let resultRegion = null
+        for (let region of regions) {
+            let newResult = this._hiddenSingle(this.loadRegion32(board, region));
+            if (result === null || ! newResult.isValid || ! result.isUpdated && newResult.isUpdated) {
+                result = newResult;
+                resultRegion = region;
+                if (! result.isValid) {
+                    if (result.missing !== undefined) {
+                        return {
+                            colors: {
+                                error: this.indexToCoordinates3dArray1dIndices(region, -1),
+                                region: this.indexToCoordinates2dArray1d(region),
+                            },
+                            message: `INVALID: Number${result.missing.length > 1 ? 's' : ''} ${this.joinShiftsToText(result.missing)} can not be in any cell in the region.`,
+                            isUpdated: true,
+                            isValid: false,
+                        }
+                    } else if (result.multiple !== undefined) {
+                        return {
+                            colors: {
+                                error: this.indexToCoordinates3dArray1dShifts(region[result.multiple.cell], result.multiple.shifts),
+                                region: this.indexToCoordinates2dArray1d(region),
+                            },
+                            message: `INVALID: Numbers ${this.joinShiftsToText(result.multiple.shifts)} can be only in the same cell in the region.`,
+                            isUpdated: true,
+                            isValid: false,
+                        }
+                    } else {
+                        throw "Strategy2d.hiddenSingle : result.missing === undefined && result.missing === undefined";
+                    }
+                }
+            }
+        }
+
+        if (result === null || ! result.isUpdated) {
+            return { colors: {  }, message: "", isUpdated: false, isValid: true };
+        }
+
+        let reason = [];
+        for (let reasonOne of result.reason!) {
+            reason.push(reasonOne.index);
+        }
+        let reasonNumberText = result.reason!.length > 1 ? 'Numbers' : 'Number';
+        let reasonListText = this.joinShiftsToText(this.regionCoordinates2dToShiftArray1d(result.reason!, resultRegion!));
+        let cellText = result.reason!.length > 1 ? 'these cells' : 'this cell';
+        let removedNumberText = result.removed!.length > 1 ? 'numbers' : 'number';
+        return {
+            colors: {
+                reason: this.regionCoordinates2dTo3dArray1d(result.reason!, resultRegion!),
+                removed: this.regionCoordinates2dTo3dArray1d(result.removed!, resultRegion!),
+                region: this.indexToCoordinates2dArray1d(resultRegion!),
+            },
+            message: `
+                Hidden single: ${reasonNumberText} ${reasonListText} can be only in one cell from the region.
+                ${result.removed!.length} ${removedNumberText} in ${cellText} can be removed.
+            `,
             isUpdated: true,
             isValid: true,
         }
