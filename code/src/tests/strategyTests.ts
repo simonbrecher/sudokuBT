@@ -180,7 +180,9 @@ class StrategyTests {
             }
             if (result.isValid && result.isUpdated) {
                 this.renderColor(frame, result.colors.removed!, "background-removed");
-                this.renderColor(frame, result.colors.reason!, "background-reason");
+                if (result.colors.reason) {
+                    this.renderColor(frame, result.colors.reason!, "background-reason");
+                }
             } else if (! result.isValid) {
                 this.renderError(frame, result.colors.error!);
             }
