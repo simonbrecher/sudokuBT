@@ -41,9 +41,38 @@
 
 <body>
 
+<div id="test-menu-button" onclick="updateUrlParameter('test', null)">Menu</div>
+
+<div id="test-types">
+    <h2>Graphics</h2>
+    <div class="test-types">
+        <div onclick="updateUrlParameter('test', 'region_class')">Region class</div>
+        <div onclick="updateUrlParameter('test', 'builder_solution')">Builder solution</div>
+        <div onclick="updateUrlParameter('test', 'builder_task')">Builder task</div>
+        <div onclick="updateUrlParameter('test', 'canvas')">Canvas</div>
+        <div onclick="updateUrlParameter('test', 'basket_borders')">Basket boarders</div>
+        <div onclick="updateUrlParameter('test', 'background_color')">Background color</div>
+    </div>
+    <h2>Strategies</h2>
+    <div class="test-types">
+        <div onclick="updateUrlParameter('test', 'naked_single')">Naked single</div>
+        <div onclick="updateUrlParameter('test', 'hidden_single')">Hidden single</div>
+    </div>
+</div>
+
 <div id="container" class="puzzle-container"></div>
 
 <script>
+    function updateUrlParameter(parameterName, value) {
+        let url = new URL(window.location.href);
+        if (value === null) {
+            url.searchParams.delete(parameterName);
+        } else {
+            url.searchParams.set(parameterName, value);
+        }
+        window.location.href = url.toString();
+    }
+
     Debug.main();
 </script>
 

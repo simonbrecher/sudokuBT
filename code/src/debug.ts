@@ -5,22 +5,24 @@ class Debug {
     public static main(): void {
         let then = (new Date()).getMilliseconds();
 
-        // let frame = GraphicsTests.testBasicGraphicOfCell(10, 9, 2, 3);
-        // GraphicsTests.testTextWrapperRemoval(frame, 10*/*00*/1000);
+        const urlParams = new URLSearchParams(window.location.search);
 
-        // GraphicsTests.testRegionsClass();
+        if (urlParams.has("test")) {
+            document.getElementById("test-types")?.classList.add("display-none");
+            switch(urlParams.get("test")) {
+                case "region_class":        GraphicsTests.testRegionsClass();           break;
+                case "builder_solution":    GraphicsTests.testSolver();                 break;
+                case "builder_task":        GraphicsTests.testBuildSolution();          break;
+                case "canvas":              GraphicsTests.testCanvas();                 break;
+                case "basket_borders":      GraphicsTests.testBasketBorders();          break;
+                case "background_color":    GraphicsTests.testTextBackgroundColor();    break;
 
-        // GraphicsTests.testSolver();
-        // GraphicsTests.testBuildSolution();
-        // GraphicsTests.testBuildTask();
-
-        // GraphicsTests.testCanvas();
-        // GraphicsTests.testBasketBorders();
-
-        // GraphicsTests.testTextBackgroundColor();
-
-        // StrategyTests.testNakedSingle();
-        StrategyTests.testHiddenSingle();
+                case "naked_single":        StrategyTests.testNakedSingle();            break;
+                case "hidden_single":       StrategyTests.testHiddenSingle();           break;
+            }
+        } else {
+            document.getElementById("test-menu-button")?.classList.add("display-none");
+        }
 
         let now = (new Date()).getMilliseconds();
         console.log(`TIME: ${(now - then) / 1000}s`);
