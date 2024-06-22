@@ -192,13 +192,14 @@ class StrategyTests {
 
     private static readonly NAKED_SINGLE_TESTS: SingleTests = [
         ["Naked single 1", 4, null, false, null, ["----", "----", "----", "----"], true, []],
-        ["Naked single 2", 4, null, false, null, ["1---", "-1--", "-2--", "-3--"], true, []],
-        ["Naked single 3", 4, null, false, null, ["1---", "----", "----", "----"], true, [[1, 0b0011]]],
-        ["Naked single 4", 4, null, false, null, ["12--", "----", "----", "----"], true, [[2, 0b0011]]],
-        ["Naked single 5", 4, null, false, null, ["1-1-", "----", "----", "----"], true, []],
-        ["Naked single 6", 4, null, false, ["0001", "0111", "2223", "2333"], ["123-", "-42-", "---4", "---2"], true, []],
-        ["Naked single 7", 6, [2, 3], false, null, ["12----", "-34---", "5-----", "--56--", "------", "----21"], true, []],
-        ["Naked single 8", 6, null, true, null, ["126---", "-34---", "5----6", "--56--", "------", "----21"], true, []],
+        ["Naked single 2", 4, null, false, null, ["----", "----", "----", "----"], true, [[0, 0b0000]]],
+        ["Naked single 3", 4, null, false, null, ["1---", "-1--", "-2--", "-3--"], true, []],
+        ["Naked single 4", 4, null, false, null, ["1---", "----", "----", "----"], true, [[1, 0b0011]]],
+        ["Naked single 5", 4, null, false, null, ["12--", "----", "----", "----"], true, [[2, 0b0011]]],
+        ["Naked single 6", 4, null, false, null, ["1-1-", "----", "----", "----"], true, []],
+        ["Naked single 7", 4, null, false, ["0001", "0111", "2223", "2333"], ["123-", "-42-", "---4", "---2"], true, []],
+        ["Naked single 8", 6, [2, 3], false, null, ["12----", "-34---", "5-----", "--56--", "------", "----21"], true, []],
+        ["Naked single 9", 6, null, true, null, ["126---", "-34---", "5----6", "--56--", "------", "----21"], true, []],
     ];
 
     public static testNakedSingle(): void {

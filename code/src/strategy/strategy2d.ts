@@ -178,6 +178,20 @@ class Strategy2d {
     public nakedSingle(board: number[]): StrategyResult {
         let outputBoard = ArrayUtils.deepcopyArray1d(board);
 
+        for (let i = 0; i < board.length; i++) {
+            if (board[i] == 0) {
+                return {
+                    colors: {
+                        error: [this.indexToCoordinates3d(i, -1)],
+                        region: [],
+                    },
+                    message: "INVALID: There is no number in a cell.",
+                    isUpdated: true,
+                    isValid: false,
+                }
+            }
+        }
+
         let regions = this.sudoku.regions.getAllRegions(true, true, true, true, true);
         for (let region of regions) {
             let output = this._nakedSingle(this.loadRegion32(board, region));
