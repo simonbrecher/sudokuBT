@@ -19,6 +19,9 @@ class Debug {
 
                 case "naked_single":        StrategyTests.testNakedSingle();            break;
                 case "hidden_single":       StrategyTests.testHiddenSingle();           break;
+                case "perfect_matching":    ;        break;
+
+                case "ng_perfect_match":    PerfectMatchingTest.main();                 break;
             }
         } else {
             document.getElementById("test-menu-button")?.classList.add("display-none");

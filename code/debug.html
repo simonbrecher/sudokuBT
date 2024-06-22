@@ -34,9 +34,11 @@
     <script src="src/data/sudoku.js"></script>
 
     <script src="src/strategy/strategy2d.js"></script>
+    <script src="src/strategy/perfectMatching.js"></script>
 
     <script src="src/tests/graphicsTests.js"></script>
     <script src="src/tests/strategyTests.js"></script>
+    <script src="src/tests/perfectMatchingTest.js"></script>
 </head>
 
 <body>
@@ -57,6 +59,11 @@
     <div class="test-types">
         <div onclick="updateUrlParameter('test', 'naked_single')">Naked single</div>
         <div onclick="updateUrlParameter('test', 'hidden_single')">Hidden single</div>
+        <div onclick="updateUrlParameter('test', 'perfect_match')">Perfect matching</div>
+    </div>
+    <h2>Non graphic tests</h2>
+    <div class="test-types">
+        <div onclick="updateUrlParameter('test', 'ng_perfect_match')">Perfect matching</div>
     </div>
 </div>
 
