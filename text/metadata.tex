@@ -1,6 +1,3 @@
-%%% Please fill in basic information on your thesis, which will be automatically
-%%% inserted at the right places. You need to replace \xxx{...} by real data.
-
 % Type of your thesis:
 %	"bc" for Bachelor's
 %	"mgr" for Master's
@@ -14,32 +11,31 @@
 \def\StudyLanguage{cs}
 
 % Thesis title in English (exactly as in the official assignment)
-% (Note: \xxx is a "ToDo label" which makes the unfilled visible. Remove it.)
-\def\ThesisTitle{\xxx{Thesis title}}
+\def\ThesisTitle{Helper for solving sudoku variants}
 
 % Author of the thesis (you)
-\def\ThesisAuthor{\xxx{Name Surname}}
+\def\ThesisAuthor{Šimon Brecher}
 
 % Year when the thesis is submitted
-\def\YearSubmitted{\xxx{YEAR}}
+\def\YearSubmitted{2023/2024}
 
 % Name of the department or institute, where the work was officially assigned
 % (according to the Organizational Structure of MFF UK in English,
 % see https://www.mff.cuni.cz/en/faculty/organizational-structure,
 % or a full name of a department outside MFF)
-\def\Department{\xxx{Name of the department}}
+\def\Department{Department of Theoretical Computer Science and Mathematical Logic}
 
 % Is it a department (katedra), or an institute (ústav)?
-\def\DeptType{\xxx{Department}}
+\def\DeptType{Department}
 
 % Thesis supervisor: name, surname and titles
-\def\Supervisor{\xxx{Supername Supersurname}}
+\def\Supervisor{doc. Mgr. Petr Gregor, Ph.D.}
 
 % Supervisor's department (again according to Organizational structure of MFF)
-\def\SupervisorsDepartment{\xxx{department}}
+\def\SupervisorsDepartment{Department of Theoretical Computer Science and Mathematical Logic}
 
 % Study programme (does not apply to rigorosum theses)
-\def\StudyProgramme{\xxx{study programme}}
+\def\StudyProgramme{B0613A140006}
 
 % An optional dedication: you can thank whomever you wish (your supervisor,
 % consultant, who provided you with tea and pizza, etc.)
@@ -48,20 +44,17 @@
 }
 
 % Abstract (recommended length around 80-200 words; this is not a copy of your thesis assignment!)
-\def\Abstract{%
-\xxx{Use the most precise, shortest sentences that state what problem the
-thesis addresses, how it is approached, pinpoint the exact result achieved, and
-describe the applications and significance of the results. Highlight anything
-novel that was discovered or improved by the thesis. Maximum length is 200
-words, but try to fit into 120. Abstracts are often used for deciding if
-a reviewer will be suitable for the thesis; a well-written abstract thus
-increases the probability of getting a reviewer who will like the thesis.}
+\def\Abstract{
+Finding a solution for a sudoku puzzle is relatively easy.
+Unfortunately, people solve sudoku puzzles differently from machines.
+Because of that, if we want to explain how to solve a sudoku puzzle, it is not enough to only know what the correct solution is.
+The goal of this bachelor thesis is to show how to generate an explanation of the progress of solving a sudoku puzzle.
 }
 
 % 3 to 5 keywords (recommended) separated by \sep
 % Keywords are useful for indexing and searching for the theses by topic.
 \def\ThesisKeywords{%
-\xxx{keyword\sep key phrase}
+sudoku\sep solving sudoku \sep hint for solving sudoku \sep sudoku variant
 }
 
 % If any of your metadata strings contains TeX macros, you need to provide
@@ -80,16 +73,19 @@ increases the probability of getting a reviewer who will like the thesis.}
 % If you are studing in a Czech programme, you also need to provide metadata in Czech:
 % (in English programmes, this is not used anywhere)
 
-\def\ThesisTitleCS{\xxx{Název práce česky}}
-\def\DepartmentCS{\xxx{Název katedry česky}}
-\def\DeptTypeCS{\xxx{Katedra}}
-\def\SupervisorsDepartmentCS{\xxx{katedra vedoucího}}
-\def\StudyProgrammeCS{\xxx{studijní program}}
+\def\ThesisTitleCS{Rádce pro řešení variant sudoku}
+\def\DepartmentCS{Katedra teoretické informatiky a matematické logiky}
+\def\DeptTypeCS{Katedra}
+\def\SupervisorsDepartmentCS{Katedra teoretické informatiky a matematické logiky}
+\def\StudyProgrammeCS{B0613A140006}
 
 \def\ThesisKeywordsCS{%
-\xxx{klíčová slova\sep klíčové fráze}
+sudoku\sep řešení sudoku \sep nápověda řešení sudoku \sep varianta sudoku
 }
 
 \def\AbstractCS{%
-\xxx{Abstrakt práce přeložte také do češtiny.}
+Nalezení řešení pro sudoku je poměrně jednoduché.
+Lidé ale nejsou schopni řešit sudoku stejným způsobem jako počítače.
+Proto abychom byli schopni vysvětlit jak sudoku vyřešit, nestačí pouze znát správné řešení.
+Cílem této bakalářské práce je nalézt způsob, jak získat vysvětlení postupu řešení sudoku.
 }
