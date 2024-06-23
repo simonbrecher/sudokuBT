@@ -1,0 +1,4 @@
+aux/
+tmp/
+*.pdf
+!img/**/*.pdf
