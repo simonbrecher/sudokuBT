@@ -37,6 +37,14 @@ class BinaryUtils {
         return shifts;
     }
 
+    public static shiftsToBinary(shifts: number[]) {
+        let binary = 0;
+        for (let shift of shifts) {
+            binary |= 1 << shift;
+        }
+        return binary;
+    }
+
     /**
      * Choose position with least bits with value 1, from positions that have at least two bits with value 1.
      */

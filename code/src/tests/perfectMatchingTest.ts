@@ -143,4 +143,32 @@ class PerfectMatchingTest {
             }
         }
     }
+
+    /**
+     * Create multiple bipartite graphs.
+     * For each of them run PerfectMatching.getPerfectMatching method and render result in a sudoku 2 first lines
+     */
+    public static mainGraphic(): void {
+        let sizes = ArrayUtils.range1d(2, 15.01, 1);
+        let probabilities = ArrayUtils.range1d(0, 1.01, 0.2);
+        let count = 1;
+        console.log(`Count: ${sizes.length * probabilities.length * count}/100`);
+
+        for (let size of sizes) {
+            for (let probability of probabilities) {
+                for (let i = 0; i < count; i++) {
+                    let edges = this.createEdges(size, probability);
+                    let matching = PerfectMatching.getPerfectMatching(edges);
+                    let sudoku = new Sudoku(size);
+                    for (let i = 0; i < size; i++) {
+                        sudoku.solution.board[i] = BinaryUtils.shiftsToBinary(edges[i]);
+                        if (matching !== null) {
+                            sudoku.solution.board[size + i] = 1 << matching[i];
+                        }
+                    }
+                    Renderer.renderer.renderNew(sudoku.solution);
+                }
+            }
+        }
+    }
 }
