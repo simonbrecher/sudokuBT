@@ -121,7 +121,7 @@ class PerfectMatchingTest {
         let sizes = ArrayUtils.range1d(2, 31.01, 1);
         let probabilities = ArrayUtils.range1d(0, 1.01, 0.05);
         let count = 50;
-        console.log(`Count: ${sizes.length * probabilities.length * count}/100`);
+        console.log(`Count: ${sizes.length * probabilities.length * count}`);
 
         let okCount = 0;
         for (let size of sizes) {
@@ -152,7 +152,7 @@ class PerfectMatchingTest {
         let sizes = ArrayUtils.range1d(2, 15.01, 1);
         let probabilities = ArrayUtils.range1d(0, 1.01, 0.2);
         let count = 1;
-        console.log(`Count: ${sizes.length * probabilities.length * count}/100`);
+        console.log(`Count: ${sizes.length * probabilities.length * count}`);
 
         for (let size of sizes) {
             for (let probability of probabilities) {
@@ -167,6 +167,52 @@ class PerfectMatchingTest {
                         }
                     }
                     Renderer.renderer.renderNew(sudoku.solution);
+                }
+            }
+        }
+    }
+
+    private static perfectlyMatchableOne(edges: number[][]): void {
+        let matchable = PerfectMatching.getPerfectlyMatchableEdges(edges);
+        let size = edges.length;
+        let sudoku = new Sudoku(size);
+        for (let i = 0; i < size; i++) {
+            sudoku.solution.board[i] = BinaryUtils.shiftsToBinary(edges[i]);
+            if (matchable !== null) {
+                sudoku.solution.board[size + i] = BinaryUtils.shiftsToBinary(matchable[i]);
+            } else {
+                sudoku.solution.board[size + i] = 0;
+            }
+        }
+        Renderer.renderer.renderNew(sudoku.solution);
+    }
+
+    public static perfectlyMatchable(): void {
+        let manual = [
+            [[1, 2, 4, 0], [0, 5], [0, 3], [1, 2, 4, 0, 3], [0, 3, 5], [1, 2, 4, 3]],
+            [[1, 2, 4], [0, 5, 2], [0, 3], [1, 2, 4], [0, 3, 5], [1, 2, 4]],
+        ]
+        for (let m of manual) {
+            this.perfectlyMatchableOne(m);
+        }
+
+
+        let sizes = ArrayUtils.range1d(2, 15.01, 1);
+        let probabilities = ArrayUtils.range1d(0, 1.01, 0.2);
+        let count = 1;
+        console.log(`Count: ${sizes.length * probabilities.length * count}`);
+
+        for (let size of sizes) {
+            for (let probability of probabilities) {
+                for (let i = 0; i < count; i++) {
+                    let edges = this.createEdges(size, probability);
+                    let permutation = ArrayUtils.getRandomPermutation(size);
+                    for (let i = 0; i < size; i++) {
+                        if (! edges[i].includes(permutation[i])) {
+                            edges[i].push(permutation[i]);
+                        }
+                    }
+                    this.perfectlyMatchableOne(edges);
                 }
             }
         }

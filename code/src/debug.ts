@@ -19,8 +19,10 @@ class Debug {
 
                 case "naked_single":        StrategyTests.testNakedSingle();            break;
                 case "hidden_single":       StrategyTests.testHiddenSingle();           break;
-                case "perfect_match":    console.log("here"); PerfectMatchingTest.mainGraphic();          break;
+                case "perfect_match":       PerfectMatchingTest.mainGraphic();          break;
+                case "perfectly_matchable": PerfectMatchingTest.perfectlyMatchable();   break;
 
+                case "debug":               Debug.debug();                              break;
                 case "ng_perfect_match":    PerfectMatchingTest.main();                 break;
 
                 default: console.log(`unknown test type ${urlParams.get("test")}`);
@@ -31,5 +33,21 @@ class Debug {
 
         let now = (new Date()).getMilliseconds();
         console.log(`TIME: ${(now - then) / 1000}s`);
+    }
+
+    public static debug(): void {
+        // let edges = [[2, 4], [1, 2, 4], [1, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4]];
+        // let matched = [2, 4, 1, 0, 3];
+        // // @ts-ignore
+        // let graph = PerfectMatching.getMatchableEdgesGraph(edges, matched);
+        // console.log(graph);
+        // // @ts-ignore
+        // let components = PerfectMatching.getStronglyConnectedComponents(graph);
+        // console.log(components);
+
+        let graph2 = [[4], [2, 3, 5], [0, 1], [0], [3], [], []];
+        // @ts-ignore
+        let components2 = PerfectMatching.getStronglyConnectedComponents(graph2);
+        console.log(graph2, components2);
     }
 }

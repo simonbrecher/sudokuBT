@@ -92,4 +92,39 @@ class ArrayUtils {
         }
         return output;
     }
+
+    public static invertArray1d(array: number[]): number[] {
+        let output = ArrayUtils.createArray1d(array.length, null);
+        for (let i = 0; i < array.length; i++) {
+            output[array[i]] = i;
+        }
+        return output;
+    }
+
+    public static removeValue(array: number[], value: number): number[] {
+        let output = [];
+        for (let add of array) {
+            if (add != value) {
+                output.push(add);
+            }
+        }
+        return output;
+    }
+
+    /**
+     * Generate random permutation using Fisher–Yates shuffle.
+     */
+    public static getRandomPermutation(size: number): number[] {
+        let output: number[] = [];
+        for (let i = 0; i < size; i++) {
+            output.push(i);
+        }
+        for (let i = 0; i < size; i++) {
+            let random = Math.floor(Math.random() * size);
+            let x = output[random];
+            output[random] = output[i];
+            output[i] = x;
+        }
+        return output;
+    }
 }

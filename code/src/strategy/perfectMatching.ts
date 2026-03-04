@@ -165,4 +165,148 @@ class PerfectMatching {
             return <number[]>matched;
         }
     }
+
+    /**
+     * Change indices for vertices in partite B so P(a) has same index as a.
+     * @param edges  For each vertex from partition A, indices of all vertices from partition B that it has an edge to ;
+     *               Vertices in each partition have indices from 0 to (n - 1) where n is number of vertices in each partition.
+     * @param matched For each vertex from partition A, perfectly matched vertex from partition B.
+     * @return edges with changed indices.
+     */
+    private static orderEdgesByPerfectMatching(edges: number[][], matched: number[]): number[][] {
+        let invertedMatching = ArrayUtils.invertArray1d(matched);
+        let ordered: number[][] = [];
+        for (let i = 0; i < edges.length; i++) {
+            ordered.push([]);
+            for (let j = 0; j < edges[i].length; j++) {
+                ordered[i].push(invertedMatching[edges[i][j]]);
+            }
+        }
+        return ordered;
+    }
+
+    /**
+     * For bipartite graph and perfect matching, create oriented graph that is used to find all perfectly matched edges.
+     * First change indices of vertices in partition B so matched[i] = i, then remove i from edges[i].
+     * @param edges For each vertex from partition A, list of all connected vertices from partition B.
+     * @param matched For each vertex from partition A, perfectly matched vertex from partition B.
+     * @return For each vertex list of connected vertices.
+     */
+    private static getMatchableEdgesGraph(edges: number[][], matched: number[]): number[][] {
+        let orderedEdges = PerfectMatching.orderEdgesByPerfectMatching(edges, matched);
+        let output = [];
+        for (let i = 0; i < orderedEdges.length; i++) {
+            output.push(ArrayUtils.removeValue(orderedEdges[i], i));
+        }
+        return output;
+    }
+
+    /**
+     * Recursive function for tarjan's algorithm for strongly connected components of oriented graph.
+     */
+    private static getStronglyConnectedComponentsRecursive(
+        edges: number[][],
+        stack: number[], isOnStack: boolean[], nodeIndex: (number | null)[], nodeLow: (number | null)[],
+        v: number, index: number,
+        components: number[][]
+    ): number {
+        nodeIndex[v] = index;
+        nodeLow[v] = index;
+
+        index += 1;
+        stack.push(v);
+        isOnStack[v] = true;
+
+        for (let v2 of edges[v]) {
+            if (nodeIndex[v2] === null) {
+                this.getStronglyConnectedComponentsRecursive(edges, stack, isOnStack, nodeIndex, nodeLow, v2, index, components);
+                //@ts-ignore
+                if (nodeLow[v2] < nodeLow[v]) {
+                    nodeLow[v] = nodeLow[v2];
+                }
+            } else if (isOnStack[v2]) {
+                //@ts-ignore
+                if (nodeIndex[v2] < nodeLow[v]) {
+                    nodeLow[v] = nodeIndex[v2];
+                }
+            }
+        }
+
+        if (nodeLow[v] == nodeIndex[v]) {
+            let component: number[] = [];
+            let v2 = null;
+            while (v2 !== v) {
+                if (stack.length == 0) {
+                    throw "STACK IS EMPTY";
+                }
+                v2 = <number>stack.pop();
+                isOnStack[v2] = false;
+                component.push(v2);
+            }
+            components.push(component);
+        }
+
+        return index;
+    }
+
+    /**
+     * Tarjan's algorithm for strongly connected components.
+     */
+    private static getStronglyConnectedComponents(edges: number[][]): number[] {
+        let stack: number[] = [];
+        let isOnStack: boolean[] = ArrayUtils.createArray1d(edges.length, false);
+        let nodeIndex = ArrayUtils.createArray1d(edges.length, null);
+        let nodeLow = ArrayUtils.createArray1d(edges.length, null);
+        let index = 0;
+        let components: number[][] = [];
+
+        for (let v = 0; v < edges.length; v++) {
+            if (nodeIndex[v] === null) {
+                index = this.getStronglyConnectedComponentsRecursive(edges, stack, isOnStack, nodeIndex, nodeLow, v, index, components);
+            }
+        }
+
+        let output = ArrayUtils.createArray1d(edges.length, null);
+        for (let i = 0; i < components.length; i++) {
+            for (let v of components[i]) {
+                output[v] = i;
+            }
+        }
+        return output;
+    }
+
+    /**
+     * Return all perfectly matchable edges in a graph.
+     * If there is no perfect matching, return null.
+     */
+    public static getPerfectlyMatchableEdges(edges: number[][]): number[][] | null {
+        // get a perfect matching
+        let matched = this.getPerfectMatching(edges);
+        if (matched === null) {
+            return null;
+        }
+
+        // get graph used to calculate all perfectly matchable edges and its components of strong connectivity
+        let graph = this.getMatchableEdgesGraph(edges, matched);
+        let components = this.getStronglyConnectedComponents(graph);
+
+        // inverse of perfect matching
+        let invertedMatched = ArrayUtils.invertArray1d(matched);
+
+        // get all perfectly matchable edges
+        let matchable: number[][] = [];
+        for (let i = 0; i < edges.length; i++) {
+            let add: number[] = [];
+            for (let j = 0; j < edges[i].length; j++) {
+                let a = i;
+                let b = invertedMatched[edges[i][j]];
+                if (components[a] == components[b]) {
+                    add.push(edges[i][j]);
+                }
+            }
+            matchable.push(add);
+        }
+
+        return matchable;
+    }
 }
