@@ -15,12 +15,10 @@ type StrategyResult = {
 };
 
 class Strategy2d {
-    private sudoku: Sudoku;
-    private task: State;
+    private sudoku: Sudoku | null;
 
-    constructor(sudoku: Sudoku, task: State) {
-        this.sudoku = sudoku;
-        this.task = task;
+    constructor() {
+        this.sudoku = null;
     }
 
     /**
@@ -50,7 +48,7 @@ class Strategy2d {
      * Convert 1d index (y * width + x) into 2d index ( { y: y, x: x } )
      */
     private indexToCoordinates2d(index: number): StrategyCoordinates2d {
-        return { y: Math.floor(index / this.sudoku.size), x: index % this.sudoku.size };
+        return { y: Math.floor(index / this.sudoku!.size), x: index % this.sudoku!.size };
     }
 
     /**
@@ -70,7 +68,7 @@ class Strategy2d {
      * @param shift third coordinate
      */
     private indexToCoordinates3d(index: number, shift: number): StrategyCoordinates3d {
-        return { y: Math.floor(index / this.sudoku.size), x: index % this.sudoku.size, shift: shift };
+        return { y: Math.floor(index / this.sudoku!.size), x: index % this.sudoku!.size, shift: shift };
     }
 
     /**
@@ -175,7 +173,10 @@ class Strategy2d {
      *      - If no progress was made
      *      - If progress was made      - Return list of all removed values.
      */
-    public nakedSingle(board: number[]): StrategyResult {
+    public nakedSingle(state: State): StrategyResult {
+        this.sudoku = state.sudoku;
+        let board = state.board;
+
         let outputBoard = ArrayUtils.deepcopyArray1d(board);
 
         for (let i = 0; i < board.length; i++) {
@@ -306,8 +307,11 @@ class Strategy2d {
      * If all region are valid and any region can be progressed, return progress for first progressed region.
      * Otherwise, nothing is changed.
      */
-    public hiddenSingle(board: number[]): StrategyResult {
-        let regions = this.sudoku.regions.getAllRegions(true, true, true, true, true);
+    public hiddenSingle(state: State): StrategyResult {
+        this.sudoku = state.sudoku;
+        let board = state.board;
+
+        let regions = this.sudoku!.regions.getAllRegions(true, true, true, true, true);
         let result = null;
         let resultRegion = null
         for (let region of regions) {

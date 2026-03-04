@@ -67,4 +67,16 @@ class State {
             }
         }
     }
+
+    /**
+     * Set board values by list of shifts.
+     * For example [0, 1, 2], [[0, 1, 2], [0, 1, 2], [0, 1, 2]] sets first 3 cells to number [1, 2, 3].
+     * @param cells Indices of cells to set value of.
+     * @param shifts Shifts to put in each cell.
+     */
+    public setCells(cells: number[], shifts: number[][]): void {
+        for (let i = 0; i < cells.length; i++) {
+            this.board[cells[i]] = BinaryUtils.shiftsToBinary(shifts[i]);
+        }
+    }
 }

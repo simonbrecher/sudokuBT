@@ -5,7 +5,7 @@ type SudokuPermutation = {
     diagonal: boolean,
 }
 
-type SingleTests = [
+type SingleTest = [
     string,
     number,
     [number, number] | null,
@@ -14,7 +14,7 @@ type SingleTests = [
     string[],
     boolean,
     [number, number][]
-][]
+]
 
 class StrategyTests {
     private static containerNumber = 0;
@@ -143,8 +143,10 @@ class StrategyTests {
         }
     }
 
-    private static testSingle(tests: SingleTests, testMethod: (strategy: Strategy2d, board: number[]) => StrategyResult): void {
-        for (let [name, size, rectangles, isDiagonal, jigsaw, board, isPermuted, specialBinaries] of tests) {
+    private static prepareHiddenNaked(test: SingleTest)
+        : {ids: {container: string, message: string}, state: State}
+    {
+        let [name, size, rectangles, isDiagonal, jigsaw, board, isPermuted, specialBinaries] = test
             let ids = this.prepareDivs(name);
 
             let sudoku = new Sudoku(size);
@@ -157,40 +159,41 @@ class StrategyTests {
             if (jigsaw !== null) {
                 sudoku.regions.setRegionsByText(jigsaw);
             }
-            sudoku.task.setBoardByText(board);
+
+            let state = sudoku.solution.deepcopy();
+            state.setBoardByText(board);
             for (let [index, binary] of specialBinaries) {
-                sudoku.task.board[index] = binary;
+                state.board[index] = binary;
             }
 
             if (isPermuted) {
                 let permutation = this.createSudokuPermutation(sudoku, true, true, true, true);
-                this.permuteSudoku(sudoku, sudoku.task.board, permutation);
+                this.permuteSudoku(sudoku, state.board, permutation);
             }
 
-            let strategy = new Strategy2d(sudoku, sudoku.task);
-
-            let result = testMethod(strategy, sudoku.task.board);
-
-            let renderer = new Renderer();
-            renderer.doSmallNumbersOnFullBinary = true;
-            renderer.renderNew(sudoku.task, ids.container);
-            let frame = renderer.renderNew(sudoku.task, ids.container);
-            if (result.colors.region !== undefined) {
-                this.renderRegion(frame, result.colors.region);
-            }
-            if (result.isValid && result.isUpdated) {
-                this.renderColor(frame, result.colors.removed!, "background-removed");
-                if (result.colors.reason) {
-                    this.renderColor(frame, result.colors.reason!, "background-reason");
-                }
-            } else if (! result.isValid) {
-                this.renderError(frame, result.colors.error!);
-            }
-            document.getElementById(ids.message)!.textContent = result.isUpdated ? result.message : "( NOT UPDATED )";
-        }
+            return {ids: ids, state: state};
     }
 
-    private static readonly NAKED_SINGLE_TESTS: SingleTests = [
+    private static renderStrategy(ids: {container: string, message: string}, state: State, result: StrategyResult): void {
+        let renderer = new Renderer();
+        renderer.doSmallNumbersOnFullBinary = true;
+        renderer.renderNew(state, ids.container);
+        let frame = renderer.renderNew(state, ids.container);
+        if (result.colors.region !== undefined) {
+            this.renderRegion(frame, result.colors.region);
+        }
+        if (result.isValid && result.isUpdated) {
+            this.renderColor(frame, result.colors.removed!, "background-removed");
+            if (result.colors.reason) {
+                this.renderColor(frame, result.colors.reason!, "background-reason");
+            }
+        } else if (! result.isValid) {
+            this.renderError(frame, result.colors.error!);
+        }
+        document.getElementById(ids.message)!.textContent = result.isUpdated ? result.message : "( NOT UPDATED )";
+    }
+
+    private static readonly NAKED_SINGLE_TESTS: SingleTest[] = [
         ["Naked single 1", 4, null, false, null, ["----", "----", "----", "----"], true, []],
         ["Naked single 2", 4, null, false, null, ["----", "----", "----", "----"], true, [[0, 0b0000]]],
         ["Naked single 3", 4, null, false, null, ["1---", "-1--", "-2--", "-3--"], true, []],
@@ -203,11 +206,16 @@ class StrategyTests {
     ];
 
     public static testNakedSingle(): void {
-        this.testSingle(this.NAKED_SINGLE_TESTS, (strategy: Strategy2d, board: number[]) => strategy.nakedSingle(board));
+        let strategy = new Strategy2d();
+        for (let test of this.NAKED_SINGLE_TESTS) {
+            let {ids: ids, state: state} = this.prepareHiddenNaked(test);
+            let result = strategy.nakedSingle(state);
+            this.renderStrategy(ids, state, result);
+        }
         this.update();
     }
 
-    private static readonly HIDDEN_SINGLE_TESTS: SingleTests = [
+    private static readonly HIDDEN_SINGLE_TESTS: SingleTest[] = [
         ["Hidden single 1", 4, null, false, null, ["----", "----", "----", "----"], true, []],
         ["Hidden single 2", 4, null, false, null, ["123-", "----", "----", "----"], true, []],
         ["Hidden single 3", 4, null, false, null, ["----", "----", "----", "----"], true, [[0, 0b0111], [1, 0b0111], [2, 0b0111]]],
@@ -218,7 +226,89 @@ class StrategyTests {
     ];
 
     public static testHiddenSingle(): void {
-        this.testSingle(this.HIDDEN_SINGLE_TESTS, (strategy: Strategy2d, board: number[]) => strategy.hiddenSingle(board));
+        let strategy = new Strategy2d();
+        for (let test of this.HIDDEN_SINGLE_TESTS) {
+            let {ids: ids, state: state} = this.prepareHiddenNaked(test);
+            let result = strategy.hiddenSingle(state);
+            this.renderStrategy(ids, state, result);
+        }
+        this.update();
+    }
+
+    private static perfectlyMatchable2getSudoku(): State[] {
+        let states: State[] = [];
+
+        let sudoku, state;
+
+        {
+            let cells = [
+                [2, 8, 20, 32],
+                [24, 25, 28, 29],
+                [4, 5, 9, 10]
+            ]
+
+            for (let cellsOne of cells) {
+                sudoku = new Sudoku(6);
+                sudoku.regions.setRectangular(2, 3);
+                state = sudoku.task.deepcopy();
+                state.setCells(cellsOne, [[0, 1, 4], [1, 3, 4], [0, 1, 3], [3, 4]]);
+                states.push(state);
+            }
+        }
+
+        {
+            let cells = [
+                [[6, 10], [7, 8, 11]],
+                [[5, 17], [11, 23, 35]],
+                [[24, 31], [25, 26, 31]],
+            ]
+
+            for (let cellsOne of cells) {
+                sudoku = new Sudoku(6);
+                sudoku.regions.setRectangular(2, 3);
+                state = sudoku.task.deepcopy();
+                state.setCells(cellsOne[0], [[2, 5], [2, 5]]);
+                state.setCells(cellsOne[1], [[1, 2, 3, 4, 5], [0, 1, 2, 5], [2, 4, 5]]);
+                states.push(state);
+            }
+        }
+
+        {
+            let values = [
+                [[0, 2, 5], [0, 2, 5], [0, 2, 5]],
+                [[1, 3, 4], [3, 4], [1, 4]],
+                [[2, 6], [6, 7], [2, 7]],
+                [[0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3]],
+                [[0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4]],
+            ]
+
+            for (let valuesOne of values) {
+                sudoku = new Sudoku(9);
+                sudoku.regions.setRectangular(3, 3);
+
+                let regions = sudoku.regions.getAllRegions(true, true, true, true, true);
+                let region = ArrayUtils.choice(regions);
+                let chosen = ArrayUtils.choices(region, valuesOne.length);
+
+                state = sudoku.solution;
+                state.setCells(chosen, valuesOne);
+                states.push(state);
+            }
+        }
+
+        return states;
+    }
+
+    public static testPerfectlyMatchable(): void {
+        let strategy = new Strategy2d();
+        let states = this.perfectlyMatchable2getSudoku();
+        for (let i = 0; i < states.length; i++) {
+            let ids = this.prepareDivs(`Perfectly Matchable ${i}`);
+            let state = states[i];
+            let result = strategy.hiddenSingle(state);
+
+            this.renderStrategy(ids, state, result);
+        }
         this.update();
     }
 }

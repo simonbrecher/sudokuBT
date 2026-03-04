@@ -21,6 +21,7 @@ class Debug {
                 case "hidden_single":       StrategyTests.testHiddenSingle();           break;
                 case "perfect_match":       PerfectMatchingTest.mainGraphic();          break;
                 case "perfectly_matchable": PerfectMatchingTest.perfectlyMatchable();   break;
+                case "perfectly_matchable_2":   StrategyTests.testPerfectlyMatchable();    break;
 
                 case "debug":               Debug.debug();                              break;
                 case "ng_perfect_match":    PerfectMatchingTest.main();                 break;
@@ -36,18 +37,8 @@ class Debug {
     }
 
     public static debug(): void {
-        // let edges = [[2, 4], [1, 2, 4], [1, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4]];
-        // let matched = [2, 4, 1, 0, 3];
-        // // @ts-ignore
-        // let graph = PerfectMatching.getMatchableEdgesGraph(edges, matched);
-        // console.log(graph);
-        // // @ts-ignore
-        // let components = PerfectMatching.getStronglyConnectedComponents(graph);
-        // console.log(components);
-
-        let graph2 = [[4], [2, 3, 5], [0, 1], [0], [3], [], []];
-        // @ts-ignore
-        let components2 = PerfectMatching.getStronglyConnectedComponents(graph2);
-        console.log(graph2, components2);
+        let values = ["a", "b", "c", "d"];
+        let choices = 0;
+        console.log(ArrayUtils.choices(values, choices));
     }
 }

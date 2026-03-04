@@ -12,6 +12,17 @@ class Builder {
 
     public DO_LOG = true;
 
+    /**
+     * Solver used by this builder, if it is null, then use Solver.solver singleton.
+     * Default value is null.
+     * Use this.getSolver() to access solver.
+     */
+    public solver: Solver | null = null;
+
+    public getSolver(): Solver {
+        return this.solver === null ? Solver.solver : this.solver;
+    }
+
     constructor() {
 
     }
@@ -31,7 +42,7 @@ class Builder {
         solution.board = ArrayUtils.createArray1d(sudoku.size * sudoku.size, sudoku.fullBinary);
 
         while (true) {
-            Solver.solver.solve(solution);
+            this.getSolver().solve(solution);
             switch (solution.countSolutions()) {
                 case 0:
                     return false;
@@ -79,7 +90,7 @@ class Builder {
             let removedValue = task.board[remove];
             task.board[remove] = sudoku.fullBinary;
 
-            let solutionCount = Solver.solver.countSolutionsUnsolved(task);
+            let solutionCount = this.getSolver().countSolutionsUnsolved(task);
             switch (solutionCount) {
                 case 0:
                     throw "ERROR: Solver.createTaskTry found 0 solutions, which should not be possible";

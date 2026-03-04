@@ -119,11 +119,45 @@ class ArrayUtils {
         for (let i = 0; i < size; i++) {
             output.push(i);
         }
-        for (let i = 0; i < size; i++) {
-            let random = Math.floor(Math.random() * size);
-            let x = output[random];
-            output[random] = output[i];
-            output[i] = x;
+        this.shuffle(output);
+        return output;
+    }
+
+    /**
+     * Shuffle array using Fisher-Yates shuffle.
+     */
+    public static shuffle(array: any[]): void {
+        for (let i = array.length - 1; i > 0; i--) {
+            let random = Math.floor(Math.random() * (i + 1));
+            let x = array[random];
+            array[random] = array[i];
+            array[i] = x;
+        }
+    }
+
+    /**
+     * Choose random element from array.
+     */
+    public static choice(array: any[]): any {
+        let random = Math.floor(Math.random() * array.length);
+        return array[random];
+    }
+
+    /**
+     * Choose multiple items from array and return new array with same order.
+     */
+    public static choices(array: any[], amount: number): any[] {
+        let output = [];
+        let total = array.length;
+        let choices = amount;
+        for (let value of array) {
+            let probability = choices / total;
+            let chosen = Math.random() < probability;
+            if (chosen) {
+                output.push(value);
+                choices --;
+            }
+            total --;
         }
         return output;
     }
