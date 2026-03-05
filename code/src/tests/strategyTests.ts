@@ -280,6 +280,7 @@ class StrategyTests {
                 [[2, 6], [6, 7], [2, 7]],
                 [[0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3]],
                 [[0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4]],
+                [[0, 1], [0, 1], [2, 3], [2, 3]],
             ]
 
             for (let valuesOne of values) {
@@ -305,7 +306,7 @@ class StrategyTests {
         for (let i = 0; i < states.length; i++) {
             let ids = this.prepareDivs(`Perfectly Matchable ${i}`);
             let state = states[i];
-            let result = strategy.hiddenSingle(state);
+            let result = strategy.pairing(state);
 
             this.renderStrategy(ids, state, result);
         }

@@ -1,3 +1,9 @@
+type GraphHallProof = {
+    set: number[], // S subset of A for source, P(S) subset of A for sink
+    matched: number[], // P(S) subset of B for source, S subset of B for sink
+    edges: number[][], // [a, b][] edges that can be proven perfectly unmatchable, a from A, b from B
+}
+
 class PerfectMatching {
     /**
      * Uses bfs to construct the tree used by dfs in one iteration of Hopcroft–Karp algorithm.
@@ -219,7 +225,7 @@ class PerfectMatching {
 
         for (let v2 of edges[v]) {
             if (nodeIndex[v2] === null) {
-                this.getStronglyConnectedComponentsRecursive(edges, stack, isOnStack, nodeIndex, nodeLow, v2, index, components);
+                index = this.getStronglyConnectedComponentsRecursive(edges, stack, isOnStack, nodeIndex, nodeLow, v2, index, components);
                 //@ts-ignore
                 if (nodeLow[v2] < nodeLow[v]) {
                     nodeLow[v] = nodeLow[v2];
@@ -308,5 +314,184 @@ class PerfectMatching {
         }
 
         return matchable;
+    }
+
+    /**
+     * If there is a perfectly unmatchable edge in bipartite graph with perfect matching, return condensation.
+     * @param graph Graph as returned by getMatchableEdgesGraph.
+     * @param matched Perfect matching used to create graph in argument graph.
+     * @param components Components of strong connectivity of graph in argument graph.
+     * @return null if there is no perfectly unmatchable edge,
+     * otherwise for each component return all components to which there exists unmatchable edge.
+     */
+    private static getComponentGraph(graph: number[][], components: number[]): number[][] | null {
+        let componentCount = Math.max(...components) + 1;
+        let condensation: Set<number>[] = Array.from({ length: componentCount }, () => new Set());
+
+        let unmatchableEdgeExists = false;
+        for (let i = 0; i < graph.length; i++) {
+            for (let j = 0; j < graph[i].length; j++) {
+                let a = i;
+                let b = graph[i][j];
+                if (components[a] != components[b]) {
+                    unmatchableEdgeExists = true;
+                    condensation[components[b]].add(components[a]);
+                }
+            }
+        }
+        if (unmatchableEdgeExists) {
+            return condensation.map(s => Array.from(s));
+        }
+        return null;
+    }
+
+    /**
+     * Get any smallest component from a graph.
+     * @param chooseFromComponents Indices of components from which we want to choose the smallest one.
+     * @param vertexComponents For each vertex, index of component to which it belongs.
+     * @return The smallest component from chooseFromComponents with lowest index.
+     */
+    private static getSmallestComponent(chooseFromComponents: number[], vertexComponents: number[]): number {
+        let componentCount = vertexComponents.reduce((a, b) => Math.max(a, b), 0) + 1;
+        let componentSize = ArrayUtils.createArray1d(componentCount, 0);
+        for (let c of vertexComponents) {
+            componentSize[c] ++;
+        }
+
+        let maxComponent = 0;
+        let maxComponentSize = 0;
+        for (let c of chooseFromComponents) {
+            if (componentSize[c] >= maxComponentSize) {
+                maxComponent = c;
+                maxComponentSize = componentSize[c];
+            }
+        }
+
+        return maxComponent;
+    }
+
+    /**
+     * Get all sources and sinks of a DAG.
+     * @param graph DAG
+     * @return Sources and sinks of the DAG.
+     */
+    private static getSourcesSinks(graph: number[][])
+        : {sources: number[], sinks: number[]}
+    {
+        let isSource: boolean[] = ArrayUtils.createArray1d(graph.length, true);
+        let isSink: boolean[] = ArrayUtils.createArray1d(graph.length, true);
+        for (let i = 0; i < graph.length; i++) {
+            for (let j of graph[i]) {
+                isSource[j] = false;
+                isSink[i] = false;
+            }
+        }
+
+        let sources = [];
+        let sinks = [];
+        for (let i = 0; i < graph.length; i++) {
+            if (isSource[i]) {
+                sources.push(i);
+            }
+            if (isSink[i]) {
+                sinks.push(i);
+            }
+        }
+
+        return {sources: sources, sinks: sinks};
+    }
+
+    /**
+     * Get any smallest proof using hall's theorem, that some edges are perfectly unmatchable.
+     * @param isSource True if we search for proof based on source of condensation, false if it is sink.
+     * @param sourceSink Indices of all sources / sinks of condensation (based on value of isSource).
+     * @param vertexComponents For each vertex of partition A from graph in parameter edges, index of component of connectivity.
+     * @param edges Original graph that part of sudoku was converted to.
+     * @param matched Perfect matching of graph in parameter edges.
+     * @return Proof that some edges are perfectly unmatchable in format of type GraphHallProof.
+     */
+    private static getSourceSinkProof(
+        isSource: boolean, sourceSink: number[], vertexComponents: number[],
+        edges: number[][], matched: number[]
+    ): GraphHallProof {
+        let inverseMatched = ArrayUtils.invertArray1d(matched);
+
+        let bestSourceSink = this.getSmallestComponent(sourceSink, vertexComponents);
+
+        let set: number[] = []; // S (source: subset of A, sink: subset of B)
+        let matchedSet: number[] = []; // P(S) (source: subset of B, sink: subset of A)
+        for (let i = 0; i < edges.length; i++) {
+            if (vertexComponents[i] == bestSourceSink) {
+                if (isSource) {
+                    set.push(i);
+                    matchedSet.push(matched[i]);
+                } else {
+                    set.push(matched[i]);
+                    matchedSet.push(i);
+                }
+            }
+        }
+
+        let unmatchableEdges: number[][] = [];
+        for (let i = 0; i < edges.length; i++) {
+            for (let j = 0; j < edges[i].length; j++) {
+                let a = i;
+                let b = edges[i][j];
+                if (isSource) {
+                    if (vertexComponents[inverseMatched[b]] == bestSourceSink && vertexComponents[a] != bestSourceSink) {
+                        unmatchableEdges.push([a, b]);
+                    }
+                } else {
+                    if (vertexComponents[a] == bestSourceSink && vertexComponents[inverseMatched[b]] != bestSourceSink) {
+                        unmatchableEdges.push([a, b]);
+                    }
+                }
+            }
+        }
+
+        if (isSource) {
+            return {set: set, matched: matchedSet, edges: unmatchableEdges};
+        } else {
+            return {set: matchedSet, matched: set, edges: unmatchableEdges};
+        }
+    }
+
+    /**
+     * Try to find any smallest proof using hall's theorem, that some edges are perfectly unmatchable.
+     * One region:      Source -> naked candidate - on positions <set> there can only be numbers <matched>.
+     *                  Sink -> hidden candidate - numbers <matched> can only be on positions <set>.
+     * Intersection:    Both sink and source are region -> region, it depends, what directions are partitions A and B.
+     * @param edges Bipartite graph.
+     * @return  "no-matching" if bipartite graph has no perfect matching.
+     *          "no-unmatchable-edge" if bipartite graph has perfect matching and all edges are perfectly matchable.
+     *          otherwise, return smallest proof with hall's theorem both for a source and sink of condensation.
+     */
+    public static getHallProof(edges: number[][])
+        : {source: GraphHallProof, sink: GraphHallProof} | "no-matching" | "no-unmatchable-edge"
+    {
+        // get perfect matching
+        let matched = this.getPerfectMatching(edges);
+        if (matched === null) {
+            return "no-matching";
+        }
+
+        // get graph used to calculate all perfectly matchable edges and its components of strong connectivity
+        let graph = this.getMatchableEdgesGraph(edges, matched);
+        let components = this.getStronglyConnectedComponents(graph);
+
+        // calculate condensation previous graph, we need to know what components are sources and sinks
+        let condensation = this.getComponentGraph(graph, components);
+        if (condensation === null) {
+            return "no-unmatchable-edge";
+        }
+
+        // get sources and sinks of condensation
+        let {sources: sources, sinks: sinks} = this.getSourcesSinks(condensation);
+
+        let source = this.getSourceSinkProof(true, sources, components, edges, matched);
+
+        let sink = this.getSourceSinkProof(false, sinks, components, edges, matched);
+
+        return {source: source, sink: sink};
     }
 }

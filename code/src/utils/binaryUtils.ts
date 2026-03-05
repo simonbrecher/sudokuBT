@@ -45,6 +45,14 @@ class BinaryUtils {
         return binary;
     }
 
+    public static binaryToShifts(binaries: number[]): number[][] {
+        let output = [];
+        for (let binary of binaries) {
+            output.push(this.binaryToShifts32(binary));
+        }
+        return output;
+    }
+
     /**
      * Choose position with least bits with value 1, from positions that have at least two bits with value 1.
      */

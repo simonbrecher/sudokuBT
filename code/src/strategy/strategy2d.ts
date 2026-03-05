@@ -13,6 +13,12 @@ type StrategyResult = {
     isUpdated: boolean,
     isValid: boolean,
 };
+type StrategyHallProof = {
+    isSource: boolean,
+    isUpdated: boolean,
+    isValid: boolean,
+    values: number[],
+}
 
 class Strategy2d {
     private sudoku: Sudoku | null;
@@ -260,7 +266,8 @@ class Strategy2d {
         reason?: StrategyRegionCoordinates2d[], removed?: StrategyRegionCoordinates2d[],
         multiple?: { cell: number, shifts: number[] }, missing?: number[],
         isUpdated: boolean, isValid: boolean,
-    } {
+    }
+    {
         // find all values that are in one/multiple/zero cells
         let once = 0;
         let twice = 0;
@@ -372,5 +379,45 @@ class Strategy2d {
             isUpdated: true,
             isValid: true,
         }
+    }
+
+    private _pairing(binaries: number[]): [StrategyHallProof | null, StrategyHallProof | null]
+    {
+        let edges = BinaryUtils.binaryToShifts(binaries);
+
+        let hallProof = PerfectMatching.getHallProof(edges);
+
+        if (hallProof == "no-matching") {
+            throw "NO MATCHING (TODO)"; // TODO
+        }
+        if (hallProof === "no-unmatchable-edge") {
+            let source: StrategyHallProof = { isSource: true, isUpdated: false, isValid: true, values: [] };
+            let sink: StrategyHallProof = { isSource: false, isUpdated: false, isValid: true, values: [] };
+            return [source, sink];
+        }
+
+        let source: StrategyHallProof = { isSource: true, isUpdated: false, isValid: true, values: [] };
+        let sink: StrategyHallProof = { isSource: false, isUpdated: false, isValid: true, values: [] };
+        return [source, sink];
+    }
+
+    public pairing(state: State): StrategyResult {
+        this.sudoku = state.sudoku;
+        let board = state.board;
+
+        let regions = this.sudoku!.regions.getAllRegions(true, true, true, true, true);
+        let result = null;
+        let resultRegion = null;
+        for (let region of regions) {
+            let newResults = this._pairing(this.loadRegion32(board, region));
+            for (let newResult of newResults) {
+                if (newResult !== null && result === null) {
+                    result = newResult;
+                    resultRegion = region;
+                }
+            }
+        }
+
+        return { colors: {  }, message: "", isUpdated: false, isValid: true }; // TODO
     }
 }
