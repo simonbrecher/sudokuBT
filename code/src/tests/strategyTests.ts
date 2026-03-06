@@ -241,51 +241,23 @@ class StrategyTests {
         let sudoku, state;
 
         {
-            let cells = [
-                [2, 8, 20, 32],
-                [24, 25, 28, 29],
-                [4, 5, 9, 10]
+            let values: [[number, number], number[][]][] = [
+                [[3, 2], [[0]]],
+                [[3, 2], [[0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4]]],
+                [[3, 2], [[0, 1, 4], [1, 3, 4], [0, 1, 3], [3, 4]]],
+                [[3, 2], [[2, 5], [2, 5], [1, 2, 3, 4, 5], [0, 1, 2, 5], [2, 4, 5]]],
+                [[3, 3], [[0, 2, 5], [0, 2, 5], [0, 2, 5]]],
+                [[3, 3], [[1, 3, 4], [3, 4], [1, 4]]],
+                [[3, 3], [[2, 6], [6, 7], [2, 7]]],
+                [[3, 3], [[0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3]]],
+                [[3, 3], [[0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4]]],
+                [[3, 3], [[0, 1], [0, 1], [2, 3], [2, 3]]],
             ]
 
-            for (let cellsOne of cells) {
-                sudoku = new Sudoku(6);
-                sudoku.regions.setRectangular(2, 3);
-                state = sudoku.task.deepcopy();
-                state.setCells(cellsOne, [[0, 1, 4], [1, 3, 4], [0, 1, 3], [3, 4]]);
-                states.push(state);
-            }
-        }
-
-        {
-            let cells = [
-                [[6, 10], [7, 8, 11]],
-                [[5, 17], [11, 23, 35]],
-                [[24, 31], [25, 26, 31]],
-            ]
-
-            for (let cellsOne of cells) {
-                sudoku = new Sudoku(6);
-                sudoku.regions.setRectangular(2, 3);
-                state = sudoku.task.deepcopy();
-                state.setCells(cellsOne[0], [[2, 5], [2, 5]]);
-                state.setCells(cellsOne[1], [[1, 2, 3, 4, 5], [0, 1, 2, 5], [2, 4, 5]]);
-                states.push(state);
-            }
-        }
-
-        {
-            let values = [
-                [[0, 2, 5], [0, 2, 5], [0, 2, 5]],
-                [[1, 3, 4], [3, 4], [1, 4]],
-                [[2, 6], [6, 7], [2, 7]],
-                [[0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3]],
-                [[0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4]],
-                [[0, 1], [0, 1], [2, 3], [2, 3]],
-            ]
-
-            for (let valuesOne of values) {
-                sudoku = new Sudoku(9);
-                sudoku.regions.setRectangular(3, 3);
+            for (let x of values) {
+                let [[rectangleWidth, rectangleHeight], valuesOne] = x;
+                sudoku = new Sudoku(rectangleHeight * rectangleWidth);
+                sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
 
                 let regions = sudoku.regions.getAllRegions(true, true, true, true, true);
                 let region = ArrayUtils.choice(regions);
@@ -293,6 +265,10 @@ class StrategyTests {
 
                 state = sudoku.solution;
                 state.setCells(chosen, valuesOne);
+
+                let permutation = this.createSudokuPermutation(sudoku, false, false, true, false);
+                this.permuteSudoku(sudoku, state.board, permutation);
+
                 states.push(state);
             }
         }
@@ -306,7 +282,7 @@ class StrategyTests {
         for (let i = 0; i < states.length; i++) {
             let ids = this.prepareDivs(`Perfectly Matchable ${i}`);
             let state = states[i];
-            let result = strategy.pairing(state);
+            let result = strategy.region(state);
 
             this.renderStrategy(ids, state, result);
         }

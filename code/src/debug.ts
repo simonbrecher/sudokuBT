@@ -37,8 +37,12 @@ class Debug {
     }
 
     public static debug(): void {
-        let values = ["a", "b", "c", "d"];
-        let choices = 0;
-        console.log(ArrayUtils.choices(values, choices));
+        let strategy = new Strategy2d();
+        for (let i = 1; i < 6; i++) {
+            //@ts-ignore
+            console.log(strategy.getMessageNakedHidden(true, i));
+            //@ts-ignore
+            console.log(strategy.getMessageNakedHidden(false, i));
+        }
     }
 }

@@ -15,12 +15,16 @@ type StrategyResult = {
 };
 type StrategyHallProof = {
     isSource: boolean,
-    isUpdated: boolean,
     isValid: boolean,
-    values: number[],
+    size: number,
+    reason: StrategyRegionCoordinates2d[],
+    removed: StrategyRegionCoordinates2d[],
+    priority: number, // lower number = higher priority, -1 for error and 1000 for non-updated
 }
 
 class Strategy2d {
+    private static readonly REGION_SIZE_TEXT = ["single", "pair", "triple", "quadruple"];
+
     private sudoku: Sudoku | null;
 
     constructor() {
@@ -374,14 +378,37 @@ class Strategy2d {
             },
             message: `
                 Hidden single: ${reasonNumberText} ${reasonListText} can be only in one cell from the region.
-                ${result.removed!.length} ${removedNumberText} in ${cellText} can be removed.
+                The other ${result.removed!.length} ${removedNumberText} in ${cellText} can be removed.
             `,
             isUpdated: true,
             isValid: true,
         }
     }
 
-    private _pairing(binaries: number[]): [StrategyHallProof | null, StrategyHallProof | null]
+    private getMessageNakedHidden(isSource: boolean, size: number): string {
+        let sizeText = size <= Strategy2d.REGION_SIZE_TEXT.length ? Strategy2d.REGION_SIZE_TEXT[size - 1] : `${size}-tuple`;
+        let number = size == 1 ? "number" : "numbers";
+        let cell = size == 1 ? "cell" : "cells";
+        let this1 = size == 1 ? "this" : "these";
+        if (isSource) {
+            return `
+            Naked ${sizeText}: In ${size} ${cell} of the region there can only be ${size} ${number},
+            therefore ${this1} ${number} cannot be in any other cell in the region.
+            `;
+        } else {
+            return `
+            Hidden ${sizeText}: ${size} ${number} can only be in ${size} ${cell} in the region, 
+            therefore there cannot be any other number in ${this1} ${cell}.
+            `;
+        }
+    }
+
+    /**
+     * Try to find any smallest proof using hall's theorem, that some edges are perfectly unmatchable.
+     * Source -> naked candidate - on positions <set> there can only be numbers <matched>.
+     * Sink -> hidden candidate - numbers <matched> can only be on positions <set>.
+     */
+    private _region(binaries: number[]): StrategyHallProof[]
     {
         let edges = BinaryUtils.binaryToShifts(binaries);
 
@@ -391,17 +418,38 @@ class Strategy2d {
             throw "NO MATCHING (TODO)"; // TODO
         }
         if (hallProof === "no-unmatchable-edge") {
-            let source: StrategyHallProof = { isSource: true, isUpdated: false, isValid: true, values: [] };
-            let sink: StrategyHallProof = { isSource: false, isUpdated: false, isValid: true, values: [] };
-            return [source, sink];
+            return [];
         }
 
-        let source: StrategyHallProof = { isSource: true, isUpdated: false, isValid: true, values: [] };
-        let sink: StrategyHallProof = { isSource: false, isUpdated: false, isValid: true, values: [] };
-        return [source, sink];
+        let isSource = hallProof.source.set.length <= hallProof.sink.set.length;
+        let proof = isSource ? hallProof.source : hallProof.sink;
+
+        let reason: StrategyRegionCoordinates2d[] = [];
+        for (let a of proof.set) {
+            for (let b of edges[a]) {
+                if (proof.matched.includes(b)) {
+                    reason.push({index: a, shift: b});
+                }
+            }
+        }
+
+        let removed: StrategyRegionCoordinates2d[] = [];
+        for (let edge of proof.edges) {
+            let [a, b] = edge;
+            removed.push({index: a, shift: b});
+        }
+
+        return [{
+            isSource: isSource,
+            isValid: true,
+            size: proof.set.length,
+            reason: reason,
+            removed: removed,
+            priority: proof.set.length + (isSource ? 0 : 0.5),
+        }];
     }
 
-    public pairing(state: State): StrategyResult {
+    public region(state: State): StrategyResult {
         this.sudoku = state.sudoku;
         let board = state.board;
 
@@ -409,15 +457,37 @@ class Strategy2d {
         let result = null;
         let resultRegion = null;
         for (let region of regions) {
-            let newResults = this._pairing(this.loadRegion32(board, region));
+            let newResults = this._region(this.loadRegion32(board, region));
             for (let newResult of newResults) {
-                if (newResult !== null && result === null) {
+                if (result === null || newResult.priority < result.priority) {
                     result = newResult;
                     resultRegion = region;
                 }
             }
+            if (result !== null && ! result.isValid) {
+                break;
+            }
         }
 
-        return { colors: {  }, message: "", isUpdated: false, isValid: true }; // TODO
+        if (result === null) {
+            return { colors: {}, message: "", isUpdated: false, isValid: true, }
+
+        } else if (result.isValid) {
+            let message = this.getMessageNakedHidden(result.isSource, result.size);
+
+            return {
+                colors: {
+                    reason: this.regionCoordinates2dTo3dArray1d(result.reason!, resultRegion!),
+                    removed: this.regionCoordinates2dTo3dArray1d(result.removed!, resultRegion!),
+                    region: this.indexToCoordinates2dArray1d(resultRegion!),
+                },
+                message: message,
+                isUpdated: true,
+                isValid: true,
+            }
+
+        } else {
+            throw "TODO invalid"; // TODO
+        }
     }
 }

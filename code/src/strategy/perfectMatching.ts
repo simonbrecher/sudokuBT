@@ -418,17 +418,12 @@ class PerfectMatching {
 
         let bestSourceSink = this.getSmallestComponent(sourceSink, vertexComponents);
 
-        let set: number[] = []; // S (source: subset of A, sink: subset of B)
-        let matchedSet: number[] = []; // P(S) (source: subset of B, sink: subset of A)
+        let set: number[] = []; // S subset of A for source, P(S) subset of A for sink
+        let matchedSet: number[] = []; // P(S) subset of B for source, S subset of B for sink
         for (let i = 0; i < edges.length; i++) {
             if (vertexComponents[i] == bestSourceSink) {
-                if (isSource) {
-                    set.push(i);
-                    matchedSet.push(matched[i]);
-                } else {
-                    set.push(matched[i]);
-                    matchedSet.push(i);
-                }
+                set.push(i);
+                matchedSet.push(matched[i]);
             }
         }
 
@@ -437,23 +432,15 @@ class PerfectMatching {
             for (let j = 0; j < edges[i].length; j++) {
                 let a = i;
                 let b = edges[i][j];
-                if (isSource) {
-                    if (vertexComponents[inverseMatched[b]] == bestSourceSink && vertexComponents[a] != bestSourceSink) {
-                        unmatchableEdges.push([a, b]);
-                    }
-                } else {
-                    if (vertexComponents[a] == bestSourceSink && vertexComponents[inverseMatched[b]] != bestSourceSink) {
-                        unmatchableEdges.push([a, b]);
-                    }
+                let aMatches = vertexComponents[a] == bestSourceSink;
+                let bMatches = vertexComponents[inverseMatched[b]] == bestSourceSink;
+                if (aMatches != bMatches && bMatches == isSource) {
+                    unmatchableEdges.push([a, b]);
                 }
             }
         }
 
-        if (isSource) {
-            return {set: set, matched: matchedSet, edges: unmatchableEdges};
-        } else {
-            return {set: matchedSet, matched: set, edges: unmatchableEdges};
-        }
+        return {set: set, matched: matchedSet, edges: unmatchableEdges};
     }
 
     /**
