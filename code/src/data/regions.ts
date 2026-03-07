@@ -23,22 +23,18 @@ class Regions {
     private readonly _columns: number[][];
     private readonly _lines: number[][];
     public get rows(): number[][] {
-        Regions.throwAccessErrorIf(! this.hasLines, "Regions.rows", "! Regions.hasLines");
-        return this._rows;
+        return this.hasLines ? this._rows : [];
     }
     public get columns(): number[][] {
-        Regions.throwAccessErrorIf(! this.hasLines, "Regions.columns", "! Regions.hasLines");
-        return this._columns;
+        return this.hasLines ? this._columns : [];
     }
     public get lines(): number[][] {
-        Regions.throwAccessErrorIf(! this.hasLines, "Regions.lines", "! Regions.hasLines");
-        return this._lines;
+        return this.hasLines ? this._lines : [];
     }
     public hasDiagonals: boolean = false;
     private readonly _diagonals: number[][];
     public get diagonals(): number[][] {
-        Regions.throwAccessErrorIf(! this.hasDiagonals, "Regions.diagonals", "! Regions.hasDiagonals");
-        return this._diagonals;
+        return this.hasDiagonals ? this._diagonals : [];
     }
     private _rectangles: { height: number, width: number } | null = null;
     public isRectangular(): boolean {
@@ -57,16 +53,14 @@ class Regions {
         return this._regions !== null;
     }
     public get regions(): number[][] {
-        Regions.throwAccessErrorIf(this._regions === null, "Regions.regions", "Regions._regions === null");
-        return this._regions!;
+        return this._regions !== null ? this._regions! : [];
     }
     private _extraRegions: number[][] | null = null;
     public hasExtraRegions(): boolean {
         return this._extraRegions !== null;
     }
     public get extraRegions(): number[][] {
-        Regions.throwAccessErrorIf(this._extraRegions === null, "Regions.extraRegions", "Regions._extraRegions === null");
-        return this._extraRegions!;
+        return this._extraRegions !== null ? this._extraRegions! : [];
     }
     public removeExtraRegions(): void {
         this._extraRegions = null;

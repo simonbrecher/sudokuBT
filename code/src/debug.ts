@@ -21,7 +21,8 @@ class Debug {
                 case "hidden_single":       StrategyTests.testHiddenSingle();           break;
                 case "perfect_match":       PerfectMatchingTest.mainGraphic();          break;
                 case "perfectly_matchable": PerfectMatchingTest.perfectlyMatchable();   break;
-                case "perfectly_matchable_2":   StrategyTests.testPerfectlyMatchable();    break;
+                case "region":              StrategyTests.testRegion();                 break;
+                case "pointing":            StrategyTests.testPointing();               break;
 
                 case "debug":               Debug.debug();                              break;
                 case "ng_perfect_match":    PerfectMatchingTest.main();                 break;

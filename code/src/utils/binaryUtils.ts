@@ -88,4 +88,12 @@ class BinaryUtils {
         }
         return bits[Math.floor(Math.random() * bits.length)];
     }
+
+    public static or(binaries: number[]): number {
+        let output = 0;
+        for (let b of binaries) {
+            output |= b;
+        }
+        return output;
+    }
 }

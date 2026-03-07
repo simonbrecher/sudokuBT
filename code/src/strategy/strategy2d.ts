@@ -5,7 +5,9 @@ type StrategyColors = {
     removed?: StrategyCoordinates3d[], // numbers that will be removed
     reason?: StrategyCoordinates3d[],  // numbers that are the reason for other numbers being removed
     error?: StrategyCoordinates3d[],   // numbers that cause error
-    region?: StrategyCoordinates2d[],  // cells of a region
+    region1?: StrategyCoordinates2d[],  // cells of a region (1st color)
+    region2?: StrategyCoordinates2d[],  // cells of a region (2nd color)
+    region3?: StrategyCoordinates2d[],  // cells of a region (3rd color)
 };
 type StrategyResult = {
     colors: StrategyColors,
@@ -20,6 +22,14 @@ type StrategyHallProof = {
     reason: StrategyRegionCoordinates2d[],
     removed: StrategyRegionCoordinates2d[],
     priority: number, // lower number = higher priority, -1 for error and 1000 for non-updated
+}
+type StrategyPointingProof = {
+    region1: number[], // region that is missing a number
+    region2: number[], // region that has a number that is supposed to be deleted
+    intersection: number[], // intersection of both regions
+    binaries2: number[],
+    binariesIntersection: number[],
+    proof: number,
 }
 
 class Strategy2d {
@@ -194,7 +204,6 @@ class Strategy2d {
                 return {
                     colors: {
                         error: [this.indexToCoordinates3d(i, -1)],
-                        region: [],
                     },
                     message: "INVALID: There is no number in a cell.",
                     isUpdated: true,
@@ -217,7 +226,7 @@ class Strategy2d {
                 return {
                     colors: {
                         error: [error1, error2],
-                        region: this.indexToCoordinates2dArray1d(region),
+                        region1: this.indexToCoordinates2dArray1d(region),
                     },
                     message: "INVALID: Two cells in a region have the same number.",
                     isUpdated: true,
@@ -335,7 +344,7 @@ class Strategy2d {
                         return {
                             colors: {
                                 error: this.indexToCoordinates3dArray1dIndices(region, -1),
-                                region: this.indexToCoordinates2dArray1d(region),
+                                region1: this.indexToCoordinates2dArray1d(region),
                             },
                             message: `INVALID: Number${result.missing.length > 1 ? 's' : ''} ${this.joinShiftsToText(result.missing)} can not be in any cell in the region.`,
                             isUpdated: true,
@@ -345,7 +354,7 @@ class Strategy2d {
                         return {
                             colors: {
                                 error: this.indexToCoordinates3dArray1dShifts(region[result.multiple.cell], result.multiple.shifts),
-                                region: this.indexToCoordinates2dArray1d(region),
+                                region1: this.indexToCoordinates2dArray1d(region),
                             },
                             message: `INVALID: Numbers ${this.joinShiftsToText(result.multiple.shifts)} can be only in the same cell in the region.`,
                             isUpdated: true,
@@ -374,7 +383,7 @@ class Strategy2d {
             colors: {
                 reason: this.regionCoordinates2dTo3dArray1d(result.reason!, resultRegion!),
                 removed: this.regionCoordinates2dTo3dArray1d(result.removed!, resultRegion!),
-                region: this.indexToCoordinates2dArray1d(resultRegion!),
+                region1: this.indexToCoordinates2dArray1d(resultRegion!),
             },
             message: `
                 Hidden single: ${reasonNumberText} ${reasonListText} can be only in one cell from the region.
@@ -479,7 +488,7 @@ class Strategy2d {
                 colors: {
                     reason: this.regionCoordinates2dTo3dArray1d(result.reason!, resultRegion!),
                     removed: this.regionCoordinates2dTo3dArray1d(result.removed!, resultRegion!),
-                    region: this.indexToCoordinates2dArray1d(resultRegion!),
+                    region1: this.indexToCoordinates2dArray1d(resultRegion!),
                 },
                 message: message,
                 isUpdated: true,
@@ -489,5 +498,111 @@ class Strategy2d {
         } else {
             throw "TODO invalid"; // TODO
         }
+    }
+
+    private splitRegionsToIntersections(region1: number[], region2: number[]): number[][] {
+        let set1 = new Set(region1);
+        let set2 = new Set(region2);
+        let r1 = region1.filter(x => !set2.has(x));
+        let r2 = region2.filter(x => !set1.has(x));
+        let intersection = region1.filter(x => set2.has(x));
+        return [r1, r2, intersection];
+    }
+
+    private _pointing(
+        r1: number[], r2: number[], intersection: number[], board: number[]
+    ): StrategyPointingProof | null {
+        let binaries1 = this.loadRegion32(board, r1);
+        let binaries2 = this.loadRegion32(board, r2);
+        let binariesIntersection = this.loadRegion32(board, intersection);
+
+        let binary1 = BinaryUtils.or(binaries1);
+        let binary2 = BinaryUtils.or(binaries2);
+
+        let proof = binary2 & ~ binary1;
+        if (proof != 0) {
+            return {
+                binaries2: binaries2, binariesIntersection: binariesIntersection, region1: r1, region2: r2,
+                intersection: intersection, proof: proof,
+            };
+        }
+
+        proof = binary1 & ~ binary2;
+        if (proof != 0) {
+            return {
+                binaries2: binaries1, binariesIntersection: binariesIntersection, region1: r2, region2: r1,
+                intersection: intersection, proof: proof,
+            };
+        }
+
+        return null;
+    }
+
+    public pointing(state: State): StrategyResult {
+        this.sudoku = state.sudoku;
+        let board = state.board;
+
+        let result: StrategyPointingProof | null = null;
+
+        let regions = state.sudoku.regions.getAllRegions(true, true, true, true, true);
+        for (let i = 0; i < regions.length; i++) {
+            for (let j = 0; j < i; j++) {
+                let region1 = regions[i];
+                let region2 = regions[j];
+                let [r1, r2, intersection] = this.splitRegionsToIntersections(region1, region2);
+                let isIntersectionOk = r1.length > 0 && r2.length > 0 && intersection.length >= 2;
+
+                if (isIntersectionOk) {
+                    result = this._pointing(r1, r2, intersection, board);
+                }
+
+                if (result !== null) {
+                    break;
+                }
+            }
+            if (result !== null) {
+                break;
+            }
+        }
+
+        if (result !== null) {
+            console.log(result);
+
+            let reason = [];
+            for (let i = 0; i < result.intersection.length; i++) {
+                let index = result.intersection[i];
+                let binary = result.binaries2[i] & result.proof;
+                for (let shift of BinaryUtils.binaryToShifts32(binary)) {
+                    reason.push(this.indexToCoordinates3d(index, shift));
+                }
+            }
+
+            let removed = [];
+            for (let i = 0; i < result.region2.length; i++) {
+                let index = result.region2[i];
+                let binary = result.binaries2[i] & result.proof;
+                for (let shift of BinaryUtils.binaryToShifts32(binary)) {
+                    removed.push(this.indexToCoordinates3d(index, shift));
+                }
+            }
+
+            return {
+                isValid: true,
+                isUpdated: true,
+                colors: {
+                    removed: removed,
+                    reason: reason,
+                    region1: this.indexToCoordinates2dArray1d(result.region1),
+                    region2: this.indexToCoordinates2dArray1d(result.region2),
+                    region3: this.indexToCoordinates2dArray1d(result.intersection),
+                },
+                message: `
+                Pointing: If all occurrences of a number in a region are inside another region,
+                this number can not be in that region anywhere else.
+                `,
+            };
+        }
+
+        return { colors: {}, message: "", isUpdated: false, isValid: true, };
     }
 }

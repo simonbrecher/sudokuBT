@@ -63,9 +63,9 @@ class StrategyTests {
         return { container: `${containerId}-inner`, message: messageId };
     }
 
-    private static renderRegion(frame: Frame, region: StrategyCoordinates2d[]): void {
+    private static renderRegion(frame: Frame, region: StrategyCoordinates2d[], color: string): void {
         for (let regionCell of region) {
-            frame.getCell(regionCell.y, regionCell.x).setBackgroundColor("#5FF");
+            frame.getCell(regionCell.y, regionCell.x).setBackgroundColor(color);
         }
     }
 
@@ -179,16 +179,23 @@ class StrategyTests {
         renderer.doSmallNumbersOnFullBinary = true;
         renderer.renderNew(state, ids.container);
         let frame = renderer.renderNew(state, ids.container);
-        if (result.colors.region !== undefined) {
-            this.renderRegion(frame, result.colors.region);
+        if (result.colors.region1 !== undefined) {
+            this.renderRegion(frame, result.colors.region1, "#5FF");
         }
-        if (result.isValid && result.isUpdated) {
-            this.renderColor(frame, result.colors.removed!, "background-removed");
-            if (result.colors.reason) {
-                this.renderColor(frame, result.colors.reason!, "background-reason");
-            }
-        } else if (! result.isValid) {
-            this.renderError(frame, result.colors.error!);
+        if (result.colors.region2 !== undefined) {
+            this.renderRegion(frame, result.colors.region2, "#5FF");
+        }
+        if (result.colors.region3 !== undefined) {
+            this.renderRegion(frame, result.colors.region3, "#FFA");
+        }
+        if (result.colors.removed !== undefined) {
+            this.renderColor(frame, result.colors.removed, "background-removed");
+        }
+        if (result.colors.reason !== undefined) {
+            this.renderColor(frame, result.colors.reason, "background-reason");
+        }
+        if (result.colors.error !== undefined) {
+            this.renderError(frame, result.colors.error);
         }
         document.getElementById(ids.message)!.textContent = result.isUpdated ? result.message : "( NOT UPDATED )";
     }
@@ -235,7 +242,7 @@ class StrategyTests {
         this.update();
     }
 
-    private static perfectlyMatchable2getSudoku(): State[] {
+    private static regionGetSudoku(): State[] {
         let states: State[] = [];
 
         let sudoku, state;
@@ -276,13 +283,61 @@ class StrategyTests {
         return states;
     }
 
-    public static testPerfectlyMatchable(): void {
+    public static testRegion(): void {
         let strategy = new Strategy2d();
-        let states = this.perfectlyMatchable2getSudoku();
+        let states = this.regionGetSudoku();
         for (let i = 0; i < states.length; i++) {
-            let ids = this.prepareDivs(`Perfectly Matchable ${i}`);
+            let ids = this.prepareDivs(`Region ${i}`);
             let state = states[i];
             let result = strategy.region(state);
+
+            this.renderStrategy(ids, state, result);
+        }
+        this.update();
+    }
+
+    private static pointingGetSudoku(): State[] {
+        let states: State[] = [];
+
+        let sudoku, state;
+
+        {
+            let values: [number, [number, number], number[][]][] = [
+                [0, [3, 2], [[0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4]]],
+                [0, [3, 3], Array.from({ length: 6 }, () => [0, 1, 2, 3, 4, 5, 6])],
+                [18, [3, 3], Array.from({ length: 6 }, () => [0, 1, 2, 3, 4, 5, 6, 7])],
+            ];
+
+            for (let x of values) {
+                let [regionId, [rectangleWidth, rectangleHeight], valuesOne] = x;
+                sudoku = new Sudoku(rectangleHeight * rectangleWidth);
+                sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
+
+                let regions = sudoku.regions.getAllRegions(true, true, true, true, true);
+                // let region = ArrayUtils.choice(regions);
+                // let chosen = ArrayUtils.choices(region, valuesOne.length);
+                let chosen = regions[regionId].slice(0, valuesOne.length);
+
+                state = sudoku.solution;
+                state.setCells(chosen, valuesOne);
+
+                let permutation = this.createSudokuPermutation(sudoku, false, false, true, false);
+                this.permuteSudoku(sudoku, state.board, permutation);
+
+                states.push(state);
+            }
+        }
+
+        return states;
+    }
+
+    public static testPointing(): void {
+        let strategy = new Strategy2d();
+        let states = this.pointingGetSudoku();
+        for (let i = 0; i < states.length; i++) {
+            let ids = this.prepareDivs(`Pointing ${i}`);
+            let state = states[i];
+            let result = strategy.pointing(state);
 
             this.renderStrategy(ids, state, result);
         }
