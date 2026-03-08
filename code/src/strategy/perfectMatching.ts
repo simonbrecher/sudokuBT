@@ -349,7 +349,7 @@ class PerfectMatching {
      * Get any smallest component from a graph.
      * @param chooseFromComponents Indices of components from which we want to choose the smallest one.
      * @param vertexComponents For each vertex, index of component to which it belongs.
-     * @return The smallest component from chooseFromComponents with lowest index.
+     * @return The smallest component from chooseFromComponents with the lowest index.
      */
     private static getSmallestComponent(chooseFromComponents: number[], vertexComponents: number[]): number {
         let componentCount = vertexComponents.reduce((a, b) => Math.max(a, b), 0) + 1;
@@ -358,22 +358,22 @@ class PerfectMatching {
             componentSize[c] ++;
         }
 
-        let maxComponent = 0;
-        let maxComponentSize = 0;
+        let minComponent = chooseFromComponents[0];
+        let minComponentSize = componentSize[minComponent];
         for (let c of chooseFromComponents) {
-            if (componentSize[c] >= maxComponentSize) {
-                maxComponent = c;
-                maxComponentSize = componentSize[c];
+            if (componentSize[c] <= minComponentSize) {
+                minComponent = c;
+                minComponentSize = componentSize[c];
             }
         }
 
-        return maxComponent;
+        return minComponent;
     }
 
     /**
-     * Get all sources and sinks of a DAG.
+     * Get all sources and sinks of a DAG, that don't have degree 0.
      * @param graph DAG
-     * @return Sources and sinks of the DAG.
+     * @return Sources and sinks of the DAG, that don't have degree 0.
      */
     private static getSourcesSinks(graph: number[][])
         : {sources: number[], sinks: number[]}
@@ -390,10 +390,10 @@ class PerfectMatching {
         let sources = [];
         let sinks = [];
         for (let i = 0; i < graph.length; i++) {
-            if (isSource[i]) {
+            if (isSource[i] && ! isSink[i]) {
                 sources.push(i);
             }
-            if (isSink[i]) {
+            if (isSink[i] && ! isSource[i]) {
                 sinks.push(i);
             }
         }

@@ -23,6 +23,7 @@ class Debug {
                 case "perfectly_matchable": PerfectMatchingTest.perfectlyMatchable();   break;
                 case "region":              StrategyTests.testRegion();                 break;
                 case "pointing":            StrategyTests.testPointing();               break;
+                case "intersection":        StrategyTests.testIntersection();           break;
 
                 case "debug":               Debug.debug();                              break;
                 case "ng_perfect_match":    PerfectMatchingTest.main();                 break;

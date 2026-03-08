@@ -343,4 +343,74 @@ class StrategyTests {
         }
         this.update();
     }
+
+    private static intersectionGetSudoku(): State[] {
+        let states: State[] = [];
+
+        let sudoku, state;
+
+        {
+            let values: [[number, number], [number[], number[]]][] = [
+                [[3, 3], [[0, 5], [9, 14]]],
+                [[3, 3], [[0, 2, 5], [9, 13, 15]]],
+                [[3, 3], [[0, 2, 5, 6], [9, 13, 15, 16]]],
+                [[3, 3], [[0, 2, 5, 6, 7], [9, 13, 15, 16, 17]]],
+                [[4, 2], [[8, 10], [16, 18]]],
+                [[3, 2], [[6], [0]]],
+            ];
+
+            for (let x of values) {
+                let [[rectangleWidth, rectangleHeight], [regions1, regions2]] = x;
+                let size = rectangleHeight * rectangleWidth;
+                sudoku = new Sudoku(size);
+                if (rectangleHeight != 1) {
+                    sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
+                }
+
+                let regions = sudoku.regions.getAllRegions(true, true, true, true, true);
+
+                let regionA = [];
+                for (let r of regions1) {
+                    for (let index of regions[r]) {
+                        regionA.push(index);
+                    }
+                }
+                let regionB = [];
+                for (let r of regions2) {
+                    for (let index of regions[r]) {
+                        regionB.push(index);
+                    }
+                }
+                let strategy = new Strategy2d();
+                // @ts-ignore
+                let [r1, r2, intersection] = strategy.splitRegionsToIntersections(regionA, regionB);
+
+                state = sudoku.solution;
+                let value = BinaryUtils.createFullBinary(size) & ~ 1;
+                for (let index of r1) {
+                    state.board[index] = value;
+                }
+
+                let permutation = this.createSudokuPermutation(sudoku, false, false, true, false);
+                this.permuteSudoku(sudoku, state.board, permutation);
+
+                states.push(state);
+            }
+        }
+
+        return states;
+    }
+
+    public static testIntersection(): void {
+        let strategy = new Strategy2d();
+        let states = this.intersectionGetSudoku();
+        for (let i = 0; i < states.length; i++) {
+            let ids = this.prepareDivs(`Intersection ${i}`);
+            let state = states[i];
+            let result = strategy.intersection(state);
+
+            this.renderStrategy(ids, state, result);
+        }
+        this.update();
+    }
 }

@@ -15,7 +15,7 @@ type StrategyResult = {
     isUpdated: boolean,
     isValid: boolean,
 };
-type StrategyHallProof = {
+type StrategyRegionProof = {
     isSource: boolean,
     isValid: boolean,
     size: number,
@@ -30,6 +30,17 @@ type StrategyPointingProof = {
     binaries2: number[],
     binariesIntersection: number[],
     proof: number,
+}
+type StrategyIntersectionProof = {
+    isSource: boolean,
+    isValid: boolean,
+    size: number,
+    reason: StrategyCoordinates3d[],
+    removed: StrategyCoordinates3d[],
+    region1: StrategyCoordinates2d[],
+    region2: StrategyCoordinates2d[],
+    region3: StrategyCoordinates2d[],
+    priority: number, // lower number = higher priority, -1 for error and 1000 for non-updated
 }
 
 class Strategy2d {
@@ -417,8 +428,7 @@ class Strategy2d {
      * Source -> naked candidate - on positions <set> there can only be numbers <matched>.
      * Sink -> hidden candidate - numbers <matched> can only be on positions <set>.
      */
-    private _region(binaries: number[]): StrategyHallProof[]
-    {
+    private _region(binaries: number[]): StrategyRegionProof[] {
         let edges = BinaryUtils.binaryToShifts(binaries);
 
         let hallProof = PerfectMatching.getHallProof(edges);
@@ -604,5 +614,140 @@ class Strategy2d {
         }
 
         return { colors: {}, message: "", isUpdated: false, isValid: true, };
+    }
+
+    private _intersection(
+        board: number[], shift: number, regions1: number[][], regions2: number[][]
+    ): StrategyIntersectionProof | null {
+        let size = this.sudoku!.size;
+        let shiftBinary = 1 << shift;
+
+        // for each 1d index of cell, get in what region of regions1 and regions2 it is
+        let r1 = ArrayUtils.createArray1d(size * size, null);
+        let r2 = ArrayUtils.createArray1d(size * size, null);
+        for (let r = 0; r < size; r++) {
+            for (let i = 0; i < size; i++) {
+                r1[regions1[r][i]] = r;
+                r2[regions2[r][i]] = r;
+            }
+        }
+
+        // find what intersections of regions (coordinates) can have at least 1 of shift in board
+        let hasEdge = ArrayUtils.createArray2d(size, size, false);
+        for (let index = 0; index < size * size; index++) {
+            if ((board[index] & shiftBinary) != 0) {
+                hasEdge[r1[index]][r2[index]] = true;
+            }
+        }
+
+        // get bipartite graph
+        let edges = ArrayUtils.createArray2d(size, 0, null);
+        for (let r1 = 0; r1 < size; r1++) {
+            for (let r2 = 0; r2 < size; r2++) {
+                if (hasEdge[r1][r2]) {
+                    edges[r1].push(r2);
+                }
+            }
+        }
+
+        let hallProof = PerfectMatching.getHallProof(edges);
+
+        if (hallProof == "no-matching") {
+            throw "NO MATCHING (TODO)"; // TODO
+        }
+        if (hallProof === "no-unmatchable-edge") {
+            return null;
+        }
+
+        let isSource = hallProof.source.set.length <= hallProof.sink.set.length;
+        let proof = isSource ? hallProof.source : hallProof.sink;
+
+        // get all cells that are in regions of the intersection
+        let proofRegions1 = [];
+        for (let a of proof.set) {
+            for (let index of regions1[a]) {
+                proofRegions1.push(index);
+            }
+        }
+        let proofRegions2 = [];
+        for (let b of proof.matched) {
+            for (let index of regions2[b]) {
+                proofRegions2.push(index);
+            }
+        }
+
+        let [proofR1, proofR2, proofIntersection] = this.splitRegionsToIntersections(proofRegions1, proofRegions2);
+
+        let reason: StrategyCoordinates3d[] = [];
+        for (let index of proofIntersection) {
+            if ((board[index] & shiftBinary) != 0) {
+                reason.push(this.indexToCoordinates3d(index, shift));
+            }
+        }
+
+        let removedRegion = isSource ? proofR2 : proofR1;
+        let removed: StrategyCoordinates3d[] = [];
+        for (let index of removedRegion) {
+            if ((board[index] & shiftBinary) != 0) {
+                removed.push(this.indexToCoordinates3d(index, shift));
+            }
+        }
+
+        return {
+            isSource: isSource,
+            isValid: true,
+            size: proof.set.length,
+            reason: reason,
+            removed: removed,
+            region1: this.indexToCoordinates2dArray1d(proofR1),
+            region2: this.indexToCoordinates2dArray1d(proofR2),
+            region3: this.indexToCoordinates2dArray1d(proofIntersection),
+            priority: proof.set.length,
+        };
+    }
+
+    public intersection(state: State): StrategyResult {
+        this.sudoku = state.sudoku;
+        let board = state.board;
+
+        let regions: [number[][], number[][]][] = [];
+        let rows = this.sudoku.regions.rows;
+        let columns = this.sudoku.regions.columns;
+        regions.push([rows, columns]);
+        if (this.sudoku.regions.hasRegions()) {
+            let regions1 = this.sudoku.regions.regions;
+            regions.push([regions1, rows]);
+            regions.push([regions1, columns]);
+        }
+
+        let result: StrategyIntersectionProof | null = null;
+        for (let [region1, region2] of regions) {
+            for (let shift = 0; shift < this.sudoku.size; shift++) {
+                let newResult = this._intersection(board, shift, region1, region2);
+                if (result === null || newResult !== null && newResult.priority < result.priority) {
+                    result = newResult;
+                }
+            }
+        }
+
+        if (result === null) {
+            return {colors: {}, isUpdated: false, isValid: false, message: "",};
+        }
+
+        return {
+            colors: {
+                reason: result.reason,
+                removed: result.removed,
+                region1: result.region1,
+                region2: result.region2,
+                region3: result.region3,
+            },
+            isUpdated: true,
+            isValid: true,
+            message: `
+                X wing: If all occurrences of a number in ${result.size} regions are inside another ${result.size} regions,
+                this number can not be in those regions anywhere else.
+                `,
+        };
     }
 }
