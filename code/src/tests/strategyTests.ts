@@ -63,9 +63,9 @@ class StrategyTests {
         return { container: `${containerId}-inner`, message: messageId };
     }
 
-    private static renderRegion(frame: Frame, region: StrategyCoordinates2d[], color: string): void {
+    private static renderRegion(frame: Frame, region: StrategyCoordinates2d[], css: string): void {
         for (let regionCell of region) {
-            frame.getCell(regionCell.y, regionCell.x).setBackgroundColor(color);
+            frame.getCell(regionCell.y, regionCell.x).addCellClass(css);
         }
     }
 
@@ -82,8 +82,8 @@ class StrategyTests {
     private static renderError(frame: Frame, error: StrategyCoordinates3d[]): void {
         for (let errorCell of error) {
             let cell = frame.getCell(errorCell.y, errorCell.x);
-            if (errorCell.shift === -1) {
-                cell.setBackgroundColor("#F00");
+                if (errorCell.shift === -1) {
+                    cell.addCellClass("background-error");
                 cell.setTextBackgroundColor(null, "background-error", true);
             } else {
                 let found = cell.setTextBackgroundColor(`${errorCell.shift + 1}`, "background-error", false);
@@ -180,13 +180,13 @@ class StrategyTests {
         renderer.renderNew(state, ids.container);
         let frame = renderer.renderNew(state, ids.container);
         if (result.colors.region1 !== undefined) {
-            this.renderRegion(frame, result.colors.region1, "#5FF");
+            this.renderRegion(frame, result.colors.region1, "background-region-1");
         }
         if (result.colors.region2 !== undefined) {
-            this.renderRegion(frame, result.colors.region2, "#5FF");
+            this.renderRegion(frame, result.colors.region2, "background-region-2");
         }
         if (result.colors.region3 !== undefined) {
-            this.renderRegion(frame, result.colors.region3, "#FFA");
+            this.renderRegion(frame, result.colors.region3, "background-region-3");
         }
         if (result.colors.removed !== undefined) {
             this.renderColor(frame, result.colors.removed, "background-removed");

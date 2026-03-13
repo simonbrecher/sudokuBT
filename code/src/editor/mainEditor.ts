@@ -10,14 +10,16 @@ class MainEditor {
 
     public static sudoku: Sudoku;
 
-    public static menuPosition: [string | null, string | null] = [null, null];
+    public static menuPosition: {left: string | null, right: string | null} = {left: null, right: null};
+
+    public static numberPlus: number = 0;
 
     public static isConfirmOpen: boolean = true;
 
     private static windowsSeen: string[] = [];
     private static windowsOpen: string[] = [];
 
-    private static readonly VIEW_TASK_ONLY = ["menu-button-regions", "menu-button-view", "menu-button-solve-start"];
+    private static readonly VIEW_TASK_ONLY = ["menu-button-regions", "menu-button-numbers", "menu-button-view", "menu-button-solve-start"];
     private static readonly VIEW_SOLVE_ONLY = ["menu-button-task-edit", "menu-button-solve-restart"];
 
     /**
@@ -30,23 +32,32 @@ class MainEditor {
         this.hideConfirmWindow();
     }
 
+    private static resetSolution(): void {
+        this.sudoku.solution = this.sudoku.task.deepcopy();
+    }
+
     /**
      * Render sudoku normally
      */
     private static renderSudoku(): void {
-        Renderer.renderer.render(this.sudoku.solution, this.frame);
+        if (this.menuPosition.left === "solve") {
+            Renderer.renderer.doSmallNumbersOnFullBinary = true;
+            Renderer.renderer.render(this.sudoku.solution, this.frame);
+            Renderer.renderer.doSmallNumbersOnFullBinary = false;
+        } else {
+            Renderer.renderer.render(this.sudoku.task, this.frame);
+        }
     }
 
     /**
      * Render sudoku
      */
-    private static render(): void {
-        if (this.menuPosition[1] === "regions-jigsaw" || this.menuPosition[1] === "regions-extraregions") {
+   public static render(): void {
+        if (this.menuPosition.right === "regions-jigsaw" || this.menuPosition.right === "regions-extraregions") {
             RegionEditor.renderSudoku();
         } else {
             this.renderSudoku();
         }
-        this.updateChecks();
     }
 
     /**
@@ -67,8 +78,8 @@ class MainEditor {
 
         this.updateForResize();
 
-        if (this.menuPosition[1] === "regions-jigsaw" || this.menuPosition[1] === "regions-extraregions") {
-            RegionEditor.addEventListeners();
+        if (this.menuPosition.right === "regions-jigsaw" || this.menuPosition.right === "regions-extraregions") {
+            EditorUtils.addEventListeners(RegionEditor.eventListeners);
         }
     }
 
@@ -88,6 +99,12 @@ class MainEditor {
 
         GraphicsUtils.addOrRemoveClass("menu-button-regions-windoku", "display-none", this.size !== 9);
 
+        GraphicsUtils.addOrRemoveClass("text-plus10", "display-none", this.size < 10 || this.size >= 20);
+        GraphicsUtils.addOrRemoveClass("text-plus20", "display-none", this.size < 20);
+        GraphicsUtils.addOrRemoveClass("menu-button-numbers-plus0", "display-none", this.size < 10);
+        GraphicsUtils.addOrRemoveClass("menu-button-numbers-plus10", "display-none", this.size < 10);
+        GraphicsUtils.addOrRemoveClass("menu-button-numbers-plus20", "display-none", this.size < 20);
+
         // Change text based on size
         document.getElementById("text-jigsaw-1")!.textContent = `All regions must have ${this.size} cells.`;
         document.getElementById("text-extraregions-1")!.textContent = `All extra regions must have ${this.size} cells.`;
@@ -97,7 +114,6 @@ class MainEditor {
         while (select.options.length > 0) {
             select.options.remove(0);
         }
-
         for (let rectangleHeight = 2; rectangleHeight < this.size; rectangleHeight++) {
             let rectangleWidth = Math.floor(this.size / rectangleHeight);
             if (rectangleHeight * rectangleWidth === this.size) {
@@ -131,7 +147,6 @@ class MainEditor {
     private static showConfirmWindow(name: string, isRepeat: boolean): void {
         if (! isRepeat) {
             if (this.windowsSeen.includes(name)) {
-                console.log("SHOW CONFIRM WINDOW DENIED", name);
                 return;
             } else {
                 this.windowsSeen.push(name);
@@ -167,7 +182,7 @@ class MainEditor {
      * @param rightPosition new position in right menu
      */
     private static changeMenuPosition(leftPosition: string, rightPosition: string | null): boolean {
-        let [previousLeftPosition, previousRightPosition] = this.menuPosition;
+        let {left: previousLeftPosition, right: previousRightPosition} = this.menuPosition;
 
         console.log(`${previousLeftPosition} ${previousRightPosition} -> ${leftPosition} ${rightPosition}`);
 
@@ -194,7 +209,6 @@ class MainEditor {
         let isSolve = leftPosition === "solve";
         if (previousLeftPosition === null || isSolve != previousIsSolve) {
             if (isSolve) {
-                console.log("-> isSolve");
                 for (let c of this.VIEW_SOLVE_ONLY) {
                     GraphicsUtils.removeClass(c, "display-none");
                 }
@@ -202,7 +216,6 @@ class MainEditor {
                     GraphicsUtils.addClass(c, "display-none");
                 }
             } else {
-                console.log("-> ! isSolve");
                 for (let c of this.VIEW_SOLVE_ONLY) {
                     GraphicsUtils.addClass(c, "display-none");
                 }
@@ -213,25 +226,34 @@ class MainEditor {
         }
 
         // add/remove event listeners
-        if (rightPosition !== previousRightPosition) {
-            let hadRegionsListeners = previousRightPosition === "regions-jigsaw" || previousRightPosition === "regions-extraregions";
-            let willHaveRegionsListeners = rightPosition === "regions-jigsaw" || rightPosition === "regions-extraregions";
+        if (leftPosition !== previousLeftPosition || rightPosition !== previousRightPosition) {
+            let hadRegionsListeners = RegionEditor.hasEventListeners(previousLeftPosition!, previousRightPosition!);
+            let willHaveRegionsListeners = RegionEditor.hasEventListeners(leftPosition!, rightPosition!);
             if (willHaveRegionsListeners && ! hadRegionsListeners) {
-                RegionEditor.addEventListeners();
+                EditorUtils.addEventListeners(RegionEditor.eventListeners);
             } else if (hadRegionsListeners && ! willHaveRegionsListeners) {
-                RegionEditor.removeEventListeners();
+                EditorUtils.removeEventListeners(RegionEditor.eventListeners);
+            }
+
+            let hadNumbersListeners = NumberEditor.hasEventListeners(previousLeftPosition!, previousRightPosition!);
+            let willHaveNumbersListeners = NumberEditor.hasEventListeners(leftPosition!, rightPosition!);
+            if (willHaveNumbersListeners && ! hadNumbersListeners) {
+                EditorUtils.addEventListeners(NumberEditor.eventListeners);
+            } else if (hadNumbersListeners && ! willHaveNumbersListeners) {
+                EditorUtils.removeEventListeners(NumberEditor.eventListeners);
+            }
+
+            if (leftPosition !== previousLeftPosition && hadNumbersListeners) {
+                NumberEditor.removeChosenCell();
             }
         }
 
-        this.menuPosition = [leftPosition, rightPosition];
+        this.menuPosition = {left: leftPosition, right: rightPosition};
 
         return leftPosition !== previousLeftPosition || rightPosition !== previousRightPosition;
     }
 
-    /**
-     * Add or remove .selected class for all checks
-     */
-    public static updateChecks(): void {
+    public static updateChecksRegions(): void {
         let isNone = ! this.sudoku.regions.hasRegions();
         let isRectangular = this.sudoku.regions.isRectangular();
         let isJigsaw = ! (isNone || isRectangular);
@@ -248,11 +270,16 @@ class MainEditor {
         GraphicsUtils.addOrRemoveClass("check-regions-extraregions", "selected", isExtraRegions);
     }
 
+    private static updateChecksPlus(): void {
+        for (let plus = 0; plus <= 20; plus += 10) {
+            GraphicsUtils.addOrRemoveClass(`check-numbers-plus${plus}`, "selected", plus == this.numberPlus);
+        }
+    }
+
     public static pressedResizeButton(): void {
         if (! this.isConfirmOpen) {
             this.addTemporaryButtonFocus("resize");
             this.showConfirmWindow("resize", true);
-            console.log("resize");
         }
     }
 
@@ -262,7 +289,6 @@ class MainEditor {
             let newSize = parseInt(resizeInput.value);
             this.size = Math.max(this.MIN_SIZE, Math.min(this.MAX_SIZE, newSize));
             if (newSize === this.size) {
-                console.log("resize-confirm");
                 this.hideConfirmWindow();
                 this.createFrame();
                 this.render();
@@ -275,34 +301,28 @@ class MainEditor {
 
     public static cancel(): void {
         this.hideConfirmWindow();
-        console.log("cancel");
     }
 
     public static pressedTaskEditButton(): void {
         if (! this.isConfirmOpen) {
             this.addTemporaryButtonFocus("task-edit");
             this.showConfirmWindow("task-edit", true);
-            console.log("task-edit");
         }
     }
 
     public static confirmTaskEdit(): void {
         this.changeMenuPosition("view", null);
         this.hideConfirmWindow();
-        console.log("task-edit-confirm");
+        this.render();
     }
 
     public static pressedRegionsButton(): void {
         if (! this.isConfirmOpen) {
             this.showConfirmWindow("regions", false);
-            let isClicked = this.changeMenuPosition("regions", "regions-view");
-            this.setRegionsNoneToSudoku();
-            if (isClicked) {
-                console.log("regions");
-            }
+            this.changeMenuPosition("regions", "regions-view");
+            this.updateChecksRegions();
             this.render();
         }
-        this.render();
     }
 
     public static pressedRegionsRectangularButton(): void {
@@ -310,7 +330,6 @@ class MainEditor {
             this.addTemporaryButtonFocus("regions-rectangular");
             this.changeMenuPosition("regions", "regions-view");
             this.showConfirmWindow("regions-rectangular", true);
-            console.log("regions-rectangular");
         }
     }
 
@@ -325,7 +344,7 @@ class MainEditor {
         this.hideConfirmWindow();
         this.changeMenuPosition("regions", "regions-view");
         this.setRegionsRectangularToSudoku();
-        console.log("regions-rectangular-confirm");
+        this.updateChecksRegions();
         this.render();
     }
 
@@ -338,7 +357,7 @@ class MainEditor {
             this.addTemporaryButtonFocus("regions-none");
             this.changeMenuPosition("regions", "regions-view");
             this.setRegionsNoneToSudoku();
-            console.log("regions-none");
+            this.updateChecksRegions();
             this.render();
         }
     }
@@ -346,10 +365,7 @@ class MainEditor {
     public static pressedRegionsJigsawButton(): void {
         if (! this.isConfirmOpen) {
             this.showConfirmWindow("regions-jigsaw", false);
-            let isClicked = this.changeMenuPosition("regions", "regions-jigsaw");
-            if (isClicked) {
-                console.log("regions-jigsaw");
-            }
+            this.changeMenuPosition("regions", "regions-jigsaw");
             RegionEditor.checkIfRegionsAreAll();
             this.render();
         }
@@ -359,8 +375,8 @@ class MainEditor {
         if (! this.isConfirmOpen) {
             this.addTemporaryButtonFocus("regions-diagonal");
             this.changeMenuPosition("regions", "regions-view");
-            console.log("regions-diagonal");
             this.sudoku.regions.hasDiagonals = ! this.sudoku.regions.hasDiagonals;
+            this.updateChecksRegions();
             this.render();
         }
     }
@@ -374,7 +390,7 @@ class MainEditor {
             this.addTemporaryButtonFocus("regions-noextraregions");
             this.changeMenuPosition("regions", "regions-view");
             this.setRegionsNoextraregionsToSudoku();
-            console.log("regions-noextraregions");
+            this.updateChecksRegions();
             this.render();
         }
     }
@@ -388,7 +404,7 @@ class MainEditor {
             this.addTemporaryButtonFocus("regions-windoku");
             this.changeMenuPosition("regions", "regions-view");
             this.setRegionsWindokuToSudoku();
-            console.log("regions-windoku");
+            this.updateChecksRegions();
             this.render();
         }
     }
@@ -396,10 +412,7 @@ class MainEditor {
     public static pressedRegionsExtraregionsButton(): void {
         if (! this.isConfirmOpen) {
             this.showConfirmWindow("regions-extraregions", false);
-            let isClicked = this.changeMenuPosition("regions", "regions-extraregions");
-            if (isClicked) {
-                console.log("regions-extraregions");
-            }
+            this.changeMenuPosition("regions", "regions-extraregions");
             RegionEditor.checkIfRegionsAreAll();
             this.render();
         }
@@ -407,32 +420,39 @@ class MainEditor {
 
     public static pressedRegionsViewButton(): void {
         if (! this.isConfirmOpen) {
-            let isClicked = this.changeMenuPosition("regions", "regions-view");
-            if (isClicked) {
-                console.log("regions-view");
-            }
+            this.changeMenuPosition("regions", "regions-view");
             this.render();
+        }
+    }
+
+    public static pressedNumbersButton(): void {
+        if (! this.isConfirmOpen) {
+            this.showConfirmWindow("numbers", false);
+            this.changeMenuPosition("numbers", null);
+            this.numberPlus = 0;
+            this.updateChecksPlus();
+            this.render();
+        }
+    }
+
+    public static pressedNumbersPlus(plus: number): void {
+        if (! this.isConfirmOpen) {
+            this.numberPlus = plus;
+            this.updateChecksPlus();
         }
     }
 
     public static pressedViewButton(): void {
         if (! this.isConfirmOpen) {
-            let isClicked = this.changeMenuPosition("view", null);
-            if (isClicked) {
-                console.log("view");
-            }
+            this.changeMenuPosition("view", null);
             this.render();
         }
     }
 
     public static pressedSolveStartButton(): void {
         if (! this.isConfirmOpen) {
-            // TODO: implement
-
-            let isClicked = this.changeMenuPosition("solve", null);
-            if (isClicked) {
-                console.log("solve-start");
-            }
+            this.resetSolution();
+            this.changeMenuPosition("solve", null);
             this.render();
         }
     }
@@ -441,14 +461,12 @@ class MainEditor {
         if (! this.isConfirmOpen) {
             this.showConfirmWindow("solve-restart", true);
             this.addTemporaryButtonFocus("solve-restart");
-            console.log("solve-restart");
-            this.render();
         }
     }
 
     public static confirmSolveRestart(): void {
-        // TODO: implement
+        this.resetSolution();
         this.hideConfirmWindow();
-        console.log("solve-restart-confirm");
+        this.render();
     }
 }

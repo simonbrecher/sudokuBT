@@ -206,4 +206,18 @@ class Cell {
                 throw `ERROR: Cell.getBorderWidth got invalid direction=${direction}`;
         }
     }
+
+    /**
+     * Add cell class
+     */
+    public addCellClass(css: string): void {
+        this.cellElement.classList.add(css);
+    }
+
+    /**
+     * Remove cell class
+     */
+    public removeCellClass(name: string): void {
+        this.cellElement.classList.remove(name);
+    }
 }

@@ -41,17 +41,26 @@
     display: flex; flex-wrap: wrap; align-content: flex-start; gap: 1px;
 }
 .multiple-text > div {
-    --font-color: #999;
+    --font-color: #888;
     font-size: calc(var(--relative-font-size-multiple) * (var(--height) - 2px) / var(--inner-count-1d));
     height: calc((100% - var(--inner-count-1d) * 1px + 1px) / var(--inner-count-1d));
     width: calc((100% - var(--inner-count-1d) * 1px + 1px) / var(--inner-count-1d));
     display: flex; justify-content: center; align-items: center;
 }
 
-.text-wrapper > .background-removed { background-color: #FF0; --font-color: #000; }
-.text-wrapper > .background-reason { background-color: #0F0; --font-color: #000; }
-.text-wrapper > .background-error { background-color: #F30; --font-color: #000; }
-.text-wrapper > .background-region { background-color: #0FF; --font-color: #000; }
+.background-removed { background-color: #FF0; }
+.background-reason { background-color: #0F0; }
+.background-error { background-color: #F30; }
+.background-region-1 { background-color: #6FF; }
+.background-region-2 { background-color: #6FF; }
+.background-region-3 { background-color: #FFA; }
+.text-wrapper > .background-removed, .text-wrapper > .background-reason, .text-wrapper > .background-error
+{ --font-color: #000; }
+
+.background-chosen-big { background-color: #5AF; }
+.background-chosen-small { background: linear-gradient(135deg, #5AF 30%, var(--background-color) 30%); }
+.background-chosen-big .multiple-text > div, .background-chosen-small .multiple-text > div
+{ --font-color: #000; }
 
 .canvas {
     position: absolute; height: calc(100% - var(--strong-border-width)); width: calc(100% - var(--strong-border-width));

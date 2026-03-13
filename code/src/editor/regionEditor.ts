@@ -1,4 +1,3 @@
-type RegionsMouseEventType = "mousedown" | "mouseup" | "mousemove" | "mouseleave" | "contextmenu";
 type RegionsSudokuData = {
     name: "jigsaw" | "extraregions",
     sudoku: Sudoku,
@@ -17,13 +16,17 @@ class RegionEditor {
 
     private static extraRegions: RegionsSudokuData;
 
-    private static eventListeners: [RegionsMouseEventType, (event: MouseEvent) => void][] = [
-        ["mousedown", (event: MouseEvent) => this.mouseDownEventListener(event)],
-        ["mouseup", (event: MouseEvent) => this.mouseUpEventListener(event)],
-        ["mousemove", (event: MouseEvent) => this.mouseMoveEventListener(event)],
-        ["mouseleave", (event: MouseEvent) => this.mouseUpEventListener(event)],
-        ["contextmenu", (event: MouseEvent) => event.preventDefault()],
+    public static eventListeners: [string, EventListener][] = [
+        ["mousedown", (event: Event) => this.mouseDownEventListener(<MouseEvent>event)],
+        ["mouseup", (event: Event) => this.mouseUpEventListener(<MouseEvent>event)],
+        ["mousemove", (event: Event) => this.mouseMoveEventListener(<MouseEvent>event)],
+        ["mouseleave", (event: Event) => this.mouseUpEventListener(<MouseEvent>event)],
+        ["contextmenu", (event: Event) => event.preventDefault()],
     ];
+
+    public static hasEventListeners(left: string, right: string): boolean {
+        return right === "regions-jigsaw" || right === "regions-extraregions";
+    }
 
     /**
      * Render sudoku while editing jigsaw regions
@@ -50,7 +53,7 @@ class RegionEditor {
     }
 
     public static renderSudoku(): void {
-        switch (MainEditor.menuPosition[1]) {
+        switch (MainEditor.menuPosition.right) {
             case "regions-jigsaw":
                 this.renderJigsaw();
                 break;
@@ -58,7 +61,7 @@ class RegionEditor {
                 this.renderExtraRegions();
                 break;
             default:
-                throw `Cannot render regions sudoku if MainEditor.menuPosition[1]=${MainEditor.menuPosition[1]}`;
+                throw `Cannot render regions sudoku if MainEditor.menuPosition.right=${MainEditor.menuPosition.right}`;
         }
     }
 
@@ -98,27 +101,18 @@ class RegionEditor {
     }
 
     private static getActiveSudokuData(): RegionsSudokuData {
-        switch (MainEditor.menuPosition[1]) {
+        switch (MainEditor.menuPosition.right) {
             case "regions-jigsaw":
                 return this.jigsaw;
             case "regions-extraregions":
                 return this.extraRegions;
             default:
-                throw `Cannot call getActiveSudokuData if MainEditor.menuPosition[1]==${MainEditor.menuPosition[1]}`;
+                throw `Cannot call getActiveSudokuData if MainEditor.menuPosition.right==${MainEditor.menuPosition.right}`;
         }
     }
 
-    private static mouseCoordinatesToCellCoordinates(mouseY: number, mouseX: number): { y: number, x: number } {
-        let bound = MainEditor.frame.puzzleWrapper.getBoundingClientRect();
-        let y = Math.floor((mouseY - bound.top) / bound.height * MainEditor.size);
-        let x = Math.floor((mouseX - bound.left) / bound.width * MainEditor.size);
-        y = Math.min(MainEditor.size - 1, Math.max(0, y));
-        x = Math.min(MainEditor.size - 1, Math.max(0, x));
-        return { y: y, x: x };
-    }
-
     private static mouseDownEventListener(event: MouseEvent): void {
-        let cell = this.mouseCoordinatesToCellCoordinates(event.y, event.x);
+        let cell = EditorUtils.mouseCoordinatesToCellCoordinates(event.y, event.x);
         if ((event.buttons & 1) !== 0) {
             this.addCellToRegion(this.getActiveSudokuData(), cell.y, cell.x);
         } else if ((event.buttons & 2) !== 0) {
@@ -159,7 +153,7 @@ class RegionEditor {
         let sudokuData = this.getActiveSudokuData();
         if ((event.buttons & 1) !== 0) {
             if (sudokuData.nextRegion.size < MainEditor.size) {
-                let cell = this.mouseCoordinatesToCellCoordinates(event.y, event.x);
+                let cell = EditorUtils.mouseCoordinatesToCellCoordinates(event.y, event.x);
                 this.addCellToRegion(sudokuData, cell.y, cell.x);
             }
         } else {
@@ -172,25 +166,13 @@ class RegionEditor {
         if (sudokuData.name == "jigsaw") {
             if (Math.max(...sudokuData.regionsMatrix) === MainEditor.size - 1) {
                 MainEditor.sudoku.regions.setJigsaw(PositionUtils.matrixToRegions(sudokuData.regionsMatrix));
-                MainEditor.updateChecks();
+                MainEditor.updateChecksRegions();
             }
         } else {
             if (Math.max(...sudokuData.regionsMatrix) > -1) {
                 MainEditor.sudoku.regions.setExtraRegions(PositionUtils.matrixToRegions(sudokuData.regionsMatrix));
-                MainEditor.updateChecks();
+                MainEditor.updateChecksRegions();
             }
-        }
-    }
-
-    public static addEventListeners(): void {
-        for (let [name, method] of this.eventListeners) {
-            MainEditor.frame.puzzleWrapper.addEventListener(name, method);
-        }
-    }
-
-    public static removeEventListeners(): void {
-        for (let [name, method] of this.eventListeners) {
-            MainEditor.frame.puzzleWrapper.removeEventListener(name, method);
         }
     }
 }

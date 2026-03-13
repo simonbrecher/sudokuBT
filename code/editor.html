@@ -19,6 +19,8 @@
 
     <script src="src/editor/mainEditor.js"></script>
     <script src="src/editor/regionEditor.js"></script>
+    <script src="src/editor/numberEditor.js"></script>
+    <script src="src/editor/editorUtils.js"></script>
 
     <script src="src/graphics/basketBorderStyle.js"></script>
     <script src="src/graphics/canvas.js"></script>
@@ -47,6 +49,7 @@
             <div class="menu-title">Edit Task</div>
             <div id="menu-button-task-edit" class="menu-button" onclick="MainEditor.pressedTaskEditButton();">Edit Task</div>
             <div id="menu-button-regions" class="menu-button" onclick="MainEditor.pressedRegionsButton();">Edit Regions</div>
+            <div id="menu-button-numbers" class="menu-button" onclick="MainEditor.pressedNumbersButton();">Edit Numbers</div>
             <div id="menu-button-view" class="menu-button" onclick="MainEditor.pressedViewButton();">View Task</div>
         </section>
         <section id="menu-section-solve" class="menu-section">
@@ -100,8 +103,19 @@
                 <div id="menu-button-regions-view" class="menu-button" onclick="MainEditor.pressedRegionsViewButton();">View</div>
             </section>
         </section>
-        <section id="menu-section-view" class="menu-section">
-            <div id="menu-button-view-nothing" class="menu-button">...</div>
+        <section id="menu-section-numbers" class="menu-section">
+            <div id="menu-button-numbers-plus0" class="menu-button" onclick="MainEditor.pressedNumbersPlus(0);">
+                +0
+                <div id="check-numbers-plus0" class="check"></div>
+            </div>
+            <div id="menu-button-numbers-plus10" class="menu-button" onclick="MainEditor.pressedNumbersPlus(10);">
+                +10
+                <div id="check-numbers-plus10" class="check"></div>
+            </div>
+            <div id="menu-button-numbers-plus20" class="menu-button" onclick="MainEditor.pressedNumbersPlus(20);">
+                +20
+                <div id="check-numbers-plus20" class="check"></div>
+            </div>
         </section>
     </div>
 </div>
@@ -188,6 +202,20 @@
     <div>In a sudoku region, every number has to appear exactly once.</div>
     <div>You can add regions of 3 main types: regular, diagonal and extra regions.</div>
     <div>Every row and column of sudoku also counts as a region,<br> so each row and column must have every number exactly once as well.</div>
+    <div class="confirm-window-button-wrapper">
+        <div class="ok" onclick="MainEditor.cancel();">Ok</div>
+    </div>
+</div>
+
+<div id="confirm-window-numbers" class="confirm-window">
+    <div class="confirm-section">What are sudoku numbers</div>
+    <div>You can fill some cells with a number.</div>
+    <div>Left click on a cell to choose it.</div>
+    <div>Press a number key to fill the cell with a number.</div>
+    <div>Press Backspace or Delete to remove a number from the cell.</div>
+    <div id="text-plus10">For numbers 10 or higher use +10 button.</div>
+    <div id="text-plus20">For numbers 10 or higher use +10 and +20 buttons.</div>
+    <div>Objective of solving sudoku is to fill all other numbers, but you can not change numbers in task.</div>
     <div class="confirm-window-button-wrapper">
         <div class="ok" onclick="MainEditor.cancel();">Ok</div>
     </div>
