@@ -11,6 +11,7 @@ type StrategyColors = {
 };
 type StrategyResult = {
     colors: StrategyColors,
+    name: string,
     message: string,
     isUpdated: boolean,
     isValid: boolean,
@@ -44,18 +45,14 @@ type StrategyIntersectionProof = {
 }
 
 class Strategy2d {
-    private static readonly REGION_SIZE_TEXT = ["single", "pair", "triple", "quadruple"];
+    private static readonly REGION_SIZE_TEXT = ["Single", "Pair", "Triple", "Quadruple"];
 
-    private sudoku: Sudoku | null;
-
-    constructor() {
-        this.sudoku = null;
-    }
+    private static sudoku: Sudoku | null = null;
 
     /**
      * Load region from 1d board.
      */
-    private loadRegion32(board: number[], region: number[]): number[] {
+    private static loadRegion32(board: number[], region: number[]): number[] {
         let binaries = [];
         for (let index of region) {
             binaries.push(board[index]);
@@ -69,7 +66,7 @@ class Strategy2d {
      * @param region array of indices of the region's cells
      * @param binaries New values of cells.
      */
-    private saveRegion32(board: number[], region: number[], binaries: number[]): void {
+    private static saveRegion32(board: number[], region: number[], binaries: number[]): void {
         for (let i = 0; i < region.length; i++) {
             board[region[i]] &= binaries[i];
         }
@@ -78,14 +75,14 @@ class Strategy2d {
     /**
      * Convert 1d index (y * width + x) into 2d index ( { y: y, x: x } )
      */
-    private indexToCoordinates2d(index: number): StrategyCoordinates2d {
+    private static indexToCoordinates2d(index: number): StrategyCoordinates2d {
         return { y: Math.floor(index / this.sudoku!.size), x: index % this.sudoku!.size };
     }
 
     /**
      * Convert 1d array of 1d indices (y * width + x) into 1d array of 2d indices ( { y: y, x: x } )
      */
-    private indexToCoordinates2dArray1d(indices: number[]): StrategyCoordinates2d[] {
+    private static indexToCoordinates2dArray1d(indices: number[]): StrategyCoordinates2d[] {
         let output = [];
         for (let index of indices) {
             output.push(this.indexToCoordinates2d(index));
@@ -98,14 +95,14 @@ class Strategy2d {
      * @param index (y * width + x)
      * @param shift third coordinate
      */
-    private indexToCoordinates3d(index: number, shift: number): StrategyCoordinates3d {
+    private static indexToCoordinates3d(index: number, shift: number): StrategyCoordinates3d {
         return { y: Math.floor(index / this.sudoku!.size), x: index % this.sudoku!.size, shift: shift };
     }
 
     /**
      * Convert 1d array of 1d indices (y * width + x) and shift into 3d indices ( { y: y, x: x, shift: shift } )
      */
-    private indexToCoordinates3dArray1dIndices(indices: number[], shift: number): StrategyCoordinates3d[] {
+    private static indexToCoordinates3dArray1dIndices(indices: number[], shift: number): StrategyCoordinates3d[] {
         let output = [];
         for (let index of indices) {
             output.push(this.indexToCoordinates3d(index, shift));
@@ -116,7 +113,7 @@ class Strategy2d {
     /**
      * Convert 1d index (y * width + x) and 1d array of shifts into 3d indices ( { y: y, x: x, shift: shift } )
      */
-    private indexToCoordinates3dArray1dShifts(index: number, shifts: number[]): StrategyCoordinates3d[] {
+    private static indexToCoordinates3dArray1dShifts(index: number, shifts: number[]): StrategyCoordinates3d[] {
         let output = [];
         for (let shift of shifts) {
             output.push(this.indexToCoordinates3d(index, shift));
@@ -127,7 +124,7 @@ class Strategy2d {
     /**
      * Convert StrategyRegionCoordinates2d[] to StrategyCoordinates3d[]
      */
-    private regionCoordinates2dTo3dArray1d(regionIndices: StrategyRegionCoordinates2d[], region: number[]): StrategyCoordinates3d[] {
+    private static regionCoordinates2dTo3dArray1d(regionIndices: StrategyRegionCoordinates2d[], region: number[]): StrategyCoordinates3d[] {
         let output = [];
         for (let regionIndex of regionIndices) {
             output.push(this.indexToCoordinates3d(region[regionIndex.index], regionIndex.shift));
@@ -138,7 +135,7 @@ class Strategy2d {
     /**
      * Convert StrategyRegionCoordinates2d[] to index[]
      */
-    private regionCoordinates2dToShiftArray1d(regionIndices: StrategyRegionCoordinates2d[], region: number[]): number[] {
+    private static regionCoordinates2dToShiftArray1d(regionIndices: StrategyRegionCoordinates2d[], region: number[]): number[] {
         let output = [];
         for (let regionIndex of regionIndices) {
             output.push(regionIndex.shift);
@@ -146,7 +143,7 @@ class Strategy2d {
         return output;
     }
 
-    private joinShiftsToText(shifts: number[]): string {
+    private static joinShiftsToText(shifts: number[]): string {
         let copyShifts = ArrayUtils.deepcopyArray1d(shifts);
         copyShifts.sort((a, b) => a - b);
         switch (copyShifts.length) {
@@ -171,7 +168,7 @@ class Strategy2d {
      * @return  { output: [index1, index2], isValid: false } If two cells with one number have the same number.
      *          { output: (new binaries), isValid: true } Otherwise.
      */
-    private _nakedSingle(binaries: number[]): { output: number[], isValid: boolean } {
+    private static _nakedSingle(binaries: number[]): { output: number[], isValid: boolean } {
         // find all values that have to be in some cell
         let once = 0;
         for (let i = 0; i < binaries.length; i++) {
@@ -204,7 +201,7 @@ class Strategy2d {
      *      - If no progress was made
      *      - If progress was made      - Return list of all removed values.
      */
-    public nakedSingle(state: State): StrategyResult {
+    public static nakedSingle(state: State): StrategyResult {
         this.sudoku = state.sudoku;
         let board = state.board;
 
@@ -216,7 +213,8 @@ class Strategy2d {
                     colors: {
                         error: [this.indexToCoordinates3d(i, -1)],
                     },
-                    message: "INVALID: There is no number in a cell.",
+                    name: "INVALID",
+                    message: "There is no number in a cell.",
                     isUpdated: true,
                     isValid: false,
                 }
@@ -239,7 +237,8 @@ class Strategy2d {
                         error: [error1, error2],
                         region1: this.indexToCoordinates2dArray1d(region),
                     },
-                    message: "INVALID: Two cells in a region have the same number.",
+                    name: "INVALID",
+                    message: "Two cells in a region have the same number.",
                     isUpdated: true,
                     isValid: false,
                 };
@@ -248,7 +247,7 @@ class Strategy2d {
         }
 
         if (ArrayUtils.equals1d(outputBoard, board)) {
-            return { colors: {  }, message: "", isUpdated: false, isValid: true };
+            return { colors: {  }, name: "", message: "", isUpdated: false, isValid: true };
         }
 
         let removed: StrategyCoordinates3d[] = [];
@@ -270,7 +269,8 @@ class Strategy2d {
             colors: {
                 removed: removed,
             },
-            message: `Naked single: Removed ${removed.length} numbers.`,
+            name: "Naked Single",
+            message: `Removed ${removed.length} numbers.`,
             isUpdated: true,
             isValid: true,
         }
@@ -286,7 +286,7 @@ class Strategy2d {
      * @return isUpdated:   true if any progress was made, or isValid==false
      * @return isValid:     false if region is known to have no solution
      */
-    private _hiddenSingle(binaries: number[]): {
+    private static _hiddenSingle(binaries: number[]): {
         reason?: StrategyRegionCoordinates2d[], removed?: StrategyRegionCoordinates2d[],
         multiple?: { cell: number, shifts: number[] }, missing?: number[],
         isUpdated: boolean, isValid: boolean,
@@ -308,7 +308,6 @@ class Strategy2d {
         }
 
         // check what values can be removed
-        let isUpdated = false;
         let reason = [];
         let removed = [];
         for (let i = 0; i < binaries.length; i++) {
@@ -320,16 +319,19 @@ class Strategy2d {
                     return { multiple: multiple, isUpdated: true, isValid: false };
                 }
 
-                reason.push({ index: i, shift: BinaryUtils.binaryToShifts32(binaries[i] & once)[0] });
+                let isReason = false;
                 for (let shift of BinaryUtils.binaryToShifts32(binaries[i] & ~ once)) {
+                    isReason = true;
                     removed.push({ index: i, shift: shift });
                 }
-                isUpdated = true;
+                if (isReason) {
+                    reason.push({ index: i, shift: BinaryUtils.binaryToShifts32(binaries[i] & once)[0], });
+                }
             }
             binaries[i] &= ~ once;
         }
 
-        return { reason: reason, removed: removed, isUpdated: isUpdated, isValid: true };
+        return { reason: reason, removed: removed, isUpdated: removed.length > 0, isValid: true, };
     }
 
     /**
@@ -338,7 +340,7 @@ class Strategy2d {
      * If all region are valid and any region can be progressed, return progress for first progressed region.
      * Otherwise, nothing is changed.
      */
-    public hiddenSingle(state: State): StrategyResult {
+    public static hiddenSingle(state: State): StrategyResult {
         this.sudoku = state.sudoku;
         let board = state.board;
 
@@ -357,7 +359,8 @@ class Strategy2d {
                                 error: this.indexToCoordinates3dArray1dIndices(region, -1),
                                 region1: this.indexToCoordinates2dArray1d(region),
                             },
-                            message: `INVALID: Number${result.missing.length > 1 ? 's' : ''} ${this.joinShiftsToText(result.missing)} can not be in any cell in the region.`,
+                            name: "INVALID",
+                            message: `Number${result.missing.length > 1 ? 's' : ''} ${this.joinShiftsToText(result.missing)} can not be in any cell in the region.`,
                             isUpdated: true,
                             isValid: false,
                         }
@@ -367,7 +370,8 @@ class Strategy2d {
                                 error: this.indexToCoordinates3dArray1dShifts(region[result.multiple.cell], result.multiple.shifts),
                                 region1: this.indexToCoordinates2dArray1d(region),
                             },
-                            message: `INVALID: Numbers ${this.joinShiftsToText(result.multiple.shifts)} can be only in the same cell in the region.`,
+                            name: "INVALID",
+                            message: `Numbers ${this.joinShiftsToText(result.multiple.shifts)} can be only in the same cell in the region.`,
                             isUpdated: true,
                             isValid: false,
                         }
@@ -379,7 +383,7 @@ class Strategy2d {
         }
 
         if (result === null || ! result.isUpdated) {
-            return { colors: {  }, message: "", isUpdated: false, isValid: true };
+            return { colors: {  }, name: "", message: "", isUpdated: false, isValid: true };
         }
 
         let reason = [];
@@ -396,8 +400,9 @@ class Strategy2d {
                 removed: this.regionCoordinates2dTo3dArray1d(result.removed!, resultRegion!),
                 region1: this.indexToCoordinates2dArray1d(resultRegion!),
             },
+            name: "Hidden Single",
             message: `
-                Hidden single: ${reasonNumberText} ${reasonListText} can be only in one cell from the region.
+                ${reasonNumberText} ${reasonListText} can be only in one cell from the region.
                 The other ${result.removed!.length} ${removedNumberText} in ${cellText} can be removed.
             `,
             isUpdated: true,
@@ -405,21 +410,29 @@ class Strategy2d {
         }
     }
 
-    private getMessageNakedHidden(isSource: boolean, size: number): string {
-        let sizeText = size <= Strategy2d.REGION_SIZE_TEXT.length ? Strategy2d.REGION_SIZE_TEXT[size - 1] : `${size}-tuple`;
+    private static getMessageNakedHidden(isSource: boolean, size: number): {name: string, message: string} {
+        let sizeText = size <= this.REGION_SIZE_TEXT.length ? this.REGION_SIZE_TEXT[size - 1] : `${size}-tuple`;
         let number = size == 1 ? "number" : "numbers";
         let cell = size == 1 ? "cell" : "cells";
         let this1 = size == 1 ? "this" : "these";
         if (isSource) {
-            return `
-            Naked ${sizeText}: In ${size} ${cell} of the region there can only be ${size} ${number},
-            therefore ${this1} ${number} cannot be in any other cell in the region.
-            `;
+            return {
+                name: `Naked ${sizeText}`,
+                message:
+                    `
+                    In ${size} ${cell} of the region there can only be ${size} ${number},
+                    therefore ${this1} ${number} cannot be in any other cell in the region.
+                    `,
+            };
         } else {
-            return `
-            Hidden ${sizeText}: ${size} ${number} can only be in ${size} ${cell} in the region, 
-            therefore there cannot be any other number in ${this1} ${cell}.
-            `;
+            return {
+                name: `Hidden ${sizeText}`,
+                message:
+                    `
+                    ${size} ${number} can only be in ${size} ${cell} in the region, 
+                    therefore there cannot be any other number in ${this1} ${cell}.
+                    `,
+            };
         }
     }
 
@@ -428,7 +441,7 @@ class Strategy2d {
      * Source -> naked candidate - on positions <set> there can only be numbers <matched>.
      * Sink -> hidden candidate - numbers <matched> can only be on positions <set>.
      */
-    private _region(binaries: number[]): StrategyRegionProof[] {
+    private static _region(binaries: number[]): StrategyRegionProof[] {
         let edges = BinaryUtils.binaryToShifts(binaries);
 
         let hallProof = PerfectMatching.getHallProof(edges);
@@ -468,7 +481,7 @@ class Strategy2d {
         }];
     }
 
-    public region(state: State): StrategyResult {
+    public static region(state: State): StrategyResult {
         this.sudoku = state.sudoku;
         let board = state.board;
 
@@ -489,10 +502,10 @@ class Strategy2d {
         }
 
         if (result === null) {
-            return { colors: {}, message: "", isUpdated: false, isValid: true, }
+            return { colors: {}, name: "", message: "", isUpdated: false, isValid: true, }
 
         } else if (result.isValid) {
-            let message = this.getMessageNakedHidden(result.isSource, result.size);
+            let {name: name, message: message} = this.getMessageNakedHidden(result.isSource, result.size);
 
             return {
                 colors: {
@@ -500,6 +513,7 @@ class Strategy2d {
                     removed: this.regionCoordinates2dTo3dArray1d(result.removed!, resultRegion!),
                     region1: this.indexToCoordinates2dArray1d(resultRegion!),
                 },
+                name: name,
                 message: message,
                 isUpdated: true,
                 isValid: true,
@@ -510,7 +524,7 @@ class Strategy2d {
         }
     }
 
-    private splitRegionsToIntersections(region1: number[], region2: number[]): number[][] {
+    private static splitRegionsToIntersections(region1: number[], region2: number[]): number[][] {
         let set1 = new Set(region1);
         let set2 = new Set(region2);
         let r1 = region1.filter(x => !set2.has(x));
@@ -519,7 +533,7 @@ class Strategy2d {
         return [r1, r2, intersection];
     }
 
-    private _pointing(
+    private static _pointing(
         r1: number[], r2: number[], intersection: number[], board: number[]
     ): StrategyPointingProof | null {
         let binaries1 = this.loadRegion32(board, r1);
@@ -548,7 +562,7 @@ class Strategy2d {
         return null;
     }
 
-    public pointing(state: State): StrategyResult {
+    public static pointing(state: State): StrategyResult {
         this.sudoku = state.sudoku;
         let board = state.board;
 
@@ -576,8 +590,6 @@ class Strategy2d {
         }
 
         if (result !== null) {
-            console.log(result);
-
             let reason = [];
             for (let i = 0; i < result.intersection.length; i++) {
                 let index = result.intersection[i];
@@ -606,17 +618,18 @@ class Strategy2d {
                     region2: this.indexToCoordinates2dArray1d(result.region2),
                     region3: this.indexToCoordinates2dArray1d(result.intersection),
                 },
+                name: "Pointing",
                 message: `
-                Pointing: If all occurrences of a number in a region are inside another region,
+                If all occurrences of a number in a region are inside another region,
                 this number can not be in that region anywhere else.
                 `,
             };
         }
 
-        return { colors: {}, message: "", isUpdated: false, isValid: true, };
+        return { colors: {}, name: "", message: "", isUpdated: false, isValid: true, };
     }
 
-    private _intersection(
+    private static _intersection(
         board: number[], shift: number, regions1: number[][], regions2: number[][]
     ): StrategyIntersectionProof | null {
         let size = this.sudoku!.size;
@@ -706,7 +719,7 @@ class Strategy2d {
         };
     }
 
-    public intersection(state: State): StrategyResult {
+    public static intersection(state: State): StrategyResult {
         this.sudoku = state.sudoku;
         let board = state.board;
 
@@ -720,6 +733,7 @@ class Strategy2d {
             regions.push([regions1, columns]);
         }
 
+
         let result: StrategyIntersectionProof | null = null;
         for (let [region1, region2] of regions) {
             for (let shift = 0; shift < this.sudoku.size; shift++) {
@@ -731,7 +745,7 @@ class Strategy2d {
         }
 
         if (result === null) {
-            return {colors: {}, isUpdated: false, isValid: false, message: "",};
+            return {colors: {}, isUpdated: false, isValid: true, name: "", message: "",};
         }
 
         return {
@@ -744,8 +758,9 @@ class Strategy2d {
             },
             isUpdated: true,
             isValid: true,
+            name: "X Wing",
             message: `
-                X wing: If all occurrences of a number in ${result.size} regions are inside another ${result.size} regions,
+                If all occurrences of a number in ${result.size} regions are inside another ${result.size} regions,
                 this number can not be in those regions anywhere else.
                 `,
         };

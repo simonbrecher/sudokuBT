@@ -63,37 +63,6 @@ class StrategyTests {
         return { container: `${containerId}-inner`, message: messageId };
     }
 
-    private static renderRegion(frame: Frame, region: StrategyCoordinates2d[], css: string): void {
-        for (let regionCell of region) {
-            frame.getCell(regionCell.y, regionCell.x).addCellClass(css);
-        }
-    }
-
-    private static renderColor(frame: Frame, colors: StrategyCoordinates3d[], css: string): void {
-        for (let color of colors) {
-            let cell = frame.getCell(color.y, color.x);
-            let found = cell.setTextBackgroundColor(`${color.shift + 1}`, css, false);
-            if (! found) {
-                throw "ERROR: StrategyTests.renderColor(): Did not find text in cell.";
-            }
-        }
-    }
-
-    private static renderError(frame: Frame, error: StrategyCoordinates3d[]): void {
-        for (let errorCell of error) {
-            let cell = frame.getCell(errorCell.y, errorCell.x);
-                if (errorCell.shift === -1) {
-                    cell.addCellClass("background-error");
-                cell.setTextBackgroundColor(null, "background-error", true);
-            } else {
-                let found = cell.setTextBackgroundColor(`${errorCell.shift + 1}`, "background-error", false);
-                if (! found) {
-                    throw "ERROR: StrategyTests.renderError(): Did not find text in cell.";
-                }
-            }
-        }
-    }
-
     private static createSudokuPermutation(
         sudoku: Sudoku, permuteRows: boolean, permuteColumns: boolean, permuteNumbers: boolean, permuteDiagonal: boolean
     ): SudokuPermutation {
@@ -180,24 +149,31 @@ class StrategyTests {
         renderer.renderNew(state, ids.container);
         let frame = renderer.renderNew(state, ids.container);
         if (result.colors.region1 !== undefined) {
-            this.renderRegion(frame, result.colors.region1, "background-region-1");
+            // @ts-ignore
+            StrategyEditor.renderRegion(frame, result.colors.region1, "background-region-1");
         }
         if (result.colors.region2 !== undefined) {
-            this.renderRegion(frame, result.colors.region2, "background-region-2");
+            // @ts-ignore
+            StrategyEditor.renderRegion(frame, result.colors.region2, "background-region-2");
         }
         if (result.colors.region3 !== undefined) {
-            this.renderRegion(frame, result.colors.region3, "background-region-3");
+            // @ts-ignore
+            StrategyEditor.renderRegion(frame, result.colors.region3, "background-region-3");
         }
         if (result.colors.removed !== undefined) {
-            this.renderColor(frame, result.colors.removed, "background-removed");
+            // @ts-ignore
+            StrategyEditor.renderColor(frame, result.colors.removed, "background-removed");
         }
         if (result.colors.reason !== undefined) {
-            this.renderColor(frame, result.colors.reason, "background-reason");
+            // @ts-ignore
+            StrategyEditor.renderColor(frame, result.colors.reason, "background-reason");
         }
         if (result.colors.error !== undefined) {
-            this.renderError(frame, result.colors.error);
+            // @ts-ignore
+            StrategyEditor.renderError(frame, result.colors.error);
         }
-        document.getElementById(ids.message)!.textContent = result.isUpdated ? result.message : "( NOT UPDATED )";
+        let message = result.isUpdated ? (`${result.name}: ${result.message}`) : "( NOT UPDATED )";
+        document.getElementById(ids.message)!.textContent = message;
     }
 
     private static readonly NAKED_SINGLE_TESTS: SingleTest[] = [
@@ -213,10 +189,9 @@ class StrategyTests {
     ];
 
     public static testNakedSingle(): void {
-        let strategy = new Strategy2d();
         for (let test of this.NAKED_SINGLE_TESTS) {
             let {ids: ids, state: state} = this.prepareHiddenNaked(test);
-            let result = strategy.nakedSingle(state);
+            let result = Strategy2d.nakedSingle(state);
             this.renderStrategy(ids, state, result);
         }
         this.update();
@@ -230,13 +205,14 @@ class StrategyTests {
         ["Hidden single 5", 4, null, false, null, ["----", "----", "----", "----"], true, [[0, 0b0001], [1, 0b0001], [2, 0b0001], [3, 0b0001]]],
         ["Hidden single 6", 4, null, false, null, ["----", "----", "----", "----"], true, [[0, 0b0011], [1, 0b0011], [2, 0b0011]]],
         ["Hidden single 7", 5, null, false, null, ["-----", "-----", "-----", "-----", "-----"], true, [[0, 0b10011], [1, 0b01011], [2, 0b00111], [3, 0b00011], [4, 0b00011]]],
+        ["Hidden single 8", 4, null, false, null, ["12--", "----", "----", "----"], true, [[2, 0b1100], [3, 0b1100]]],
+        ["Hidden single 9", 4, null, false, null, ["1---", "----", "----", "----"], true, [[1, 0b1110], [2, 0b1100], [3, 0b1100]]],
     ];
 
     public static testHiddenSingle(): void {
-        let strategy = new Strategy2d();
         for (let test of this.HIDDEN_SINGLE_TESTS) {
             let {ids: ids, state: state} = this.prepareHiddenNaked(test);
-            let result = strategy.hiddenSingle(state);
+            let result = Strategy2d.hiddenSingle(state);
             this.renderStrategy(ids, state, result);
         }
         this.update();
@@ -284,12 +260,11 @@ class StrategyTests {
     }
 
     public static testRegion(): void {
-        let strategy = new Strategy2d();
         let states = this.regionGetSudoku();
         for (let i = 0; i < states.length; i++) {
             let ids = this.prepareDivs(`Region ${i}`);
             let state = states[i];
-            let result = strategy.region(state);
+            let result = Strategy2d.region(state);
 
             this.renderStrategy(ids, state, result);
         }
@@ -332,12 +307,11 @@ class StrategyTests {
     }
 
     public static testPointing(): void {
-        let strategy = new Strategy2d();
         let states = this.pointingGetSudoku();
         for (let i = 0; i < states.length; i++) {
             let ids = this.prepareDivs(`Pointing ${i}`);
             let state = states[i];
-            let result = strategy.pointing(state);
+            let result = Strategy2d.pointing(state);
 
             this.renderStrategy(ids, state, result);
         }
@@ -381,9 +355,8 @@ class StrategyTests {
                         regionB.push(index);
                     }
                 }
-                let strategy = new Strategy2d();
                 // @ts-ignore
-                let [r1, r2, intersection] = strategy.splitRegionsToIntersections(regionA, regionB);
+                let [r1, r2, intersection] = Strategy2d.splitRegionsToIntersections(regionA, regionB);
 
                 state = sudoku.solution;
                 let value = BinaryUtils.createFullBinary(size) & ~ 1;
@@ -402,12 +375,11 @@ class StrategyTests {
     }
 
     public static testIntersection(): void {
-        let strategy = new Strategy2d();
         let states = this.intersectionGetSudoku();
         for (let i = 0; i < states.length; i++) {
             let ids = this.prepareDivs(`Intersection ${i}`);
             let state = states[i];
-            let result = strategy.intersection(state);
+            let result = Strategy2d.intersection(state);
 
             this.renderStrategy(ids, state, result);
         }

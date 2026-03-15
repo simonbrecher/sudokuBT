@@ -19,17 +19,23 @@ class MainEditor {
     private static windowsSeen: string[] = [];
     private static windowsOpen: string[] = [];
 
-    private static readonly VIEW_TASK_ONLY = ["menu-button-regions", "menu-button-numbers", "menu-button-view", "menu-button-solve-start"];
-    private static readonly VIEW_SOLVE_ONLY = ["menu-button-task-edit", "menu-button-solve-restart"];
+    private static readonly VIEW_TASK_ONLY = ["menu-button-regions", "menu-button-numbers", "menu-button-solve-start"];
+    private static readonly VIEW_SOLVE_ONLY = ["menu-button-task-edit", "menu-button-solve-restart", "menu-button-solve-next"];
+    private static readonly SHOW_SECTION: Record<string, string[]> = {
+        regions: ["regions"],
+        numbers: ["numbers"],
+        solve: ["numbers", "strategy"],
+    };
 
     /**
      * This method is called by <script><script/> in editor.html
      */
     public static main(): void {
         this.createFrame();
-        this.render();
-        this.changeMenuPosition("view", null);
+        this.showConfirmWindow("numbers", false);
+        this.changeMenuPosition("numbers", null);
         this.hideConfirmWindow();
+        this.render();
     }
 
     private static resetSolution(): void {
@@ -42,8 +48,10 @@ class MainEditor {
     private static renderSudoku(): void {
         if (this.menuPosition.left === "solve") {
             Renderer.renderer.doSmallNumbersOnFullBinary = true;
+            Renderer.renderer.doDifferentiateTaskBigNumber = true;
             Renderer.renderer.render(this.sudoku.solution, this.frame);
             Renderer.renderer.doSmallNumbersOnFullBinary = false;
+            Renderer.renderer.doDifferentiateTaskBigNumber = false;
         } else {
             Renderer.renderer.render(this.sudoku.task, this.frame);
         }
@@ -52,7 +60,8 @@ class MainEditor {
     /**
      * Render sudoku
      */
-   public static render(): void {
+    public static render(): void {
+        StrategyEditor.setLastResult(null);
         if (this.menuPosition.right === "regions-jigsaw" || this.menuPosition.right === "regions-extraregions") {
             RegionEditor.renderSudoku();
         } else {
@@ -101,8 +110,7 @@ class MainEditor {
 
         GraphicsUtils.addOrRemoveClass("text-plus10", "display-none", this.size < 10 || this.size >= 20);
         GraphicsUtils.addOrRemoveClass("text-plus20", "display-none", this.size < 20);
-        GraphicsUtils.addOrRemoveClass("menu-button-numbers-plus0", "display-none", this.size < 10);
-        GraphicsUtils.addOrRemoveClass("menu-button-numbers-plus10", "display-none", this.size < 10);
+        GraphicsUtils.addOrRemoveClass("right-menu-section-numbers", "display-none", this.size < 10);
         GraphicsUtils.addOrRemoveClass("menu-button-numbers-plus20", "display-none", this.size < 20);
 
         // Change text based on size
@@ -190,10 +198,14 @@ class MainEditor {
         if (leftPosition !== previousLeftPosition) {
             if (previousLeftPosition !== null) {
                 GraphicsUtils.removeClass(`menu-button-${previousLeftPosition}`, "selected");
-                GraphicsUtils.removeClass(`menu-section-${previousLeftPosition}`, "selected");
+                for (let position of this.SHOW_SECTION[previousLeftPosition]) {
+                    GraphicsUtils.removeClass(`right-menu-section-${position}`, "selected");
+                }
             }
             GraphicsUtils.addClass(`menu-button-${leftPosition}`, "selected");
-            GraphicsUtils.addClass(`menu-section-${leftPosition}`, "selected");
+            for (let position of this.SHOW_SECTION[leftPosition]) {
+                GraphicsUtils.addClass(`right-menu-section-${position}`, "selected");
+            }
         }
         if (rightPosition !== previousRightPosition) {
             if (previousRightPosition !== null) {
@@ -201,6 +213,29 @@ class MainEditor {
             }
             if (rightPosition !== null) {
                 GraphicsUtils.addClass(`menu-button-${rightPosition}`, "selected");
+            }
+        }
+
+        // add/remove event listeners
+        if (leftPosition !== previousLeftPosition || rightPosition !== previousRightPosition) {
+            let hadRegionsListeners = RegionEditor.hasEventListeners(previousLeftPosition!, previousRightPosition!);
+            let willHaveRegionsListeners = RegionEditor.hasEventListeners(leftPosition!, rightPosition!);
+            if (willHaveRegionsListeners && ! hadRegionsListeners) {
+                EditorUtils.addEventListeners(RegionEditor.eventListeners);
+            } else if (hadRegionsListeners && ! willHaveRegionsListeners) {
+                EditorUtils.removeEventListeners(RegionEditor.eventListeners);
+            }
+
+            let hadNumbersListeners = NumberEditor.hasEventListeners(previousLeftPosition!, previousRightPosition!);
+            let willHaveNumbersListeners = NumberEditor.hasEventListeners(leftPosition!, rightPosition!);
+            if (willHaveNumbersListeners && ! hadNumbersListeners) {
+                EditorUtils.addEventListeners(NumberEditor.eventListeners);
+            } else if (hadNumbersListeners && ! willHaveNumbersListeners) {
+                EditorUtils.removeEventListeners(NumberEditor.eventListeners);
+            }
+
+            if (leftPosition !== previousLeftPosition && hadNumbersListeners) {
+                NumberEditor.removeChosenCell();
             }
         }
 
@@ -225,26 +260,13 @@ class MainEditor {
             }
         }
 
-        // add/remove event listeners
-        if (leftPosition !== previousLeftPosition || rightPosition !== previousRightPosition) {
-            let hadRegionsListeners = RegionEditor.hasEventListeners(previousLeftPosition!, previousRightPosition!);
-            let willHaveRegionsListeners = RegionEditor.hasEventListeners(leftPosition!, rightPosition!);
-            if (willHaveRegionsListeners && ! hadRegionsListeners) {
-                EditorUtils.addEventListeners(RegionEditor.eventListeners);
-            } else if (hadRegionsListeners && ! willHaveRegionsListeners) {
-                EditorUtils.removeEventListeners(RegionEditor.eventListeners);
-            }
-
-            let hadNumbersListeners = NumberEditor.hasEventListeners(previousLeftPosition!, previousRightPosition!);
-            let willHaveNumbersListeners = NumberEditor.hasEventListeners(leftPosition!, rightPosition!);
-            if (willHaveNumbersListeners && ! hadNumbersListeners) {
-                EditorUtils.addEventListeners(NumberEditor.eventListeners);
-            } else if (hadNumbersListeners && ! willHaveNumbersListeners) {
-                EditorUtils.removeEventListeners(NumberEditor.eventListeners);
-            }
-
-            if (leftPosition !== previousLeftPosition && hadNumbersListeners) {
-                NumberEditor.removeChosenCell();
+        // Show/hide strategy buttons based on menu position
+        if (previousLeftPosition === null || isSolve != previousIsSolve) {
+            if (isSolve) {
+                StrategyEditor.addStrategyButtons(this.sudoku);
+                this.updateChecksStrategy();
+            } else {
+                StrategyEditor.removeStrategyButtons();
             }
         }
 
@@ -276,6 +298,17 @@ class MainEditor {
         }
     }
 
+    private static updateChecksStrategy(): void {
+        for (let strategyId = 0; strategyId < StrategyEditor.isStrategyOn.length; strategyId++) {
+            let check = document.getElementById(`check-strategy-${strategyId}`);
+            if (StrategyEditor.isStrategyOn[strategyId]) {
+                check?.classList.add("selected");
+            } else {
+                check?.classList.remove("selected");
+            }
+        }
+    }
+
     public static pressedResizeButton(): void {
         if (! this.isConfirmOpen) {
             this.addTemporaryButtonFocus("resize");
@@ -291,8 +324,9 @@ class MainEditor {
             if (newSize === this.size) {
                 this.hideConfirmWindow();
                 this.createFrame();
+                this.showConfirmWindow("numbers", false);
+                this.changeMenuPosition("numbers", null);
                 this.render();
-                this.changeMenuPosition("view", null);
             } else {
                 resizeInput.value = `${this.size}`;
             }
@@ -311,7 +345,8 @@ class MainEditor {
     }
 
     public static confirmTaskEdit(): void {
-        this.changeMenuPosition("view", null);
+        this.showConfirmWindow("numbers", false);
+        this.changeMenuPosition("numbers", null);
         this.hideConfirmWindow();
         this.render();
     }
@@ -442,13 +477,6 @@ class MainEditor {
         }
     }
 
-    public static pressedViewButton(): void {
-        if (! this.isConfirmOpen) {
-            this.changeMenuPosition("view", null);
-            this.render();
-        }
-    }
-
     public static pressedSolveStartButton(): void {
         if (! this.isConfirmOpen) {
             this.resetSolution();
@@ -468,5 +496,35 @@ class MainEditor {
         this.resetSolution();
         this.hideConfirmWindow();
         this.render();
+    }
+
+    public static pressedStrategyButton(strategyId: number): void {
+        if (! this.isConfirmOpen) {
+            this.addTemporaryButtonFocus(`strategy-${strategyId}`);
+
+            let strategyData = StrategyEditor.strategyTypeData[strategyId];
+
+            if (strategyData.isCompulsory) {
+                this.showConfirmWindow("strategy-compulsory", true);
+                return;
+            }
+
+            StrategyEditor.isStrategyOn[strategyId] = ! StrategyEditor.isStrategyOn[strategyId];
+            this.updateChecksStrategy();
+        }
+    }
+
+    public static pressedSolveNextButton(): void {
+        if (! this.isConfirmOpen) {
+            this.addTemporaryButtonFocus("solve-next");
+            StrategyEditor.tryAllStrategies();
+        }
+    }
+
+    public static pressedSolveApplyButton(): void {
+        if (! this.isConfirmOpen) {
+            this.addTemporaryButtonFocus("solve-apply");
+            StrategyEditor.applyLastResult();
+        }
     }
 }

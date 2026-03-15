@@ -2,6 +2,7 @@ class Renderer {
     public static renderer: Renderer = new Renderer();
 
     public doRenderNumbers: boolean = true;
+        public doDifferentiateTaskBigNumber: boolean = false;
         public doSmallNumbersOnFullBinary: boolean = false;
         public doSmallNumbersOnOneNumber: boolean = false;
     public doRenderBackgroundColor: boolean = true;
@@ -17,6 +18,7 @@ class Renderer {
     public doRenderExtraRegionsBackgroundColor: boolean = true;
         public extraRegionsBackgroundColor: string = "#EEE";
     public doRemoveBackgroundTextsBackgroundColor: boolean = true;
+    public doRemoveAllCellClasses: boolean = true;
 
     constructor() {
 
@@ -44,15 +46,33 @@ class Renderer {
         for (let y = 0; y < sudoku.size; y++) {
             for (let x = 0; x < sudoku.size; x++) {
                 let cell = frame.getCell(y, x);
+
+                if (this.doRemoveAllCellClasses) {
+                    cell.removeAllCellClasses();
+                }
+
                 if (this.doRemoveBackgroundTextsBackgroundColor) {
                     cell.removeTextsBackgroundColor();
                 }
+
+                cell.removeCellClass("not-in-task");
                 if (this.doRenderNumbers) {
-                    cell.setText(this.binaryToCharacters(state.board[y * sudoku.size + x], sudoku.fullBinary));
+                    let index = y * sudoku.size + x;
+                    cell.setText(this.binaryToCharacters(state.board[index], sudoku.fullBinary));
+
+                    if (this.doDifferentiateTaskBigNumber) {
+                        let binary = state.board[index];
+                        let taskBinary = state.sudoku.task.board[index];
+                        if (BinaryUtils.has1bit32(binary) && ! BinaryUtils.has1bit32(taskBinary)) {
+                            cell.addCellClass("not-in-task");
+                        }
+                    }
                 }
+
                 if (this.doRenderCellBorders) {
                     cell.setBorder(this.cellBordersStyle, Cell.DIRECTIONS.all);
                 }
+
                 if (this.doRenderBackgroundColor) {
                     cell.setBackgroundColor(this.backgroundColor);
                 }

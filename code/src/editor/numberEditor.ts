@@ -76,7 +76,9 @@
                         }
                     }
 
+                    Renderer.renderer.doRemoveAllCellClasses = false;
                     MainEditor.render();
+                    Renderer.renderer.doRemoveAllCellClasses = true;
                 }
             }
         } else if (event.key === "Backspace" || event.key === "Delete") {
@@ -89,7 +91,9 @@
                     MainEditor.sudoku.task.board[index] = MainEditor.sudoku.fullBinary;
                 }
 
+                Renderer.renderer.doRemoveAllCellClasses = false;
                 MainEditor.render();
+                Renderer.renderer.doRemoveAllCellClasses = true;
             }
         }
     }

@@ -31,7 +31,8 @@
 .text-wrapper { position: absolute; height: var(--height); width: var(--width); }
 
 .text-wrapper { --inner-count-1d: 0; --relative-font-size-single: 0.8; --relative-font-size-multiple: 1; }
-.text-wrapper > div { --font-color: #000; color: var(--font-color); }
+.text-wrapper { --font-color: #000; }
+.text-wrapper div { color: var(--font-color); }
 .text-wrapper.single-text > div {
     font-size: calc(var(--relative-font-size-single) * var(--height)); height: 100%; width: 100%;
     display: flex; justify-content: center; align-items: center;
@@ -47,19 +48,26 @@
     width: calc((100% - var(--inner-count-1d) * 1px + 1px) / var(--inner-count-1d));
     display: flex; justify-content: center; align-items: center;
 }
+.not-in-task > .single-text { --font-color: #00B; }
 
-.background-removed { background-color: #FF0; }
-.background-reason { background-color: #0F0; }
-.background-error { background-color: #F30; }
-.background-region-1 { background-color: #6FF; }
-.background-region-2 { background-color: #6FF; }
-.background-region-3 { background-color: #FFA; }
-.text-wrapper > .background-removed, .text-wrapper > .background-reason, .text-wrapper > .background-error
+.background-region-1 { --background-color: #6FF !important; }
+.background-region-2 { --background-color: #6FF !important; }
+.background-region-3 { --background-color: #FFA !important; }
+.background-removed { --background-color: #FF0; background-color: var(--background-color); }
+.background-reason { --background-color: #0F0; background-color: var(--background-color); }
+.background-error-big { --background-color: #F30 !important; }
+.background-error-small { --background-color: #F30; background-color: var(--background-color); }
+.text-wrapper > .background-removed, .text-wrapper > .background-reason, .text-wrapper > .background-error-small
 { --font-color: #000; }
 
-.background-chosen-big { background-color: #5AF; }
-.background-chosen-small { background: linear-gradient(135deg, #5AF 30%, var(--background-color) 30%); }
-.background-chosen-big .multiple-text > div, .background-chosen-small .multiple-text > div
+.background-chosen-big, .background-chosen-big > .single-text > div {
+    --background-color: #5AF !important; background-color: var(--background-color);
+}
+.background-chosen-small, .background-chosen-small > .single-text > div {
+    background: linear-gradient(135deg, #5AF 30%, var(--background-color) 30%);
+}
+.background-chosen-big .multiple-text > div, .background-chosen-small .multiple-text > div,
+.background-error-big .multiple-text > div
 { --font-color: #000; }
 
 .canvas {

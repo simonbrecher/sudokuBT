@@ -66,3 +66,14 @@ input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-o
 .confirm:hover { background-color: #0C0; }
 .cancel:hover { background-color: #C00; }
 .ok:hover { background-color: #CC0; }
+
+.strategy-text {
+    margin-top: 2px; padding: 2px; border: 1px solid #000; text-align: center;
+    display: flex; flex-direction: column;
+    max-width: 650px;
+}
+#strategy-text-1, #strategy-text-2 { font-size: 25px; }
+#strategy-text-3 { font-size: 18px; }
+
+#container { display: flex; flex-direction: column; align-items: center; }
+#container-wrapper { display: flex; flex-direction: column; }

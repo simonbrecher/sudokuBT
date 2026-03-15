@@ -17,10 +17,8 @@
     <script src="src/utils/graphicsUtils.js"></script>
     <script src="src/utils/positionUtils.js"></script>
 
-    <script src="src/editor/mainEditor.js"></script>
-    <script src="src/editor/regionEditor.js"></script>
-    <script src="src/editor/numberEditor.js"></script>
-    <script src="src/editor/editorUtils.js"></script>
+    <script src="src/strategy/perfectMatching.js"></script>
+    <script src="src/strategy/strategy2d.js"></script>
 
     <script src="src/graphics/basketBorderStyle.js"></script>
     <script src="src/graphics/canvas.js"></script>
@@ -35,32 +33,46 @@
     <script src="src/data/regions.js"></script>
     <script src="src/data/state.js"></script>
     <script src="src/data/sudoku.js"></script>
+
+    <script src="src/editor/mainEditor.js"></script>
+    <script src="src/editor/regionEditor.js"></script>
+    <script src="src/editor/numberEditor.js"></script>
+    <script src="src/editor/strategyEditor.js"></script>
+    <script src="src/editor/editorUtils.js"></script>
 </head>
 
 <body>
 
 <div id="page-wrapper">
     <div id="left-menu" class="menu">
-        <section id="menu-section-new" class="menu-section">
+        <section id="left-menu-section-new" class="menu-section">
             <div class="menu-title">Reset</div>
             <div id="menu-button-resize" class="menu-button" onclick="MainEditor.pressedResizeButton();">New Sudoku</div>
         </section>
-        <section id="menu-section-task" class="menu-section">
+        <section id="left-menu-section-task" class="menu-section">
             <div class="menu-title">Edit Task</div>
             <div id="menu-button-task-edit" class="menu-button" onclick="MainEditor.pressedTaskEditButton();">Edit Task</div>
             <div id="menu-button-regions" class="menu-button" onclick="MainEditor.pressedRegionsButton();">Edit Regions</div>
             <div id="menu-button-numbers" class="menu-button" onclick="MainEditor.pressedNumbersButton();">Edit Numbers</div>
-            <div id="menu-button-view" class="menu-button" onclick="MainEditor.pressedViewButton();">View Task</div>
         </section>
-        <section id="menu-section-solve" class="menu-section">
+        <section id="left-menu-section-solve" class="menu-section">
             <div class="menu-title">Solve</div>
             <div id="menu-button-solve-start" class="menu-button" onclick="MainEditor.pressedSolveStartButton();">Start Solving</div>
             <div id="menu-button-solve-restart" class="menu-button" onclick="MainEditor.pressedSolveRestartButton();">Restart Solving</div>
+            <div id="menu-button-solve-next" class="menu-button" onclick="MainEditor.pressedSolveNextButton();">Get next step</div>
+            <div id="menu-button-solve-apply" class="menu-button" onclick="MainEditor.pressedSolveApplyButton();">Apply step</div>
         </section>
     </div>
-    <div id="container"></div>
+    <div id="container-wrapper">
+        <div id="container"></div>
+        <div class="strategy-text">
+            <div id="strategy-text-1">Strategy text 1</div>
+            <div id="strategy-text-2">Strategy text 2</div>
+            <div id="strategy-text-3">Strategy text 3</div>
+        </div>
+    </div>
     <div id="right-menu" class="menu">
-        <section id="menu-section-regions" class="menu-section">
+        <section id="right-menu-section-regions" class="menu-section">
             <section class="menu-subsection">
                 <div class="menu-title">Regions</div>
                 <div id="menu-button-regions-none" class="menu-button" onclick="MainEditor.pressedRegionsNoneButton();">
@@ -103,7 +115,8 @@
                 <div id="menu-button-regions-view" class="menu-button" onclick="MainEditor.pressedRegionsViewButton();">View</div>
             </section>
         </section>
-        <section id="menu-section-numbers" class="menu-section">
+        <section id="right-menu-section-numbers" class="menu-section">
+            <div class="menu-title">Number</div>
             <div id="menu-button-numbers-plus0" class="menu-button" onclick="MainEditor.pressedNumbersPlus(0);">
                 +0
                 <div id="check-numbers-plus0" class="check"></div>
@@ -116,6 +129,9 @@
                 +20
                 <div id="check-numbers-plus20" class="check"></div>
             </div>
+        </section>
+        <section id="right-menu-section-strategy" class="menu-section">
+            <div class="menu-title">Strategies</div>
         </section>
     </div>
 </div>
@@ -216,6 +232,14 @@
     <div id="text-plus10">For numbers 10 or higher use +10 button.</div>
     <div id="text-plus20">For numbers 10 or higher use +10 and +20 buttons.</div>
     <div>Objective of solving sudoku is to fill all other numbers, but you can not change numbers in task.</div>
+    <div class="confirm-window-button-wrapper">
+        <div class="ok" onclick="MainEditor.cancel();">Ok</div>
+    </div>
+</div>
+
+<div id="confirm-window-strategy-compulsory" class="confirm-window">
+    <div id="confirm-strategy-compulsory" class="confirm-section">Strategy</div>
+    <div>This strategy is compulsory, it can not be turned off.</div>
     <div class="confirm-window-button-wrapper">
         <div class="ok" onclick="MainEditor.cancel();">Ok</div>
     </div>

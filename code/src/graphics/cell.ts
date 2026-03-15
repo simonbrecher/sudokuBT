@@ -11,16 +11,16 @@ class Cell {
 
     public readonly tdElement: HTMLElement;
         private tdBordersClass = ["", "", "", ""];
-        private tdSize: number = 0;
     private readonly cellElement: HTMLElement;
-        private cellHeight: string = "";
-        private cellWidth: string = "";
         private backgroundColor: string = "";
     private textWrapperElement: HTMLElement | null = null;
         private textWrapperCount: string = "";
         private textElements: HTMLElement[] = [];
-        private textColors: string[] = [];
+        private textColorsCss: string[] = [];
         private texts: string[] = [];
+    private cellClasses: Set<string> = new Set<string>();
+
+    private cellElementBound: DOMRect | null = null;
 
     constructor(tdElement: HTMLElement, tdSize: number, y: number, x: number) {
         this.y = y;
@@ -35,32 +35,50 @@ class Cell {
         this.setSize(tdSize)
     }
 
+    private setProperty(element: HTMLElement, property: string, value: string): boolean {
+        let oldValue = element.style.getPropertyValue(property);
+        if (oldValue !== value) {
+            element.style.setProperty(property, value);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Update --height and --width CSS variables of this.tdElement
      * @param tdSize new height and width of this.tdElement in pixels
      */
     private setSize(tdSize: number): void {
-        if (this.tdSize != tdSize) {
-            this.tdElement.style.setProperty("--height", `${tdSize}px`);
-            this.tdElement.style.setProperty("--width", `${tdSize}px`);
-            this.tdSize = tdSize;
-        }
+        let value = `${tdSize}px`;
+        this.setProperty(this.tdElement, "--height", value);
+        this.setProperty(this.tdElement, "--width", value);
+    }
+
+    /**
+     * Perform read for updateCellSizeWrite().
+     * Use Frame.update() to update cell sizes of all cells.
+     */
+    public updateCellSizeRead(): void {
+        this.cellElementBound = this.cellElement.getBoundingClientRect();
     }
 
     /**
      * Set --height and --width CSS properties of this.cellElement, so that they are equal to the actual width and height
      * Access this method trough Frame.update()
+     * Call Cell.updateCellSizeRead() before Cell.updateCellSizeWrite(), call read on all cells and then writes on all cells, do not mix it.
      */
-    public updateCellSize(): void {
-        let bound = this.cellElement.getBoundingClientRect();
-        let height = `${bound.height}px`;
-        let width = `${bound.width}px`;
-        if (height !== this.cellHeight) {
-            this.cellElement.style.setProperty("--height", height);
+    public updateCellSizeWrite(): void {
+        if (this.cellElementBound === null) {
+            throw "Cell.CellElementBound === null: call Cell.updateCellSizeRead() before Cell.updateCellSizeWrite().";
         }
-        if (width !== this.cellWidth) {
-            this.cellElement.style.setProperty("--width", width);
-        }
+
+        let height = `${this.cellElementBound.height}px`;
+        let width = `${this.cellElementBound.width}px`;
+        this.setProperty(this.cellElement, "--height", height);
+        this.setProperty(this.cellElement, "--width", width);
+
+        this.cellElementBound = null;
     }
 
     /**
@@ -104,14 +122,14 @@ class Cell {
 
             while (texts.length < this.texts.length) {
                 this.texts.pop();
-                this.textColors.pop();
+                this.textColorsCss.pop();
                 this.textElements[this.textElements.length - 1].remove();
                 this.textElements.pop();
             }
 
             while (texts.length > this.texts.length) {
                 this.texts.push("");
-                this.textColors.push("");
+                this.textColorsCss.push("");
                 let textElement = document.createElement("div");
                 this.textWrapperElement.appendChild(textElement);
                 this.textElements.push(textElement);
@@ -148,26 +166,26 @@ class Cell {
     /**
      * Change background color of text, by text position.
      * @param position Index of text in this.textElements[]
-     * @param color CSS class of the background color
+     * @param css CSS class of the background color
      */
-    public setTextBackgroundColorByPosition(position: number, color: string): void {
-        if (this.textColors[position] !== color) {
-            this.textColors[position] = GraphicsUtils.updateCssClass(this.textElements[position], this.textColors[position], color);
+    public setTextBackgroundColorByPosition(position: number, css: string): void {
+        if (this.textColorsCss[position] !== css) {
+            this.textColorsCss[position] = GraphicsUtils.updateCssClass(this.textElements[position], this.textColorsCss[position], css);
         }
     }
 
     /**
      * Change background color of text.
      * @param text Text, whose background color should change
-     * @param color CSS class of the background color
+     * @param css CSS class of the background color
      * @param changeAll true if for all equal texts, false if only for the first
      * @return false only if: changeAll == false and no equal text was found
      */
-    public setTextBackgroundColor(text: string | null, color: string, changeAll: boolean): boolean {
+    public setTextBackgroundColor(text: string | null, css: string, changeAll: boolean): boolean {
         let wasChanged = false;
         for (let i = 0; i < this.texts.length; i++) {
             if (text === null || this.texts[i] === text) {
-                this.setTextBackgroundColorByPosition(i, color);
+                this.setTextBackgroundColorByPosition(i, css);
                 if (! changeAll) {
                     wasChanged = true;
                     break;
@@ -182,9 +200,9 @@ class Cell {
      */
     public removeTextsBackgroundColor(): void {
         for (let i = 0; i < this.texts.length; i++) {
-            if (this.textColors[i] !== "") {
-                this.textElements[i].classList.remove(this.textColors[i]);
-                this.textColors[i] = "";
+            if (this.textColorsCss[i] !== "") {
+                this.textElements[i].classList.remove(this.textColorsCss[i]);
+                this.textColorsCss[i] = "";
             }
         }
     }
@@ -207,17 +225,19 @@ class Cell {
         }
     }
 
-    /**
-     * Add cell class
-     */
     public addCellClass(css: string): void {
         this.cellElement.classList.add(css);
+        this.cellClasses.add(css);
     }
 
-    /**
-     * Remove cell class
-     */
-    public removeCellClass(name: string): void {
-        this.cellElement.classList.remove(name);
+    public removeCellClass(css: string): void {
+        this.cellElement.classList.remove(css);
+        this.cellClasses.delete(css);
+    }
+
+    public removeAllCellClasses(): void {
+        for (const css of Array.from(this.cellClasses)) {
+            this.removeCellClass(css);
+        }
     }
 }

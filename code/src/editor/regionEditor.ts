@@ -156,8 +156,6 @@ class RegionEditor {
                 let cell = EditorUtils.mouseCoordinatesToCellCoordinates(event.y, event.x);
                 this.addCellToRegion(sudokuData, cell.y, cell.x);
             }
-        } else {
-            this.addRegion(sudokuData);
         }
     }
 

@@ -33,7 +33,7 @@ class PositionUtils {
         let regions = ArrayUtils.createArray2d(Math.max(...matrix) + 1, 0, undefined);
         for (let i = 0; i < matrix.length; i++) {
             if (matrix[i] !== -1) {
-                regions[matrix[i]].push([i]);
+                regions[matrix[i]].push(i);
             }
         }
         return regions;
