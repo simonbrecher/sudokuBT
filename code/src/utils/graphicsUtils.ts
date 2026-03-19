@@ -65,4 +65,22 @@ class GraphicsUtils {
             this.removeClass(id, cssClass);
         }
     }
+
+    public static setProperty(element: HTMLElement, property: string, value: string): boolean {
+        let oldValue = element.style.getPropertyValue(property);
+        if (oldValue !== value) {
+            element.style.setProperty(property, value);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static pxToNumber(text: string): number {
+        if (text == "0" || text == "") {
+            return 0;
+        } else {
+            return parseInt(text.slice(0, -2));
+        }
+    }
 }

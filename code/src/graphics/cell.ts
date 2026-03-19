@@ -20,7 +20,7 @@ class Cell {
         private texts: string[] = [];
     private cellClasses: Set<string> = new Set<string>();
 
-    private cellElementBound: DOMRect | null = null;
+    public boundingRect: DOMRect | null = null;
 
     constructor(tdElement: HTMLElement, tdSize: number, y: number, x: number) {
         this.y = y;
@@ -35,50 +35,41 @@ class Cell {
         this.setSize(tdSize)
     }
 
-    private setProperty(element: HTMLElement, property: string, value: string): boolean {
-        let oldValue = element.style.getPropertyValue(property);
-        if (oldValue !== value) {
-            element.style.setProperty(property, value);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     /**
      * Update --height and --width CSS variables of this.tdElement
      * @param tdSize new height and width of this.tdElement in pixels
      */
     private setSize(tdSize: number): void {
         let value = `${tdSize}px`;
-        this.setProperty(this.tdElement, "--height", value);
-        this.setProperty(this.tdElement, "--width", value);
+        GraphicsUtils.setProperty(this.tdElement, "--height", value);
+        GraphicsUtils.setProperty(this.tdElement, "--width", value);
     }
 
     /**
-     * Perform read for updateCellSizeWrite().
+     * Save DOMRect of this.cellElement for Cell.update() and Edge.update().
+     * ---
      * Use Frame.update() to update cell sizes of all cells.
+     * If you want to call this directly, call .getBoundingRect() on all elements before .update().
      */
-    public updateCellSizeRead(): void {
-        this.cellElementBound = this.cellElement.getBoundingClientRect();
+    public getBoundingRect(): void {
+        this.boundingRect = this.cellElement.getBoundingClientRect();
     }
 
     /**
      * Set --height and --width CSS properties of this.cellElement, so that they are equal to the actual width and height
+     * ---
      * Access this method trough Frame.update()
-     * Call Cell.updateCellSizeRead() before Cell.updateCellSizeWrite(), call read on all cells and then writes on all cells, do not mix it.
+     * Call Cell.getBoundingRect() before.
      */
-    public updateCellSizeWrite(): void {
-        if (this.cellElementBound === null) {
-            throw "Cell.CellElementBound === null: call Cell.updateCellSizeRead() before Cell.updateCellSizeWrite().";
+    public update(): void {
+        if (this.boundingRect === null) {
+            throw "Cell.boundingRect === null: call Cell.getBoundingRect() before Cell.updateCellSizeWrite().";
         }
 
-        let height = `${this.cellElementBound.height}px`;
-        let width = `${this.cellElementBound.width}px`;
-        this.setProperty(this.cellElement, "--height", height);
-        this.setProperty(this.cellElement, "--width", width);
-
-        this.cellElementBound = null;
+        let height = `${this.boundingRect.height}px`;
+        let width = `${this.boundingRect.width}px`;
+        GraphicsUtils.setProperty(this.cellElement, "--height", height);
+        GraphicsUtils.setProperty(this.cellElement, "--width", width);
     }
 
     /**

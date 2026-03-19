@@ -75,4 +75,15 @@
     margin-top: calc(-100% + var(--strong-border-width) / 2); margin-left: calc(var(--strong-border-width) / 2);
 }
 
+.edge-debug .edge-wrapper { border: 1px dashed red; }
+
+.edge-wrapper { --size: 0; --y: 0; --x: 0; }
+
+.edge-wrapper {
+    position: absolute; box-sizing: border-box;
+    height: var(--size); width: var(--size); left: var(--x); top: var(--y);
+}
+.edge-wrapper-horizontal {  }
+.edge-wrapper-vertical {  }
+
 .display-none { display: none; }

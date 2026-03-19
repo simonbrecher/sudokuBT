@@ -256,4 +256,18 @@ class GraphicsTests {
             frame.getCell(4, x).removeTextsBackgroundColor();
         }
     }
+
+    public static testEdgeWrapper(): void {
+        let rectangleHeight = 3;
+        let rectangleWidth = 3;
+        let size = rectangleHeight * rectangleWidth;
+        let sudoku = new Sudoku(size);
+        sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
+        let frame = Renderer.renderer.renderNew(sudoku.solution);
+        for (let [direction, y, x] of frame.edgeCoordinates) {
+            frame.getEdge(direction, y, x).addElementWrapper();
+        }
+        frame.puzzleWrapper.classList.add("edge-debug");
+        frame.update();
+    }
 }
