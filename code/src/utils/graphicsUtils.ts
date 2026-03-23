@@ -7,16 +7,16 @@ class GraphicsUtils {
      * @return newClasses
      */
     public static updateCssClasses(element: HTMLElement, oldClasses: string[], newClasses: string[]): string[] {
-        oldClasses.forEach((className: string) => {
+        for (let className of oldClasses) {
             if (! newClasses.includes(className) && className !== "") {
                 element.classList.remove(className);
             }
-        });
-        newClasses.forEach((className: string) => {
+        }
+        for (let className of newClasses) {
             if (! oldClasses.includes(className) && className !== "") {
                 element.classList.add(className);
             }
-        });
+        }
 
         return newClasses;
     }

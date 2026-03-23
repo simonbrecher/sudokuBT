@@ -7,6 +7,7 @@ class Sudoku {
     public readonly fullBinary;
 
     public readonly regions: Regions;
+    private edgeVariant: EdgeVariant | null = null;
 
     public hasSolution = false;
     public hasTask = false;
@@ -24,5 +25,21 @@ class Sudoku {
 
         this.solution = new State(ArrayUtils.createArray1d(size * size, this.fullBinary), this);
         this.task = new State(ArrayUtils.createArray1d(size * size, this.fullBinary), this);
+    }
+
+    public setEdgeVariant(factory: EdgeVariantFactory | null): void {
+        if (factory === null) {
+            this.edgeVariant = null;
+        } else {
+            this.edgeVariant = factory.build(this);
+        }
+    }
+
+    public getEdgeVariant(): EdgeVariant | null {
+        return this.edgeVariant;
+    }
+
+    public hasEdgeVariant(): boolean {
+        return this.edgeVariant !== null;
     }
 }

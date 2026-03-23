@@ -265,9 +265,75 @@ class GraphicsTests {
         sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
         let frame = Renderer.renderer.renderNew(sudoku.solution);
         for (let [direction, y, x] of frame.edgeCoordinates) {
-            frame.getEdge(direction, y, x).addElementWrapper();
+            frame.getEdge(direction, y, x).addWrapper();
         }
         frame.puzzleWrapper.classList.add("edge-debug");
         frame.update();
+    }
+
+    private static renderStrategy(frame: Frame, result: StrategyResult): void {
+        if (result.colors.region1 !== undefined) {
+            // @ts-ignore
+            StrategyEditor.renderRegion(frame, result.colors.region1, "background-region-1");
+        }
+        if (result.colors.region2 !== undefined) {
+            // @ts-ignore
+            StrategyEditor.renderRegion(frame, result.colors.region2, "background-region-2");
+        }
+        if (result.colors.region3 !== undefined) {
+            // @ts-ignore
+            StrategyEditor.renderRegion(frame, result.colors.region3, "background-region-3");
+        }
+        if (result.colors.removed !== undefined) {
+            // @ts-ignore
+            StrategyEditor.renderColor(frame, result.colors.removed, "background-removed");
+        }
+        if (result.colors.reason !== undefined) {
+            // @ts-ignore
+            StrategyEditor.renderColor(frame, result.colors.reason, "background-reason");
+        }
+        if (result.colors.error !== undefined) {
+            // @ts-ignore
+            StrategyEditor.renderError(frame, result.colors.error);
+        }
+    }
+
+    private static testEdgeLabelOne(factory: EdgeVariantFactory): void {
+        let rectangleHeight = 3;
+        let rectangleWidth = 3;
+        let size = rectangleHeight * rectangleWidth;
+        let sudoku = new Sudoku(size);
+        sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
+        sudoku.setEdgeVariant(factory);
+        // @ts-ignore
+        let edgeVariant: EdgeVariant = sudoku.getEdgeVariant();
+
+        sudoku.solution.board[0] = 0b1000;
+
+        Renderer.renderer.doSmallNumbersOnFullBinary = true;
+        let frame = Renderer.renderer.renderNew(sudoku.solution);
+
+        for (let [direction, y, x] of frame.edgeCoordinates) {
+            edgeVariant.board[direction][y][x] = ArrayUtils.choice(edgeVariant.labels);
+        }
+
+        for (let [direction, y, x] of frame.edgeCoordinates) {
+            let label = edgeVariant.board[direction][y][x];
+            let labelStyle = edgeVariant.labelStyle[label];
+            frame.getEdge(direction, y, x).addLabel(labelStyle);
+        }
+        // frame.puzzleWrapper.classList.add("edge-debug");
+        frame.update();
+
+        let result = Strategy2d.region(sudoku.solution);
+        this.renderStrategy(frame, result);
+    }
+
+    public static testEdgeLabel(): void {
+        for (let key of Object.keys(EdgeVariantFactory.variants)) {
+            // @ts-ignore
+            let factory = EdgeVariantFactory.variants[key];
+            this.testEdgeLabelOne(factory);
+        }
     }
 }

@@ -17,6 +17,7 @@ class Debug {
                 case "basket_borders":      GraphicsTests.testBasketBorders();          break;
                 case "background_color":    GraphicsTests.testTextBackgroundColor();    break;
                 case "edge_wrapper":        GraphicsTests.testEdgeWrapper();            break;
+                case "edge_label":          GraphicsTests.testEdgeLabel();              break;
 
                 case "naked_single":        StrategyTests.testNakedSingle();            break;
                 case "hidden_single":       StrategyTests.testHiddenSingle();           break;

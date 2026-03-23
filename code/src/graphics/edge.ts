@@ -1,8 +1,6 @@
-﻿type EdgeStyle = {
-    shape: string | undefined,
-    background: string | undefined,
-    border: string | undefined,
-    text: string | undefined,
+﻿type EdgeLabelStyle = {
+    css?: string[],
+    text?: string,
 }
 
 class Edge {
@@ -21,10 +19,37 @@ class Edge {
     public tdElement: HTMLElement;
 
     public wrapperElement: HTMLElement | null = null;
-    public elementElement: HTMLElement | null = null;
-        public elementStyle: EdgeStyle | null = null;
+    public labelElement: HTMLElement | null = null;
+        public labelStyle: EdgeLabelStyle | null = null;
 
     public boundingRect: DOMRect | null = null;
+
+    public static edgeStyleEquals(style1: EdgeLabelStyle | null, style2: EdgeLabelStyle | null): boolean {
+        if (style1 === null && style2 === null) {
+            return true;
+        }
+        if (style1 === null || style2 === null) {
+            return false;
+        }
+        if (style1.text !== style2.text) {
+            return false;
+        }
+        if (style1.css === undefined && style2.css === undefined) {
+            return true;
+        }
+        if (style1.css === undefined || style2.css === undefined) {
+            return false;
+        }
+        if (style1.css.length !== style2.css.length) {
+            return false;
+        }
+        for (let i = 0; i < style1.css.length; i++) {
+            if (style1.css[i] !== style2.css[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     constructor(cell1: Cell, cell2: Cell, direction: number, y: number, x: number) {
         this.direction = direction;
@@ -37,7 +62,7 @@ class Edge {
         this.tdElement = cell1.tdElement;
     }
 
-    public addElementWrapper(): void {
+    public addWrapper(): void {
         if (this.wrapperElement === null) {
             this.wrapperElement = document.createElement("div");
             this.tdElement.appendChild(this.wrapperElement);
@@ -47,19 +72,49 @@ class Edge {
         }
     }
 
-    public removeElementWrapper(): void {
+    public removeWrapper(): void {
         if (this.wrapperElement !== null) {
+            this.removeLabel();
             this.wrapperElement.remove();
             this.wrapperElement = null;
         }
     }
 
-    public addElement(style: EdgeStyle): void {
+    private addEmptyLabel(): void {
+        this.addWrapper();
 
+        this.labelElement = document.createElement("div");
+        this.wrapperElement?.appendChild(this.labelElement);
+        this.labelElement.classList.add("edge-label");
     }
 
-    public removeElement(): void {
+    private editLabel(oldStyle: EdgeLabelStyle, newStyle: EdgeLabelStyle): void {
+        GraphicsUtils.updateCssClasses(this.labelElement!, oldStyle?.css ?? [], newStyle?.css ?? []);
+        this.labelElement!.textContent = newStyle?.text ?? "";
+    }
 
+    public addLabel(style: EdgeLabelStyle | null): void {
+        if (style === null) {
+            this.removeLabel();
+            return;
+        }
+
+        if (! Edge.edgeStyleEquals(this.labelStyle, style)) {
+            if (this.labelStyle === null) {
+                this.addEmptyLabel();
+                this.labelStyle = {};
+            }
+            this.editLabel(this.labelStyle, style)
+            this.labelStyle = style;
+        }
+    }
+
+    public removeLabel(): void {
+        if (this.labelElement !== null) {
+            this.labelElement.remove();
+            this.labelElement = null;
+        }
+        this.labelStyle = null;
     }
 
     /**
@@ -94,21 +149,22 @@ class Edge {
 
         let size, x, y;
         if (this.isHorizontal) {
-            size = (bound1.height + bound2.height) / 2 * Edge.WRAPPER_RELATIVE_SIZE;
+            size = (bound1.height + bound2.height) / 2;
             x = (bound1.right + bound2.left) / 2;
             y = (bound1.top + bound2.top + bound1.bottom + bound2.bottom) / 4;
         } else {
-            size = (bound1.width + bound2.width) / 2 * Edge.WRAPPER_RELATIVE_SIZE;
+            size = (bound1.width + bound2.width) / 2;
             x = (bound1.left + bound2.left + bound1.right + bound2.right) / 4;
             y = (bound1.bottom + bound2.top) / 2;
         }
+        let wrapperSize = size * Edge.WRAPPER_RELATIVE_SIZE;
 
         if (this.boundingRect === null) {
             throw "Edge.boundingRect === null, call Edge.getBoundingRect()";
         }
 
-        let left = x - size / 2;
-        let top = y - size / 2;
+        let left = x - wrapperSize / 2;
+        let top = y - wrapperSize / 2;
 
         let oldLeft = this.boundingRect.left;
         let oldTop = this.boundingRect.top;
@@ -118,10 +174,12 @@ class Edge {
         let newLeft = GraphicsUtils.pxToNumber(oldLeftStyle) + left - oldLeft;
         let newTop = GraphicsUtils.pxToNumber(oldTopStyle) + top - oldTop;
 
-        let sizePX = `${Math.round(size)}px`;
-        let xPX = `${Math.round(newLeft)}px`;
-        let yPX = `${Math.round(newTop)}px`;
+        let wrapperSizePX = `${wrapperSize}px`;
+        let sizePX = `${size}px`;
+        let xPX = `${newLeft}px`;
+        let yPX = `${newTop}px`;
 
+        GraphicsUtils.setProperty(this.wrapperElement, "--wrapper-size", wrapperSizePX);
         GraphicsUtils.setProperty(this.wrapperElement, "--size", sizePX);
         GraphicsUtils.setProperty(this.wrapperElement, "--x", xPX);
         GraphicsUtils.setProperty(this.wrapperElement, "--y", yPX);

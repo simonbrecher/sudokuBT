@@ -38,8 +38,9 @@
     display: flex; justify-content: center; align-items: center;
 }
 .text-wrapper.multiple-text {
-    height: calc(var(--height) - 2px); width: calc(var(--width) - 2px); margin-top: 1px; margin-left: 1px;
-    display: flex; flex-wrap: wrap; align-content: flex-start; gap: 1px;
+    height: calc(var(--height) - 4px); width: calc(var(--width) - 4px);
+    display: flex; flex-wrap: wrap; align-content: flex-start;
+    gap: 1px; margin-top: 2px; margin-left: 2px;
 }
 .multiple-text > div {
     --font-color: #888;
@@ -75,15 +76,29 @@
     margin-top: calc(-100% + var(--strong-border-width) / 2); margin-left: calc(var(--strong-border-width) / 2);
 }
 
+.cell { z-index: 1; }
+.edge-wrapper { z-index: 2; }
+
 .edge-debug .edge-wrapper { border: 1px dashed red; }
 
-.edge-wrapper { --size: 0; --y: 0; --x: 0; }
+.edge-wrapper { --wrapper-size: 0; --size: 0; --y: 0; --x: 0; }
 
 .edge-wrapper {
     position: absolute; box-sizing: border-box;
-    height: var(--size); width: var(--size); left: var(--x); top: var(--y);
+    height: var(--wrapper-size); width: var(--wrapper-size); left: var(--x); top: var(--y);
+    display: flex; align-items: center; justify-content: center;
 }
 .edge-wrapper-horizontal {  }
 .edge-wrapper-vertical {  }
+
+.edge-label { height: var(--label-size); width: var(--label-size); box-sizing: border-box; }
+
+.edge-label.small-circle { --label-size: calc(var(--size) * 0.24); border: 1px solid #000; border-radius: 50%; background-color: #FFF; }
+.edge-label.big-circle { --label-size: calc(var(--size) * 0.32); border: 1px solid #000; border-radius: 50%; background-color: #FFF; }
+.edge-label.black-background { background-color: #000; }
+.edge-label.no-border { border: none; }
+.edge-label.text-1-big { display: flex; align-items: center; justify-content: center; font-size: calc(var(--label-size) * 1.1); }
+.edge-label.text-1 { display: flex; align-items: center; justify-content: center; font-size: calc(var(--label-size) * 0.95); }
+.edge-label.text-2 { display: flex; align-items: center; justify-content: center; font-size: calc(var(--label-size) * 0.8); }
 
 .display-none { display: none; }
