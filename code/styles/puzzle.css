@@ -1,13 +1,15 @@
 .puzzle {
     cursor: default; user-select: none;
     font-family: monospace; background-color: #FFF; border-collapse: collapse;
-    position: relative;
+    position: relative; width: max-content;
 }
+
+.puzzle * { box-sizing: border-box; }
 
 .puzzle-wrapper { --strong-border-width: 3px; --normal-border-width: 1px; position: relative; page-break-inside: avoid; }
 
 /* --height and --width refer to size of td */
-.puzzle td { --height: 0; --width: 0; height: var(--height); width: var(--width); box-sizing: border-box; padding: 0; }
+.puzzle td { --height: 0; --width: 0; height: var(--height); width: var(--width); padding: 0; }
 
 .border-top-none { border-top: none; }
 .border-bottom-none { border-bottom: none; }
@@ -84,14 +86,14 @@
 .edge-wrapper { --wrapper-size: 0; --size: 0; --y: 0; --x: 0; }
 
 .edge-wrapper {
-    position: absolute; box-sizing: border-box;
+    position: absolute;
     height: var(--wrapper-size); width: var(--wrapper-size); left: var(--x); top: var(--y);
     display: flex; align-items: center; justify-content: center;
 }
 .edge-wrapper-horizontal {  }
 .edge-wrapper-vertical {  }
 
-.edge-label { height: var(--label-size); width: var(--label-size); box-sizing: border-box; }
+.edge-label { height: var(--label-size); width: var(--label-size); }
 
 .edge-label.small-circle { --label-size: calc(var(--size) * 0.24); border: 1px solid #000; border-radius: 50%; background-color: #FFF; }
 .edge-label.big-circle { --label-size: calc(var(--size) * 0.32); border: 1px solid #000; border-radius: 50%; background-color: #FFF; }

@@ -25,30 +25,16 @@ class Edge {
     public boundingRect: DOMRect | null = null;
 
     public static edgeStyleEquals(style1: EdgeLabelStyle | null, style2: EdgeLabelStyle | null): boolean {
-        if (style1 === null && style2 === null) {
-            return true;
-        }
         if (style1 === null || style2 === null) {
-            return false;
+            return style1 === null && style2 === null;
         }
         if (style1.text !== style2.text) {
             return false;
         }
-        if (style1.css === undefined && style2.css === undefined) {
-            return true;
-        }
         if (style1.css === undefined || style2.css === undefined) {
-            return false;
+            return style1.css === undefined && style2.css === undefined;
         }
-        if (style1.css.length !== style2.css.length) {
-            return false;
-        }
-        for (let i = 0; i < style1.css.length; i++) {
-            if (style1.css[i] !== style2.css[i]) {
-                return false;
-            }
-        }
-        return true;
+        return ArrayUtils.equals1d(style1.css, style2.css);
     }
 
     constructor(cell1: Cell, cell2: Cell, direction: number, y: number, x: number) {

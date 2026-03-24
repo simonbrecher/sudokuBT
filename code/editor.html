@@ -7,7 +7,7 @@
     <title>Sudoku solver</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Šimon Brecher">
-    <link rel="icon" type="image/x-icon" href="images/favicon.png">
+    <link rel="icon" type="image/x-icon" href="images/favicon2.png">
 
     <link rel="stylesheet" href="styles/puzzle.css">
     <link rel="stylesheet" href="styles/editor.css">
@@ -33,7 +33,6 @@
 
     <script src="src/data/edgeVariant.js"></script>
     <script src="src/data/edgeVariantFactory.js"></script>
-
     <script src="src/data/regions.js"></script>
     <script src="src/data/state.js"></script>
     <script src="src/data/sudoku.js"></script>
@@ -50,29 +49,26 @@
 <div id="page-wrapper">
     <div id="left-menu" class="menu">
         <section id="left-menu-section-new" class="menu-section">
-            <div class="menu-title">Reset</div>
             <div id="menu-button-resize" class="menu-button" onclick="MainEditor.pressedResizeButton();">New Sudoku</div>
         </section>
         <section id="left-menu-section-task" class="menu-section">
-            <div class="menu-title">Edit Task</div>
+            <div class="menu-title"></div>
             <div id="menu-button-task-edit" class="menu-button" onclick="MainEditor.pressedTaskEditButton();">Edit Task</div>
             <div id="menu-button-regions" class="menu-button" onclick="MainEditor.pressedRegionsButton();">Edit Regions</div>
             <div id="menu-button-numbers" class="menu-button" onclick="MainEditor.pressedNumbersButton();">Edit Numbers</div>
         </section>
         <section id="left-menu-section-solve" class="menu-section">
-            <div class="menu-title">Solve</div>
+            <div class="menu-title"></div>
             <div id="menu-button-solve-start" class="menu-button" onclick="MainEditor.pressedSolveStartButton();">Start Solving</div>
             <div id="menu-button-solve-restart" class="menu-button" onclick="MainEditor.pressedSolveRestartButton();">Restart Solving</div>
-            <div id="menu-button-solve-next" class="menu-button" onclick="MainEditor.pressedSolveNextButton();">Get next step</div>
-            <div id="menu-button-solve-apply" class="menu-button" onclick="MainEditor.pressedSolveApplyButton();">Apply step</div>
+            <div id="menu-button-solve-next" class="menu-button" onclick="MainEditor.pressedSolveNextButton();">Apply Step</div>
         </section>
     </div>
     <div id="container-wrapper">
         <div id="container"></div>
-        <div class="strategy-text">
+        <div id="strategy-text-wrapper">
             <div id="strategy-text-1">Strategy text 1</div>
             <div id="strategy-text-2">Strategy text 2</div>
-            <div id="strategy-text-3">Strategy text 3</div>
         </div>
     </div>
     <div id="right-menu" class="menu">
@@ -236,14 +232,6 @@
     <div id="text-plus10">For numbers 10 or higher use +10 button.</div>
     <div id="text-plus20">For numbers 10 or higher use +10 and +20 buttons.</div>
     <div>Objective of solving sudoku is to fill all other numbers, but you can not change numbers in task.</div>
-    <div class="confirm-window-button-wrapper">
-        <div class="ok" onclick="MainEditor.cancel();">Ok</div>
-    </div>
-</div>
-
-<div id="confirm-window-strategy-compulsory" class="confirm-window">
-    <div id="confirm-strategy-compulsory" class="confirm-section">Strategy</div>
-    <div>This strategy is compulsory, it can not be turned off.</div>
     <div class="confirm-window-button-wrapper">
         <div class="ok" onclick="MainEditor.cancel();">Ok</div>
     </div>

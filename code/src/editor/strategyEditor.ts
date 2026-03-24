@@ -2,7 +2,6 @@
     name: string,
     strategy: (state: State) => StrategyResult,
     isUsable: (sudoku: Sudoku) => boolean,
-    isCompulsory: boolean,
 }
 
 class StrategyEditor {
@@ -11,13 +10,11 @@ class StrategyEditor {
             name: "Naked Single",
             strategy: Strategy2d.nakedSingle.bind(Strategy2d),
             isUsable: (sudoku: Sudoku) => true,
-            isCompulsory: true,
         },
         {
             name: "Hidden Single",
             strategy: Strategy2d.hiddenSingle.bind(Strategy2d),
             isUsable: (sudoku: Sudoku) => true,
-            isCompulsory: true,
         },
         {
             name: "Pointing",
@@ -25,25 +22,22 @@ class StrategyEditor {
             isUsable: (sudoku: Sudoku) => {
                 return sudoku.regions.hasRegions() || sudoku.regions.hasExtraRegions();
             },
-            isCompulsory: false,
         },
         {
             name: "Region",
             strategy: Strategy2d.region.bind(Strategy2d),
             isUsable: (sudoku: Sudoku) => true,
-            isCompulsory: false,
         },
         {
             name: "X Wing",
             strategy: Strategy2d.intersection.bind(Strategy2d),
             isUsable: (sudoku: Sudoku) => true,
-            isCompulsory: false,
         },
     ];
 
     public static isStrategyOn: boolean[] = [];
 
-    // use StrategyEditor.setLastResult()
+    // use StrategyEditor.setLastResult() or StrategyEditor.removeLastResult()
     private static lastResult: StrategyResult | null = null;
 
     public static removeStrategyButtons(): void {
@@ -72,12 +66,10 @@ class StrategyEditor {
                 const _strategyId = strategyId;
                 button.onclick = () => MainEditor.pressedStrategyButton(_strategyId);
 
-                if (! strategyData.isCompulsory) {
-                    let check = document.createElement("div");
-                    button.appendChild(check);
-                    check.id = `check-strategy-${strategyId}`;
-                    check.classList.add("check");
-                }
+                let check = document.createElement("div");
+                button.appendChild(check);
+                check.id = `check-strategy-${strategyId}`;
+                check.classList.add("check");
             } else {
                 this.isStrategyOn.push(false);
             }
@@ -96,6 +88,7 @@ class StrategyEditor {
             let cell = frame.getCell(color.y, color.x);
             let found = cell.setTextBackgroundColor(`${color.shift + 1}`, css, false);
             if (! found) {
+                console.log("text", `${color.shift + 1}`, "color", color, "css", css, "cell.y", cell.y, "cell.x", cell.x);
                 throw "ERROR: StrategyTests.renderColor(): Did not find text in cell.";
             }
         }
@@ -110,6 +103,7 @@ class StrategyEditor {
             } else {
                 let found = cell.setTextBackgroundColor(`${errorCell.shift + 1}`, "background-error-small", false);
                 if (! found) {
+                    console.log("text", errorCell.shift + 1, "css", "background-error-small", "cell.y", cell.y, "cell.x", cell.x);
                     throw "ERROR: StrategyTests.renderError(): Did not find text in cell.";
                 }
             }
@@ -152,12 +146,11 @@ class StrategyEditor {
             this.renderError(frame, result.colors.error);
         }
 
-        this.renderText("strategy-text-1", name);
-        this.renderText("strategy-text-2", result.name);
-        this.renderText("strategy-text-3", result.message);
+        this.renderText("strategy-text-1", result.name);
+        this.renderText("strategy-text-2", result.message);
     }
 
-    public static tryAllStrategies(): void {
+    private static tryAllStrategies(): void {
         for (let strategyId = 0; strategyId < this.isStrategyOn.length; strategyId++) {
             if (this.isStrategyOn[strategyId]) {
                 let state = MainEditor.sudoku.solution;
@@ -166,17 +159,17 @@ class StrategyEditor {
                 let result = strategy(state);
                 if (! result.isValid || result.isUpdated) {
                     this.renderStrategyResult(name, result);
-                    this.setLastResult(result.isValid ? result : null);
+                    this.setLastResult(result.isValid ? result : null, strategyId);
                     return;
                 }
             }
         }
         let message = "NOT UPDATED";
         this.renderStrategyResult("-", {colors: {}, isUpdated: false, isValid: true, name: "-", message: message});
-        this.setLastResult(null);
+        this.removeLastResult();
     }
 
-    public static applyLastResult(): void {
+    private static applyLastResult(): void {
         if (this.lastResult !== null) {
             if (this.lastResult.colors.removed !== undefined) {
                 let board = MainEditor.sudoku.solution.board;
@@ -190,13 +183,25 @@ class StrategyEditor {
         }
     }
 
-    public static setLastResult(result: StrategyResult | null): void {
-        this.lastResult = result;
-        let button = document.getElementById("menu-button-solve-apply");
-        if (result === null) {
-            button?.classList.add("display-none");
+    public static solveNext(): void {
+        if (this.lastResult === null) {
+            StrategyEditor.tryAllStrategies();
         } else {
-            button?.classList.remove("display-none");
+            StrategyEditor.applyLastResult();
         }
+    }
+
+    private static setLastResult(lastResult: StrategyResult | null, newStrategyId: number | null): void {
+        this.lastResult = lastResult;
+
+        let selectedButtonId = `menu-button-strategy-${newStrategyId}`;
+        for (let i = 0; i < this.isStrategyOn.length; i++) {
+            let buttonId = `menu-button-strategy-${i}`;
+            GraphicsUtils.addOrRemoveClass(buttonId, "strategy-last", buttonId == selectedButtonId);
+        }
+    }
+
+    public static removeLastResult(): void {
+        this.setLastResult(null, null);
     }
 }

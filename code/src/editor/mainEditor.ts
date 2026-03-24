@@ -1,6 +1,6 @@
 class MainEditor {
     private static readonly MIN_SIZE = 3;
-    private static readonly MAX_SIZE = 25;
+    private static readonly MAX_SIZE = 16;
     private static readonly MAX_BOARD_SIZE = 600;
     private static readonly MAX_CELL_SIZE = 70;
 
@@ -19,8 +19,12 @@ class MainEditor {
     private static windowsSeen: string[] = [];
     private static windowsOpen: string[] = [];
 
-    private static readonly VIEW_TASK_ONLY = ["menu-button-regions", "menu-button-numbers", "menu-button-solve-start"];
-    private static readonly VIEW_SOLVE_ONLY = ["menu-button-task-edit", "menu-button-solve-restart", "menu-button-solve-next"];
+    private static readonly VIEW_TASK_ONLY = [
+        "menu-button-regions", "menu-button-numbers", "menu-button-solve-start"
+    ];
+    private static readonly VIEW_SOLVE_ONLY = [
+        "menu-button-task-edit", "menu-button-solve-restart", "menu-button-solve-next", "strategy-text-wrapper"
+    ];
     private static readonly SHOW_SECTION: Record<string, string[]> = {
         regions: ["regions"],
         numbers: ["numbers"],
@@ -61,7 +65,7 @@ class MainEditor {
      * Render sudoku
      */
     public static render(): void {
-        StrategyEditor.setLastResult(null);
+        StrategyEditor.removeLastResult();
         if (this.menuPosition.right === "regions-jigsaw" || this.menuPosition.right === "regions-extraregions") {
             RegionEditor.renderSudoku();
         } else {
@@ -73,6 +77,8 @@ class MainEditor {
      * Create Frame object which will be used to render sudoku
      */
     private static createFrame(): void {
+        this.changeMenuPosition(null, null);
+
         if (this.frame !== null) {
             this.frame.delete();
             this.frame = null!;
@@ -189,7 +195,7 @@ class MainEditor {
      * @param leftPosition new position in left menu
      * @param rightPosition new position in right menu
      */
-    private static changeMenuPosition(leftPosition: string, rightPosition: string | null): boolean {
+    private static changeMenuPosition(leftPosition: string | null, rightPosition: string | null): boolean {
         let {left: previousLeftPosition, right: previousRightPosition} = this.menuPosition;
 
         console.log(`${previousLeftPosition} ${previousRightPosition} -> ${leftPosition} ${rightPosition}`);
@@ -203,8 +209,10 @@ class MainEditor {
                 }
             }
             GraphicsUtils.addClass(`menu-button-${leftPosition}`, "selected");
-            for (let position of this.SHOW_SECTION[leftPosition]) {
-                GraphicsUtils.addClass(`right-menu-section-${position}`, "selected");
+            if (leftPosition !== null) {
+                for (let position of this.SHOW_SECTION[leftPosition]) {
+                    GraphicsUtils.addClass(`right-menu-section-${position}`, "selected");
+                }
             }
         }
         if (rightPosition !== previousRightPosition) {
@@ -502,29 +510,17 @@ class MainEditor {
         if (! this.isConfirmOpen) {
             this.addTemporaryButtonFocus(`strategy-${strategyId}`);
 
-            let strategyData = StrategyEditor.strategyTypeData[strategyId];
-
-            if (strategyData.isCompulsory) {
-                this.showConfirmWindow("strategy-compulsory", true);
-                return;
-            }
-
             StrategyEditor.isStrategyOn[strategyId] = ! StrategyEditor.isStrategyOn[strategyId];
             this.updateChecksStrategy();
+
+            this.render();
         }
     }
 
     public static pressedSolveNextButton(): void {
         if (! this.isConfirmOpen) {
             this.addTemporaryButtonFocus("solve-next");
-            StrategyEditor.tryAllStrategies();
-        }
-    }
-
-    public static pressedSolveApplyButton(): void {
-        if (! this.isConfirmOpen) {
-            this.addTemporaryButtonFocus("solve-apply");
-            StrategyEditor.applyLastResult();
+            StrategyEditor.solveNext();
         }
     }
 }

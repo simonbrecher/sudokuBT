@@ -19,13 +19,16 @@ body { margin: 10px 0; }
 .menu, .menu .menu-subsection { gap: 2px; }
 .menu .menu-section { gap: 6px; }
 
-.menu-button, .menu-title { display: flex; justify-content: center; align-items: center; }
+.menu-button, .menu-title { display: flex; justify-content: center; align-items: center; min-height: 1lh; }
 
 .menu-title { font-size: 30px; }
 
 .menu-button { border: 3px solid #000; gap: 3px; }
 .confirm-window-closed .menu-button:hover { background-color: #D5D5D5; }
 .menu-button.selected, .menu-button.selected:hover { background-color: #BBB; }
+.confirm-window-closed .strategy-last.menu-button { background-color: #FA0; }
+.confirm-window-closed .strategy-last.menu-button:hover { background-color: #D90; }
+.confirm-window-closed .strategy-last.selected { background-color: #D90; }
 
 #left-menu .menu-button { font-size: 27px; }
 #right-menu .menu-button { font-size: 23px; }
@@ -67,13 +70,13 @@ input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-o
 .cancel:hover { background-color: #C00; }
 .ok:hover { background-color: #CC0; }
 
-.strategy-text {
-    margin-top: 2px; padding: 2px; border: 1px solid #000; text-align: center;
-    display: flex; flex-direction: column;
-    max-width: 650px;
+#strategy-text-wrapper {
+    margin-top: 2px; padding: 2px; border: 1px solid #000;
+    display: grid; grid-template-columns: 1fr;
 }
-#strategy-text-1, #strategy-text-2 { font-size: 25px; }
-#strategy-text-3 { font-size: 18px; }
+#strategy-text-1 { font-size: 25px; }
+#strategy-text-2 { font-size: 18px; min-height: 2lh; }
+#strategy-text-1, #strategy-text-2 { text-align: center; }
 
-#container { display: flex; flex-direction: column; align-items: center; }
-#container-wrapper { display: flex; flex-direction: column; }
+#container {  }
+#container-wrapper { display: inline-grid; grid-template-columns: min-content; }
