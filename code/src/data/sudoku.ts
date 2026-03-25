@@ -20,11 +20,11 @@ class Sudoku {
             throw `INVALID SIZE ERROR: Sudoku.size must be between 2 and 31, it cannot be: ${size}`;
         }
         this.size = size;
-        this.fullBinary = BinaryUtils.createFullBinary(size);
-        this.regions = new Regions(this);
+        this.fullBinary = BinaryUtils.createFullBinary(this.size);
+        this.regions = new Regions(this.size);
 
-        this.solution = new State(ArrayUtils.createArray1d(size * size, this.fullBinary), this);
-        this.task = new State(ArrayUtils.createArray1d(size * size, this.fullBinary), this);
+        this.solution = new State(ArrayUtils.createArray1d(this.size * this.size, this.fullBinary), this);
+        this.task = new State(ArrayUtils.createArray1d(this.size * this.size, this.fullBinary), this);
     }
 
     public setEdgeVariant(factory: EdgeVariantFactory | null): void {

@@ -16,7 +16,7 @@ class Regions {
         }
     }
 
-    private readonly sudoku: Sudoku;
+    private readonly size: number;
 
     public hasLines: boolean = true;
     private readonly _rows: number[][];
@@ -80,41 +80,40 @@ class Regions {
         }
     }
     public isWindoku(): boolean {
-        if (this.sudoku.size !== 9 || ! this.sudoku.regions.hasExtraRegions()) {
+        if (this.size !== 9 || ! this.hasExtraRegions()) {
             return false;
         }
-        let regionsMatrix = PositionUtils.regionsToMatrix(81, this.sudoku.regions.extraRegions);
-        regionsMatrix = PositionUtils.countConnectedAreas(regionsMatrix, this.sudoku.size, this.sudoku.size, PositionUtils.DIRECTIONS_4);
+        let regionsMatrix = PositionUtils.regionsToMatrix(81, this.extraRegions);
+        regionsMatrix = PositionUtils.countConnectedAreas(regionsMatrix, this.size, this.size, PositionUtils.DIRECTIONS_4);
         return ArrayUtils.equals1d(regionsMatrix, Regions.WINDOKU_REGIONS_MATRIX);
     }
 
-    constructor(sudoku: Sudoku) {
-        this.sudoku = sudoku;
-
+    constructor(size: number) {
+        this.size = size;
         this._rows = [];
         this._columns = [];
         this._lines = [];
-        for (let y = 0; y < this.sudoku.size; y++) {
+        for (let y = 0; y < this.size; y++) {
             let row = [];
-            for (let x = 0; x < this.sudoku.size; x++) {
-                row.push(y * this.sudoku.size + x);
+            for (let x = 0; x < this.size; x++) {
+                row.push(y * this.size + x);
             }
             this._rows.push(row);
             this._lines.push(row);
         }
-        for (let x = 0; x < this.sudoku.size; x++) {
+        for (let x = 0; x < this.size; x++) {
             let column = [];
-            for (let y = 0; y < this.sudoku.size; y++) {
-                column.push(y * this.sudoku.size + x);
+            for (let y = 0; y < this.size; y++) {
+                column.push(y * this.size + x);
             }
             this._columns.push(column);
             this._lines.push(column);
         }
 
         this._diagonals = [[], []];
-        for (let i = 0; i < this.sudoku.size; i++) {
-            this._diagonals[0].push(i * (this.sudoku.size + 1));
-            this._diagonals[1].push((i + 1) * (this.sudoku.size - 1));
+        for (let i = 0; i < this.size; i++) {
+            this._diagonals[0].push(i * (this.size + 1));
+            this._diagonals[1].push((i + 1) * (this.size - 1));
         }
     }
 
@@ -128,20 +127,20 @@ class Regions {
 
     /**
      * Set regions to regions of rectangular sudoku
-     * rectangleHeight and rectangleWidth cannot be 1 and must multiply to this.sudoku.size
+     * rectangleHeight and rectangleWidth cannot be 1 and must multiply to this.size
      */
     public setRectangular(rectangleHeight: number, rectangleWidth: number): void {
-        if (rectangleHeight === 1 || rectangleWidth === 1 || rectangleHeight * rectangleWidth !== this.sudoku.size) {
+        if (rectangleHeight === 1 || rectangleWidth === 1 || rectangleHeight * rectangleWidth !== this.size) {
             throw `INVALID SIZE ERROR: setting Rectangles.rectangleHeight=${rectangleHeight} and Rectangles.rectangleWidth=${rectangleWidth}`;
         }
         this._rectangles = { height: rectangleHeight, width: rectangleWidth };
         this._regions = [];
-        for (let startY = 0; startY < this.sudoku.size; startY+=rectangleHeight) {
-            for (let startX = 0; startX < this.sudoku.size; startX+=rectangleWidth) {
+        for (let startY = 0; startY < this.size; startY+=rectangleHeight) {
+            for (let startX = 0; startX < this.size; startX+=rectangleWidth) {
                 let rectangle = [];
                 for (let y = startY; y < startY + rectangleHeight; y++) {
                     for (let x = startX; x < startX + rectangleWidth; x++) {
-                        rectangle.push(y * this.sudoku.size + x);
+                        rectangle.push(y * this.size + x);
                     }
                 }
                 this._regions.push(rectangle);
@@ -151,8 +150,8 @@ class Regions {
 
     /**
      * Set regions to jigsaw regions.
-     * @param regions array of regions. every regions has cells in format (y * this.sudoku.size + x)
-     *      Regions must have size equal to this.sudoku.size, they must be on every cell exactly once, and they need to be edge-connected.
+     * @param regions array of regions. every regions has cells in format (y * this.size + x)
+     *      Regions must have size equal to this.size, they must be on every cell exactly once, and they need to be edge-connected.
      */
     public setJigsaw(regions: number[][]): void { // TODO: check validity of regions
         this._rectangles = null
@@ -163,19 +162,19 @@ class Regions {
      * Set extra regions to be windoku. Works only if size=9
      */
     public setWindoku(): void {
-        if (this.sudoku.size !== 9) {
-            throw `ERROR: Windoku sudoku cannot exist on size=${this.sudoku.size}`;
+        if (this.size !== 9) {
+            throw `ERROR: Windoku sudoku cannot exist on size=${this.size}`;
         }
 
-        this.sudoku.regions.setExtraRegions(Regions.WINDOKU_REGIONS);
+        this.setExtraRegions(Regions.WINDOKU_REGIONS);
     }
 
     /**
      * For every cell, get index of region that is in that cell. If there is no region (sudoku has no regions), there will be -1.
-     * On index (y * this.sudoku.size + x), there is index of region that has cell [y, x].
+     * On index (y * this.size + x), there is index of region that has cell [y, x].
      */
     public getRegionsMatrix(): number[] {
-        return PositionUtils.regionsToMatrix(this.sudoku.size * this.sudoku.size, this._regions ?? []);
+        return PositionUtils.regionsToMatrix(this.size * this.size, this._regions ?? []);
     }
 
     /**
@@ -207,10 +206,10 @@ class Regions {
      * Add jigsaw regions by text, for example: ["0011", "0012", "3312", "3322"]
      */
     public setRegionsByText(text: string[]): void { // TODO: validate correctness
-        let regions = ArrayUtils.createArray2d(this.sudoku.size, 0, undefined);
-        for (let y = 0; y < this.sudoku.size; y++) {
-            for (let x = 0; x < this.sudoku.size; x++) {
-                regions[parseInt(text[y][x])].push(y * this.sudoku.size + x);
+        let regions = ArrayUtils.createArray2d(this.size, 0, undefined);
+        for (let y = 0; y < this.size; y++) {
+            for (let x = 0; x < this.size; x++) {
+                regions[parseInt(text[y][x])].push(y * this.size + x);
             }
         }
         this.setJigsaw(regions);

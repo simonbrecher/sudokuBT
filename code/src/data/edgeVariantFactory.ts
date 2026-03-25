@@ -119,6 +119,6 @@
 
         let labelStyle = this.labelStyle(sudoku.size);
 
-        return new EdgeVariant(sudoku, labels, labelStyle, neighbours);
+        return new EdgeVariant(sudoku.size, labels, labelStyle, neighbours);
     }
 }
