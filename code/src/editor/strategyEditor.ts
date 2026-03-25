@@ -8,29 +8,29 @@ class StrategyEditor {
     public static strategyTypeData: StrategyTypeData[] = [
         {
             name: "Naked Single",
-            strategy: Strategy2d.nakedSingle.bind(Strategy2d),
+            strategy: SudokuStrategy.nakedSingle.bind(SudokuStrategy),
             isUsable: (sudoku: Sudoku) => true,
         },
         {
             name: "Hidden Single",
-            strategy: Strategy2d.hiddenSingle.bind(Strategy2d),
+            strategy: SudokuStrategy.hiddenSingle.bind(SudokuStrategy),
             isUsable: (sudoku: Sudoku) => true,
         },
         {
             name: "Pointing",
-            strategy: Strategy2d.pointing.bind(Strategy2d),
+            strategy: SudokuStrategy.pointing.bind(SudokuStrategy),
             isUsable: (sudoku: Sudoku) => {
                 return sudoku.regions.hasRegions() || sudoku.regions.hasExtraRegions();
             },
         },
         {
             name: "Region",
-            strategy: Strategy2d.region.bind(Strategy2d),
+            strategy: SudokuStrategy.region.bind(SudokuStrategy),
             isUsable: (sudoku: Sudoku) => true,
         },
         {
             name: "X Wing",
-            strategy: Strategy2d.intersection.bind(Strategy2d),
+            strategy: SudokuStrategy.intersection.bind(SudokuStrategy),
             isUsable: (sudoku: Sudoku) => true,
         },
     ];

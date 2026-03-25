@@ -41,7 +41,7 @@ class Debug {
     }
 
     public static debug(): void {
-        let strategy = new Strategy2d();
+        let strategy = new SudokuStrategy();
         for (let i = 1; i < 6; i++) {
             //@ts-ignore
             console.log(strategy.getMessageNakedHidden(true, i));

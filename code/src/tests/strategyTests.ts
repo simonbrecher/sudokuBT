@@ -191,7 +191,7 @@ class StrategyTests {
     public static testNakedSingle(): void {
         for (let test of this.NAKED_SINGLE_TESTS) {
             let {ids: ids, state: state} = this.prepareHiddenNaked(test);
-            let result = Strategy2d.nakedSingle(state);
+            let result = SudokuStrategy.nakedSingle(state);
             this.renderStrategy(ids, state, result);
         }
         this.update();
@@ -212,7 +212,7 @@ class StrategyTests {
     public static testHiddenSingle(): void {
         for (let test of this.HIDDEN_SINGLE_TESTS) {
             let {ids: ids, state: state} = this.prepareHiddenNaked(test);
-            let result = Strategy2d.hiddenSingle(state);
+            let result = SudokuStrategy.hiddenSingle(state);
             this.renderStrategy(ids, state, result);
         }
         this.update();
@@ -264,7 +264,7 @@ class StrategyTests {
         for (let i = 0; i < states.length; i++) {
             let ids = this.prepareDivs(`Region ${i}`);
             let state = states[i];
-            let result = Strategy2d.region(state);
+            let result = SudokuStrategy.region(state);
 
             this.renderStrategy(ids, state, result);
         }
@@ -312,7 +312,7 @@ class StrategyTests {
         for (let i = 0; i < states.length; i++) {
             let ids = this.prepareDivs(`Pointing ${i}`);
             let state = states[i];
-            let result = Strategy2d.pointing(state);
+            let result = SudokuStrategy.pointing(state);
 
             this.renderStrategy(ids, state, result);
         }
@@ -357,7 +357,7 @@ class StrategyTests {
                     }
                 }
                 // @ts-ignore
-                let [r1, r2, intersection] = Strategy2d.splitRegionsToIntersections(regionA, regionB);
+                let [r1, r2, intersection] = SudokuStrategy.splitRegionsToIntersections(regionA, regionB);
 
                 state = sudoku.solution;
                 let value = BinaryUtils.createFullBinary(size) & ~ 1;
@@ -380,7 +380,7 @@ class StrategyTests {
         for (let i = 0; i < states.length; i++) {
             let ids = this.prepareDivs(`Intersection ${i}`);
             let state = states[i];
-            let result = Strategy2d.intersection(state);
+            let result = SudokuStrategy.intersection(state);
 
             this.renderStrategy(ids, state, result);
         }

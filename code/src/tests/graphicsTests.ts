@@ -329,7 +329,7 @@ class GraphicsTests {
         // frame.puzzleWrapper.classList.add("edge-debug");
         frame.update();
 
-        let result = Strategy2d.region(sudoku.solution);
+        let result = SudokuStrategy.region(sudoku.solution);
         this.renderStrategy(frame, result);
     }
 

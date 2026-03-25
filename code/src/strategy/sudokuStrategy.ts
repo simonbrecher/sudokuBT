@@ -42,7 +42,7 @@ type StrategyIntersectionProof = {
     priority: number, // lower number = higher priority, -1 for error and 1000 for non-updated
 }
 
-class Strategy2d {
+class SudokuStrategy {
     private static readonly REGION_SIZE_TEXT = ["Single", "Pair", "Triple", "Quadruple"];
 
     private static sudoku: Sudoku | null = null;
@@ -146,7 +146,7 @@ class Strategy2d {
         copyShifts.sort((a, b) => a - b);
         switch (copyShifts.length) {
             case 0:
-                throw "ERROR: Strategy2d.joinShiftsToText : shifts=[]";
+                throw "ERROR: SudokuStrategy.joinShiftsToText : shifts=[]";
             case 1:
                 return `${copyShifts[0] + 1}`;
             default:
@@ -398,7 +398,7 @@ class Strategy2d {
                             isValid: false,
                         }
                     } else {
-                        throw "Strategy2d.hiddenSingle : result.missing === undefined && result.missing === undefined";
+                        throw "SudokuStrategy.hiddenSingle : result.missing === undefined && result.missing === undefined";
                     }
                 }
             }
