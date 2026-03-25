@@ -29,6 +29,7 @@ class Debug {
 
                 case "debug":               Debug.debug();                              break;
                 case "ng_perfect_match":    PerfectMatchingTest.main();                 break;
+                case "edge_connection":     EdgeTests.testEdgeConnection();             break;
 
                 default: console.log(`unknown test type ${urlParams.get("test")}`);
             }
@@ -41,12 +42,11 @@ class Debug {
     }
 
     public static debug(): void {
-        let strategy = new SudokuStrategy();
         for (let i = 1; i < 6; i++) {
-            //@ts-ignore
-            console.log(strategy.getMessageNakedHidden(true, i));
-            //@ts-ignore
-            console.log(strategy.getMessageNakedHidden(false, i));
+            // @ts-ignore
+            console.log(SudokuStrategy.getMessageNakedHidden(true, i));
+            // @ts-ignore
+            console.log(SudokuStrategy.getMessageNakedHidden(false, i));
         }
     }
 }

@@ -109,7 +109,6 @@
                         }
 
                         neighbours[label][shift1] |= 1 << shift2;
-                        neighbours[label][shift2] |= 1 << shift1;
                     }
                 }
             }

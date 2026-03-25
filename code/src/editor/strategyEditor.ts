@@ -17,6 +17,11 @@ class StrategyEditor {
             isUsable: (sudoku: Sudoku) => true,
         },
         {
+            name: "Edge Label",
+            strategy: EdgeStrategy.label.bind(EdgeStrategy),
+            isUsable: (sudoku: Sudoku) => sudoku.hasEdgeVariant(),
+        },
+        {
             name: "Pointing",
             strategy: SudokuStrategy.pointing.bind(SudokuStrategy),
             isUsable: (sudoku: Sudoku) => {

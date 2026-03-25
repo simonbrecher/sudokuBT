@@ -36,12 +36,15 @@
     <script src="src/data/state.js"></script>
     <script src="src/data/sudoku.js"></script>
 
+    <script src="src/strategy/strategyUtils.js"></script>
     <script src="src/strategy/sudokuStrategy.js"></script>
     <script src="src/strategy/perfectMatching.js"></script>
+    <script src="src/strategy/edgeStrategy.js"></script>
 
     <script src="src/tests/graphicsTests.js"></script>
     <script src="src/tests/strategyTests.js"></script>
     <script src="src/tests/perfectMatchingTest.js"></script>
+    <script src="src/tests/edgeTests.js"></script>
 
     <script src="src/editor/strategyEditor.js"></script>
 </head>
@@ -72,10 +75,11 @@
         <div onclick="updateUrlParameter('test', 'pointing')">Pointing</div>
         <div onclick="updateUrlParameter('test', 'intersection')">Intersection</div>
     </div>
-    <h2>Non graphic tests</h2>
+    <h2>Non-graphic tests</h2>
     <div class="test-types">
         <div onclick="updateUrlParameter('test', 'debug')">Debug</div>
         <div onclick="updateUrlParameter('test', 'ng_perfect_match')">Perfect matching</div>
+        <div onclick="updateUrlParameter('test', 'edge_connection')">Edge connection</div>
     </div>
 </div>
 
