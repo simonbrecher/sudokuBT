@@ -6,6 +6,6 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
-    "lib": ["dom", "es2016"],
+    "lib": ["dom", "es2024"],
   }
 }

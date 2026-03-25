@@ -17,6 +17,9 @@ class Renderer {
         public extraRegionsBorderStyle: BasketBorderStyle = BasketBorderStyle.styles.extraRegions;
     public doRenderExtraRegionsBackgroundColor: boolean = true;
         public extraRegionsBackgroundColor: string = "#EEE";
+    public doRenderEdgeVariant: boolean = true;
+        public doRenderEdgeNone: boolean = true;
+        public edgeNoneStyle: EdgeLabelStyle = { css: ["none"] };
     public doRemoveBackgroundTextsBackgroundColor: boolean = true;
     public doRemoveAllCellClasses: boolean = true;
 
@@ -96,8 +99,10 @@ class Renderer {
     }
 
     private renderDiagonals(sudoku: Sudoku, frame: Frame): void {
-        for (let diagonal of sudoku.regions.diagonals) {
-            frame.canvas.addLine1d(diagonal, this.diagonalsLineStyle, 0, 0, sudoku.size);
+        if (this.doRenderDiagonals) {
+            for (let diagonal of sudoku.regions.diagonals) {
+                frame.canvas.addLine1d(diagonal, this.diagonalsLineStyle, 0, 0, sudoku.size);
+            }
         }
     }
 
@@ -120,6 +125,22 @@ class Renderer {
         }
     }
 
+    private renderEdgeVariant(sudoku: Sudoku, frame: Frame): void {
+        if (this.doRenderEdgeVariant) {
+            let variant = sudoku.getEdgeVariant()!;
+            for (let [direction, y, x] of frame.edgeCoordinates) {
+                let label = variant.board[direction][y][x];
+                let labelStyle;
+                if (label == -1) {
+                    labelStyle = this.doRenderEdgeNone ? this.edgeNoneStyle : null;
+                } else {
+                    labelStyle = variant.labelStyle[label];
+                }
+                frame.getEdge(direction, y, x).addLabel(labelStyle);
+            }
+        }
+    }
+
     /**
      * Render state inside already existing Frame.
      */
@@ -128,11 +149,14 @@ class Renderer {
         frame.canvas.removeBasketBorders();
 
         this.renderBasic(state, state.sudoku, frame);
-        if (state.sudoku.regions.hasDiagonals && this.doRenderDiagonals) {
+        if (state.sudoku.regions.hasDiagonals) {
             this.renderDiagonals(state.sudoku, frame);
         }
         if (state.sudoku.regions.hasExtraRegions()) {
             this.renderExtraRegions(state.sudoku, frame);
+        }
+        if (state.sudoku.hasEdgeVariant()) {
+            this.renderEdgeVariant(state.sudoku, frame);
         }
         frame.update();
     }

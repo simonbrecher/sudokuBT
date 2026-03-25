@@ -41,6 +41,7 @@
     <script src="src/editor/regionEditor.js"></script>
     <script src="src/editor/numberEditor.js"></script>
     <script src="src/editor/strategyEditor.js"></script>
+    <script src="src/editor/edgeEditor.js"></script>
     <script src="src/editor/editorUtils.js"></script>
 </head>
 
@@ -56,6 +57,7 @@
             <div id="menu-button-task-edit" class="menu-button" onclick="MainEditor.pressedTaskEditButton();">Edit Task</div>
             <div id="menu-button-regions" class="menu-button" onclick="MainEditor.pressedRegionsButton();">Edit Regions</div>
             <div id="menu-button-numbers" class="menu-button" onclick="MainEditor.pressedNumbersButton();">Edit Numbers</div>
+            <div id="menu-button-edge" class="menu-button" onclick="MainEditor.pressedEdgeButton();">Edit Variant</div>
         </section>
         <section id="left-menu-section-solve" class="menu-section">
             <div class="menu-title"></div>
@@ -129,6 +131,14 @@
                 +20
                 <div id="check-numbers-plus20" class="check"></div>
             </div>
+        </section>
+        <section id="right-menu-section-edge" class="menu-section">
+            <section id="right-menu-subsection-edge-add" class="menu-subsection">
+                <div class="menu-title">Add</div>
+            </section>
+            <section id="right-menu-subsection-edge-remove" class="menu-subsection">
+                <div id="menu-button-regions-edge-remove" class="menu-button" onclick="MainEditor.pressedEdgeRemoveButton();">Remove Variant</div>
+            </section>
         </section>
         <section id="right-menu-section-strategy" class="menu-section">
             <div class="menu-title">Strategies</div>

@@ -20,7 +20,7 @@ class MainEditor {
     private static windowsOpen: string[] = [];
 
     private static readonly VIEW_TASK_ONLY = [
-        "menu-button-regions", "menu-button-numbers", "menu-button-solve-start"
+        "menu-button-regions", "menu-button-numbers", "menu-button-solve-start", "menu-button-edge"
     ];
     private static readonly VIEW_SOLVE_ONLY = [
         "menu-button-task-edit", "menu-button-solve-restart", "menu-button-solve-next", "strategy-text-wrapper"
@@ -29,6 +29,7 @@ class MainEditor {
         regions: ["regions"],
         numbers: ["numbers"],
         solve: ["numbers", "strategy"],
+        edge: ["edge"],
     };
 
     /**
@@ -58,6 +59,15 @@ class MainEditor {
             Renderer.renderer.doDifferentiateTaskBigNumber = false;
         } else {
             Renderer.renderer.render(this.sudoku.task, this.frame);
+        }
+
+        let doDebugEdgeWrappers = this.menuPosition.left === "edge" && this.sudoku.hasEdgeVariant();
+        if (doDebugEdgeWrappers) {
+            this.frame.puzzleWrapper.classList.add("edge-debug");
+            EdgeEditor.addEventListeners();
+        } else {
+            this.frame.puzzleWrapper.classList.remove("edge-debug");
+            EdgeEditor.removeEventListeners();
         }
     }
 
@@ -234,8 +244,8 @@ class MainEditor {
                 EditorUtils.removeEventListeners(RegionEditor.eventListeners);
             }
 
-            let hadNumbersListeners = NumberEditor.hasEventListeners(previousLeftPosition!, previousRightPosition!);
-            let willHaveNumbersListeners = NumberEditor.hasEventListeners(leftPosition!, rightPosition!);
+            let hadNumbersListeners = NumberEditor.hasEventListeners(previousLeftPosition!);
+            let willHaveNumbersListeners = NumberEditor.hasEventListeners(leftPosition!);
             if (willHaveNumbersListeners && ! hadNumbersListeners) {
                 EditorUtils.addEventListeners(NumberEditor.eventListeners);
             } else if (hadNumbersListeners && ! willHaveNumbersListeners) {
@@ -276,6 +286,11 @@ class MainEditor {
             } else {
                 StrategyEditor.removeStrategyButtons();
             }
+        }
+
+        // Prepare edge variant buttons
+        if (leftPosition === "edge") {
+            EdgeEditor.updateMenu();
         }
 
         this.menuPosition = {left: leftPosition, right: rightPosition};
@@ -475,6 +490,29 @@ class MainEditor {
             this.numberPlus = 0;
             this.updateChecksPlus();
             this.render();
+        }
+    }
+
+    public static pressedEdgeButton(): void {
+        if (! this.isConfirmOpen) {
+            this.changeMenuPosition("edge", null);
+            this.render();
+        }
+    }
+
+    public static pressedEdgeRemoveButton(): void {
+        if (! this.isConfirmOpen) {
+            EdgeEditor.removeVariant();
+            this.render();
+            EdgeEditor.updateMenu();
+        }
+    }
+
+    public static pressedEdgeAddButton(variantId: number): void {
+        if (! this.isConfirmOpen) {
+            EdgeEditor.addVariant(variantId);
+            this.render();
+            EdgeEditor.updateMenu();
         }
     }
 

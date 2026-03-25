@@ -9,7 +9,10 @@
 .puzzle-wrapper { --strong-border-width: 3px; --normal-border-width: 1px; position: relative; page-break-inside: avoid; }
 
 /* --height and --width refer to size of td */
-.puzzle td { --height: 0; --width: 0; height: var(--height); width: var(--width); padding: 0; }
+.puzzle td {
+    --height: 0; --width: 0; height: var(--height); width: var(--width); padding: 0;
+    --td-height: var(--height); --td-width: var(--width);
+}
 
 .border-top-none { border-top: none; }
 .border-bottom-none { border-bottom: none; }
@@ -102,5 +105,14 @@
 .edge-label.text-1-big { display: flex; align-items: center; justify-content: center; font-size: calc(var(--label-size) * 1.1); }
 .edge-label.text-1 { display: flex; align-items: center; justify-content: center; font-size: calc(var(--label-size) * 0.95); }
 .edge-label.text-2 { display: flex; align-items: center; justify-content: center; font-size: calc(var(--label-size) * 0.8); }
+
+.edge-label.vx-v { --label-size: calc(var(--td-height) * 0.28); background-image: url("../images/edge-v.svg"); }
+.edge-label.vx-x { --label-size: calc(var(--td-height) * 0.28); background-image: url("../images/edge-x.svg"); }
+.edge-debug .edge-label.none { --label-size: calc(var(--td-height) * 0.3); background-image: url("../images/edge-none.svg"); }
+.edge-label.greater, .edge-label.lesser { --label-size: calc(var(--td-height) * 0.28); background-image: url("../images/edge-v.svg"); }
+.edge-wrapper-horizontal .edge-label.greater { transform: rotate(90deg); }
+.edge-wrapper-horizontal .edge-label.lesser { transform: rotate(270deg); }
+.edge-wrapper-vertical .edge-label.greater { transform: rotate(180deg); }
+.edge-wrapper-vertical .edge-label.lesser { transform: rotate(0deg); }
 
 .display-none { display: none; }

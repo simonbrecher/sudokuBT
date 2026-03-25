@@ -304,6 +304,10 @@ class GraphicsTests {
         let size = rectangleHeight * rectangleWidth;
         let sudoku = new Sudoku(size);
         sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
+        sudoku.regions.setExtraRegions([
+            [10, 11, 12, 19, 20, 21, 29, 30, 31],
+        ]);
+        sudoku.regions.hasDiagonals = true;
         sudoku.setEdgeVariant(factory);
         // @ts-ignore
         let edgeVariant: EdgeVariant = sudoku.getEdgeVariant();

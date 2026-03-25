@@ -8,7 +8,7 @@
         ["contextmenu", (event: Event) => event.preventDefault()],
     ];
 
-    public static hasEventListeners(left: string, right: string): boolean {
+    public static hasEventListeners(left: string): boolean {
         return left === "numbers" || left === "solve";
     }
 
