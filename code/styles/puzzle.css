@@ -57,8 +57,7 @@
 .not-in-task > .single-text { --font-color: #00B; }
 
 .background-region-1 { --background-color: #6FF !important; }
-.background-region-2 { --background-color: #6FF !important; }
-.background-region-3 { --background-color: #FFA !important; }
+.background-region-2 { --background-color: #FFA !important; }
 .background-removed { --background-color: #FF0; background-color: var(--background-color); }
 .background-reason { --background-color: #0F0; background-color: var(--background-color); }
 .background-error-big { --background-color: #F30 !important; }

@@ -272,17 +272,11 @@ class GraphicsTests {
     }
 
     private static renderStrategy(frame: Frame, result: StrategyResult): void {
-        if (result.colors.region1 !== undefined) {
-            // @ts-ignore
-            StrategyEditor.renderRegion(frame, result.colors.region1, "background-region-1");
-        }
-        if (result.colors.region2 !== undefined) {
-            // @ts-ignore
-            StrategyEditor.renderRegion(frame, result.colors.region2, "background-region-2");
-        }
-        if (result.colors.region3 !== undefined) {
-            // @ts-ignore
-            StrategyEditor.renderRegion(frame, result.colors.region3, "background-region-3");
+        if (result.colors.regions !== undefined) {
+            for (let { region: region, css: css } of result.colors.regions) {
+                // @ts-ignore
+                StrategyEditor.renderRegion(frame, region, css);
+            }
         }
         if (result.colors.removed !== undefined) {
             // @ts-ignore

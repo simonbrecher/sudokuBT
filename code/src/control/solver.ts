@@ -57,7 +57,7 @@ class Solver {
     }
 
     public solveRegions(state: State): void {
-        let regions = state.sudoku.regions.getAllRegions(true, true, true, true, true);
+        let regions = state.sudoku.regions.getAllRegions();
         for (let region of regions) {
             let binaries = []
             for (let index of region) {

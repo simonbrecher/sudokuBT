@@ -161,4 +161,15 @@ class ArrayUtils {
         }
         return output;
     }
+
+    public static union(array1: any[], array2: any[]): any[] {
+        let output = [];
+        for (let value of array1) {
+            output.push(value);
+        }
+        for (let value of array2) {
+            output.push(value);
+        }
+        return output;
+    }
 }

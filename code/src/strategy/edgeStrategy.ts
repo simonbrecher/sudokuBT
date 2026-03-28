@@ -51,7 +51,6 @@
         }
 
         let board = state.board;
-        let size = state.sudoku.size;
         let variant = state.sudoku.getEdgeVariant()!;
 
         let labelCells = this.getLabelCells(state.sudoku);
@@ -71,7 +70,7 @@
                 if (result.priority == -1) {
                     return {
                         colors: {
-                            error: StrategyUtils.indexToCoordinates3dArray1dIndices([index1, index2], -1, size),
+                            error: StrategyUtils.mergeIndicesAndShift([index1, index2], -1),
                         },
                         isUpdated: true,
                         isValid: false,
@@ -98,16 +97,16 @@
 
         let removed = [];
         for (let shift of BinaryUtils.binaryToShifts32(binary1 & ~ newBinary1)) {
-            removed.push(StrategyUtils.indexToCoordinates3d(index1, shift, size));
+            removed.push({ index: index1, shift: shift });
         }
         for (let shift of BinaryUtils.binaryToShifts32(binary2 & ~ newBinary2)) {
-            removed.push(StrategyUtils.indexToCoordinates3d(index2, shift, size));
+            removed.push({ index: index2, shift: shift });
         }
 
         return {
             colors: {
                 removed: removed,
-                region1: StrategyUtils.indexToCoordinates3dArray1dIndices([index1, index2], -1, size),
+                regions: [{ region: [index1, index2], css: "background-region-1" }],
             },
             isUpdated: true,
             isValid: true,

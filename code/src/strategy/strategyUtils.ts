@@ -1,4 +1,18 @@
-﻿class StrategyUtils {
+﻿type StrategyColors = {
+    removed?: { index: number, shift: number }[], // numbers that will be removed
+    reason?: { index: number, shift: number }[],  // numbers that are the reason for other numbers being removed
+    error?: { index: number, shift: number }[],   // numbers that cause error
+    regions?: { region: number[], css: string }[],  // cells of a region (1st color)
+};
+type StrategyResult = {
+    colors: StrategyColors,
+    name: string,
+    message: string,
+    isUpdated: boolean,
+    isValid: boolean,
+};
+
+class StrategyUtils {
 
     /**
      * Load region from 1d board.
@@ -24,51 +38,12 @@
     }
 
     /**
-     * Convert 1d index (y * width + x) into 2d index ( { y: y, x: x } )
+     * Convert 1d array [index1, index2, ...] and shift to [{index: index1, shift: shift}, {index: index2, shift: shift}, ...]
      */
-    public static indexToCoordinates2d(index: number, size: number): StrategyCoordinates2d {
-        return { y: Math.floor(index / size), x: index % size };
-    }
-
-    /**
-     * Convert 1d array of 1d indices (y * width + x) into 1d array of 2d indices ( { y: y, x: x } )
-     */
-    public static indexToCoordinates2dArray1d(indices: number[], size: number): StrategyCoordinates2d[] {
+    public static mergeIndicesAndShift(indices: number[], shift: number): { index: number, shift: number }[] {
         let output = [];
         for (let index of indices) {
-            output.push(this.indexToCoordinates2d(index, size));
-        }
-        return output;
-    }
-
-    /**
-     * Convert 1d index (y * width + x) and shift into 3d index ( { y: y, x: x, shift: shift } )
-     * @param index (y * width + x)
-     * @param shift third coordinate
-     * @param size size of sudoku
-     */
-    public static indexToCoordinates3d(index: number, shift: number, size: number): StrategyCoordinates3d {
-        return { y: Math.floor(index / size), x: index % size, shift: shift };
-    }
-
-    /**
-     * Convert 1d array of 1d indices (y * width + x) and shift into 3d indices ( { y: y, x: x, shift: shift } )
-     */
-    public static indexToCoordinates3dArray1dIndices(indices: number[], shift: number, size: number): StrategyCoordinates3d[] {
-        let output = [];
-        for (let index of indices) {
-            output.push(this.indexToCoordinates3d(index, shift, size));
-        }
-        return output;
-    }
-
-    /**
-     * Convert 1d index (y * width + x) and 1d array of shifts into 3d indices ( { y: y, x: x, shift: shift } )
-     */
-    public static indexToCoordinates3dArray1dShifts(index: number, shifts: number[], size: number): StrategyCoordinates3d[] {
-        let output = [];
-        for (let shift of shifts) {
-            output.push(this.indexToCoordinates3d(index, shift, size));
+            output.push({ index: index, shift: shift });
         }
         return output;
     }
@@ -76,18 +51,28 @@
     /**
      * Convert StrategyRegionCoordinates2d[] to StrategyCoordinates3d[]
      */
-    public static regionCoordinates2dTo3dArray1d(regionIndices: StrategyRegionCoordinates2d[], region: number[], size: number): StrategyCoordinates3d[] {
+    public static regionIndexToIndex(regionIndices: number[], region: number[]): number[] {
         let output = [];
         for (let regionIndex of regionIndices) {
-            output.push(this.indexToCoordinates3d(region[regionIndex.index], regionIndex.shift, size));
+            output.push(region[regionIndex]);
+        }
+        return output;
+    }
+
+    public static regionIndexShiftToIndexShift(
+        positions: { index: number, shift: number }[], region: number[]
+    ): { index: number, shift: number }[] {
+        let output = [];
+        for (let position of positions) {
+            output.push({ index: region[position.index], shift: position.shift});
         }
         return output;
     }
 
     /**
-     * Convert StrategyRegionCoordinates2d[] to index[]
+     * Extract shifts from objects and return them as array
      */
-    public static regionCoordinates2dToShiftArray1d(regionIndices: StrategyRegionCoordinates2d[]): number[] {
+    public static extractShifts(regionIndices: { index: number, shift: number }[]): number[] {
         let output = [];
         for (let regionIndex of regionIndices) {
             output.push(regionIndex.shift);

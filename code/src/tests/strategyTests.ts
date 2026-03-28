@@ -148,17 +148,11 @@ class StrategyTests {
         renderer.doSmallNumbersOnFullBinary = true;
         renderer.renderNew(state, ids.container);
         let frame = renderer.renderNew(state, ids.container);
-        if (result.colors.region1 !== undefined) {
-            // @ts-ignore
-            StrategyEditor.renderRegion(frame, result.colors.region1, "background-region-1");
-        }
-        if (result.colors.region2 !== undefined) {
-            // @ts-ignore
-            StrategyEditor.renderRegion(frame, result.colors.region2, "background-region-2");
-        }
-        if (result.colors.region3 !== undefined) {
-            // @ts-ignore
-            StrategyEditor.renderRegion(frame, result.colors.region3, "background-region-3");
+        if (result.colors.regions !== undefined) {
+            for (let { region: region, css: css } of result.colors.regions) {
+                // @ts-ignore
+                StrategyEditor.renderRegion(frame, region, css);
+            }
         }
         if (result.colors.removed !== undefined) {
             // @ts-ignore
@@ -242,7 +236,7 @@ class StrategyTests {
                 sudoku = new Sudoku(rectangleHeight * rectangleWidth);
                 sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
 
-                let regions = sudoku.regions.getAllRegions(true, true, true, true, true);
+                let regions = sudoku.regions.getAllRegions();
                 let region = ArrayUtils.choice(regions);
                 let chosen = ArrayUtils.choices(region, valuesOne.length);
 
@@ -289,7 +283,7 @@ class StrategyTests {
                 sudoku = new Sudoku(rectangleHeight * rectangleWidth);
                 sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
 
-                let regions = sudoku.regions.getAllRegions(true, true, true, true, true);
+                let regions = sudoku.regions.getAllRegions();
                 // let region = ArrayUtils.choice(regions);
                 // let chosen = ArrayUtils.choices(region, valuesOne.length);
                 let chosen = regions[regionId].slice(0, valuesOne.length);
@@ -342,7 +336,7 @@ class StrategyTests {
                     sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
                 }
 
-                let regions = sudoku.regions.getAllRegions(true, true, true, true, true);
+                let regions = sudoku.regions.getAllRegions();
 
                 let regionA = [];
                 for (let r of regions1) {

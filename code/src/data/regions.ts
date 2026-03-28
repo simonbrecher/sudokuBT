@@ -180,7 +180,7 @@ class Regions {
     /**
      * Get array of all regions. It is possible to choose only some types.
      */
-    public getAllRegions(rows: boolean, columns: boolean, regions: boolean, diagonals: boolean, extraRegions: boolean): number[][] {
+    public getSomeRegions(rows: boolean, columns: boolean, regions: boolean, diagonals: boolean, extraRegions: boolean): number[][] {
         let output: number[][] = [];
         if (this.hasLines) {
             if (rows) {
@@ -200,6 +200,10 @@ class Regions {
             ArrayUtils.add1d(output, this._extraRegions!);
         }
         return output;
+    }
+
+    public getAllRegions(): number[][] {
+        return this.getSomeRegions(true, true, true, true, true);
     }
 
     /**

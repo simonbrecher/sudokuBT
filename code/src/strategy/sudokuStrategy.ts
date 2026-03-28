@@ -1,27 +1,9 @@
-type StrategyCoordinates2d = { y: number, x: number };
-type StrategyCoordinates3d = { y: number, x: number, shift: number };
-type StrategyRegionCoordinates2d = { index: number, shift: number };
-type StrategyColors = {
-    removed?: StrategyCoordinates3d[], // numbers that will be removed
-    reason?: StrategyCoordinates3d[],  // numbers that are the reason for other numbers being removed
-    error?: StrategyCoordinates3d[],   // numbers that cause error
-    region1?: StrategyCoordinates2d[],  // cells of a region (1st color)
-    region2?: StrategyCoordinates2d[],  // cells of a region (2nd color)
-    region3?: StrategyCoordinates2d[],  // cells of a region (3rd color)
-};
-type StrategyResult = {
-    colors: StrategyColors,
-    name: string,
-    message: string,
-    isUpdated: boolean,
-    isValid: boolean,
-};
 type StrategyRegionProof = {
     isSource: boolean,
     isValid: boolean,
     size: number,
-    reason: StrategyRegionCoordinates2d[],
-    removed: StrategyRegionCoordinates2d[],
+    reason: { index: number; shift: number }[],
+    removed: { index: number; shift: number }[],
     priority: number, // lower number = higher priority, -1 for error and 1000 for non-updated
 }
 type StrategyPointingProof = {
@@ -34,11 +16,10 @@ type StrategyIntersectionProof = {
     isSource: boolean,
     isValid: boolean,
     size: number,
-    reason: StrategyCoordinates3d[],
-    removed: StrategyCoordinates3d[],
-    region1: StrategyCoordinates2d[],
-    region2: StrategyCoordinates2d[],
-    region3: StrategyCoordinates2d[],
+    reason: { index: number, shift: number }[],
+    removed: { index: number, shift: number }[],
+    regionDifference: number[],
+    regionIntersection: number[],
     priority: number, // lower number = higher priority, -1 for error and 1000 for non-updated
 }
 
@@ -94,7 +75,7 @@ class SudokuStrategy {
             if (board[i] == 0) {
                 return {
                     colors: {
-                        error: [StrategyUtils.indexToCoordinates3d(i, -1, size)],
+                        error: [{ index: i, shift: -1 }],
                     },
                     name: "Naked Single - Error",
                     message: "There is no number in a cell.",
@@ -106,19 +87,19 @@ class SudokuStrategy {
 
         let reasonSet: Set<number> = new Set();
 
-        let regions = state.sudoku.regions.getAllRegions(true, true, true, true, true);
+        let regions = state.sudoku.regions.getAllRegions();
         for (let region of regions) {
             let input = StrategyUtils.loadRegion32(board, region);
 
-            let output = this._nakedSingle(ArrayUtils.deepcopyArray1d(input));
+            let result = this._nakedSingle(ArrayUtils.deepcopyArray1d(input));
 
-            if (output.isValid) {
-                if (! ArrayUtils.equals1d(output.output, input)) {
-                    StrategyUtils.saveRegion32(outputBoard, region, output.output);
+            if (result.isValid) {
+                if (! ArrayUtils.equals1d(result.output, input)) {
+                    StrategyUtils.saveRegion32(outputBoard, region, result.output);
 
                     let missing = 0;
                     for (let i = 0; i < input.length; i++) {
-                        missing |= input[i] & ~ output.output[i];
+                        missing |= input[i] & ~ result.output[i];
                     }
                     for (let i = 0; i < input.length; i++) {
                         if (BinaryUtils.has1bit32(input[i]) && (input[i] & missing) != 0) {
@@ -128,14 +109,17 @@ class SudokuStrategy {
                 }
 
             } else {
-                let errorShift1 = BinaryUtils.binaryToShifts32(board[region[output.output[0]]])[0];
-                let errorShift2 = BinaryUtils.binaryToShifts32(board[region[output.output[1]]])[0];
-                let error1 = StrategyUtils.indexToCoordinates3d(region[output.output[0]], errorShift1, size);
-                let error2 = StrategyUtils.indexToCoordinates3d(region[output.output[1]], errorShift2, size);
+                let error = [];
+                for (let regionIndex of result.output) {
+                    let index = region[regionIndex];
+                    // BinaryUtils.binaryToShifts32() returns array with 1 element, because there is 1 bit, so use [0] to unpack it
+                    let shift = BinaryUtils.binaryToShifts32(board[index])[0];
+                    error.push({ index: index, shift: shift });
+                }
                 return {
                     colors: {
-                        error: [error1, error2],
-                        region1: StrategyUtils.indexToCoordinates2dArray1d(region, size),
+                        error: error,
+                        regions: [{ region: region, css: "background-region-1" }],
                     },
                     name: "Naked Single - Error",
                     message: "Two cells in a region have the same number.",
@@ -150,22 +134,20 @@ class SudokuStrategy {
             return { colors: {  }, name: "", message: "", isUpdated: false, isValid: true };
         }
 
-        let reason = [];
+        let reason: { index: number, shift: number }[] = [];
         for (let index of Array.from(reasonSet)) {
             let shift = BinaryUtils.binaryToShifts32(board[index])[0];
-            reason.push(StrategyUtils.indexToCoordinates3d(index, shift, size));
+            reason.push({ index: index, shift: shift });
         }
 
-        let removed: StrategyCoordinates3d[] = [];
-        for (let y = 0; y < size; y++) {
-            for (let x = 0; x < size; x++) {
-                let before = board[y * size + x];
-                let after = outputBoard[y * size + x];
-                if (before !== after) {
-                    for (let shift = 0; shift < size; shift++) {
-                        if ((before & 1 << shift) !== (after & 1 << shift)) {
-                            removed.push({ y: y, x: x, shift: shift });
-                        }
+        let removed: { index: number, shift: number }[] = [];
+        for (let index = 0; index < size * size; index++) {
+            let before = board[index];
+            let after = outputBoard[index];
+            if (before !== after) {
+                for (let shift = 0; shift < size; shift++) {
+                    if ((before & 1 << shift) !== (after & 1 << shift)) {
+                        removed.push({ index: index, shift: shift });
                     }
                 }
             }
@@ -194,7 +176,7 @@ class SudokuStrategy {
      * @return isValid:     false if region is known to have no solution
      */
     private static _hiddenSingle(binaries: number[]): {
-        reason?: StrategyRegionCoordinates2d[], removed?: StrategyRegionCoordinates2d[],
+        reason?: { index: number, shift: number }[], removed?: { index: number, shift: number }[], // TODO regionIndex
         multiple?: { cell: number, shifts: number[] }, missing?: number[],
         isUpdated: boolean, isValid: boolean,
     }
@@ -251,7 +233,7 @@ class SudokuStrategy {
         let size = state.sudoku.size;
         let board = state.board;
 
-        let regions = state.sudoku.regions.getAllRegions(true, true, true, true, true);
+        let regions = state.sudoku.regions.getAllRegions();
         let result = null;
         let resultRegion = null
         for (let region of regions) {
@@ -263,8 +245,7 @@ class SudokuStrategy {
                     if (result.missing !== undefined) {
                         return {
                             colors: {
-                                error: StrategyUtils.indexToCoordinates3dArray1dIndices(region, -1, size),
-                                region1: StrategyUtils.indexToCoordinates2dArray1d(region, size),
+                                error: StrategyUtils.mergeIndicesAndShift(region, -1),
                             },
                             name: "Hidden Single - Error",
                             message: `Number${result.missing.length > 1 ? 's' : ''} ${StrategyUtils.joinShiftsToText(result.missing)} can not be in any cell in the region.`,
@@ -272,10 +253,16 @@ class SudokuStrategy {
                             isValid: false,
                         }
                     } else if (result.multiple !== undefined) {
+                        let index = region[result.multiple.cell];
+                        let error =  [];
+                        for (let shift of result.multiple.shifts) {
+                            error.push({ index: index, shift: shift });
+                        }
+
                         return {
                             colors: {
-                                error: StrategyUtils.indexToCoordinates3dArray1dShifts(region[result.multiple.cell], result.multiple.shifts, size),
-                                region1: StrategyUtils.indexToCoordinates2dArray1d(region, size),
+                                error: error,
+                                regions: [{ region: region, css: "background-region-1" }],
                             },
                             name: "Hidden Single - Error",
                             message: `Numbers ${StrategyUtils.joinShiftsToText(result.multiple.shifts)} can be only in the same cell in the region.`,
@@ -298,14 +285,14 @@ class SudokuStrategy {
             reason.push(reasonOne.index);
         }
         let reasonNumberText = result.reason!.length > 1 ? 'Numbers' : 'Number';
-        let reasonListText = StrategyUtils.joinShiftsToText(StrategyUtils.regionCoordinates2dToShiftArray1d(result.reason!));
+        let reasonListText = StrategyUtils.joinShiftsToText(StrategyUtils.extractShifts(result.reason!));
         let cellText = result.reason!.length > 1 ? 'these cells' : 'this cell';
         let removedNumberText = result.removed!.length > 1 ? 'numbers' : 'number';
         return {
             colors: {
-                reason: StrategyUtils.regionCoordinates2dTo3dArray1d(result.reason!, resultRegion!, size),
-                removed: StrategyUtils.regionCoordinates2dTo3dArray1d(result.removed!, resultRegion!, size),
-                region1: StrategyUtils.indexToCoordinates2dArray1d(resultRegion!, size),
+                reason: StrategyUtils.regionIndexShiftToIndexShift(result.reason!, resultRegion!),
+                removed: StrategyUtils.regionIndexShiftToIndexShift(result.removed!, resultRegion!),
+                regions: [{ region: resultRegion!, css: "background-region-1" }],
             },
             name: "Hidden Single",
             message: `
@@ -363,7 +350,7 @@ class SudokuStrategy {
         let isSource = hallProof.source.set.length <= hallProof.sink.set.length;
         let proof = isSource ? hallProof.source : hallProof.sink;
 
-        let reason: StrategyRegionCoordinates2d[] = [];
+        let reason: { index: number, shift: number }[] = [];
         for (let a of proof.set) {
             for (let b of edges[a]) {
                 if (proof.matched.includes(b)) {
@@ -372,7 +359,7 @@ class SudokuStrategy {
             }
         }
 
-        let removed: StrategyRegionCoordinates2d[] = [];
+        let removed: { index: number, shift: number }[] = [];
         for (let edge of proof.edges) {
             let [a, b] = edge;
             removed.push({index: a, shift: b});
@@ -389,10 +376,9 @@ class SudokuStrategy {
     }
 
     public static region(state: State): StrategyResult {
-        let size = state.sudoku.size;
         let board = state.board;
 
-        let regions = state.sudoku.regions.getAllRegions(true, true, true, true, true);
+        let regions = state.sudoku.regions.getAllRegions();
         let result = null;
         let resultRegion = null;
         for (let region of regions) {
@@ -416,9 +402,9 @@ class SudokuStrategy {
 
             return {
                 colors: {
-                    reason: StrategyUtils.regionCoordinates2dTo3dArray1d(result.reason!, resultRegion!, size),
-                    removed: StrategyUtils.regionCoordinates2dTo3dArray1d(result.removed!, resultRegion!, size),
-                    region1: StrategyUtils.indexToCoordinates2dArray1d(resultRegion!, size),
+                    reason: StrategyUtils.regionIndexShiftToIndexShift(result.reason!, resultRegion!),
+                    removed: StrategyUtils.regionIndexShiftToIndexShift(result.removed!, resultRegion!),
+                    regions: [{ region: resultRegion!, css: "background-region-1" }],
                 },
                 name: name,
                 message: message,
@@ -460,12 +446,11 @@ class SudokuStrategy {
     }
 
     public static pointing(state: State): StrategyResult {
-        let size = state.sudoku.size;
         let board = state.board;
+        let regions = state.sudoku.regions.getAllRegions();
 
         let result: StrategyPointingProof | null = null;
 
-        let regions = state.sudoku.regions.getAllRegions(true, true, true, true, true);
         for (let i = 0; i < regions.length; i++) {
             for (let j = 0; j < i; j++) {
                 let region1 = regions[i];
@@ -491,7 +476,7 @@ class SudokuStrategy {
             for (let index of result.intersection) {
                 let binary = board[index] & result.proof;
                 for (let shift of BinaryUtils.binaryToShifts32(binary)) {
-                    reason.push(StrategyUtils.indexToCoordinates3d(index, shift, size));
+                    reason.push({ index: index, shift: shift });
                 }
             }
 
@@ -499,7 +484,7 @@ class SudokuStrategy {
             for (let index of result.region2) {
                 let binary = board[index] & result.proof;
                 for (let shift of BinaryUtils.binaryToShifts32(binary)) {
-                    removed.push(StrategyUtils.indexToCoordinates3d(index, shift, size));
+                    removed.push({ index: index, shift: shift });
                 }
             }
 
@@ -509,9 +494,11 @@ class SudokuStrategy {
                 colors: {
                     removed: removed,
                     reason: reason,
-                    region1: StrategyUtils.indexToCoordinates2dArray1d(result.region1, size),
-                    region2: StrategyUtils.indexToCoordinates2dArray1d(result.region2, size),
-                    region3: StrategyUtils.indexToCoordinates2dArray1d(result.intersection, size),
+                    regions: [
+                        { region: result.region1, css: "background-region-1" },
+                        { region: result.region2, css: "background-region-1" },
+                        { region: result.intersection, css: "background-region-2" },
+                    ],
                 },
                 name: "Pointing",
                 message: `
@@ -585,18 +572,18 @@ class SudokuStrategy {
 
         let [proofR1, proofR2, proofIntersection] = this.splitRegionsToIntersections(proofRegions1, proofRegions2);
 
-        let reason: StrategyCoordinates3d[] = [];
+        let reason: { index: number, shift: number }[] = [];
         for (let index of proofIntersection) {
             if ((board[index] & shiftBinary) != 0) {
-                reason.push(StrategyUtils.indexToCoordinates3d(index, shift, size));
+                reason.push({ index: index, shift: shift });
             }
         }
 
         let removedRegion = isSource ? proofR2 : proofR1;
-        let removed: StrategyCoordinates3d[] = [];
+        let removed: { index: number, shift: number }[] = [];
         for (let index of removedRegion) {
             if ((board[index] & shiftBinary) != 0) {
-                removed.push(StrategyUtils.indexToCoordinates3d(index, shift, size));
+                removed.push({ index: index, shift: shift });
             }
         }
 
@@ -606,9 +593,8 @@ class SudokuStrategy {
             size: proof.set.length,
             reason: reason,
             removed: removed,
-            region1: StrategyUtils.indexToCoordinates2dArray1d(proofR1, size),
-            region2: StrategyUtils.indexToCoordinates2dArray1d(proofR2, size),
-            region3: StrategyUtils.indexToCoordinates2dArray1d(proofIntersection, size),
+            regionDifference: ArrayUtils.union(proofR1, proofR2),
+            regionIntersection: proofIntersection,
             priority: proof.set.length,
         };
     }
@@ -646,9 +632,10 @@ class SudokuStrategy {
                 colors: {
                     reason: result.reason,
                     removed: result.removed,
-                    region1: result.region1,
-                    region2: result.region2,
-                    region3: result.region3,
+                    regions: [
+                        { region: result.regionDifference, css: "background-region-1" },
+                        { region: result.regionIntersection, css: "background-region-2" },
+                    ]
                 },
                 isUpdated: true,
                 isValid: true,
