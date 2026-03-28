@@ -146,7 +146,6 @@ class StrategyTests {
     private static renderStrategy(ids: {container: string, message: string}, state: State, result: StrategyResult): void {
         let renderer = new Renderer();
         renderer.doSmallNumbersOnFullBinary = true;
-        renderer.renderNew(state, ids.container);
         let frame = renderer.renderNew(state, ids.container);
         if (result.colors.regions !== undefined) {
             for (let { region: region, css: css } of result.colors.regions) {
@@ -375,6 +374,68 @@ class StrategyTests {
             let ids = this.prepareDivs(`Intersection ${i}`);
             let state = states[i];
             let result = SudokuStrategy.intersection(state);
+
+            this.renderStrategy(ids, state, result);
+        }
+        this.update();
+    }
+
+    private static edgeRegionGetSudoku(): State[] {
+        let states: State[] = [];
+
+        let sudoku, state;
+
+        {
+            let values: [number, number[]][] = [
+                [18, [10]],
+                [18, [9, 10]],
+                [18, [9, 19]],
+                [18, [9, 11]],
+                [18, [1, 9, 10, 11, 19]],
+                [18, [0, 2, 20]],
+            ];
+
+            for (let x of values) {
+                let [regionId, indices] = x;
+                let size = 9;
+                sudoku = new Sudoku(size);
+                sudoku.regions.setRectangular(3, 3);
+
+                sudoku.setEdgeVariant(EdgeVariantFactory.variants.consecutive);
+                let variant = sudoku.getEdgeVariant()!;
+                // @ts-ignore
+                let labelCells = EdgeStrategy.getLabelCells(sudoku);
+                for (let [direction, y, x, , ] of labelCells) {
+                    variant.board[direction][y][x] = 0;
+                }
+
+                let regions = sudoku.regions.getAllRegions();
+
+                state = sudoku.solution;
+                for (let index of regions[regionId]) {
+                    if (! indices.includes(index)) {
+                        state.board[index] &= ~ 0b11;
+                    } else {
+                        state.board[index] &= ~ 0b01;
+                    }
+                }
+
+                let permutation = this.createSudokuPermutation(sudoku, false, false, true, false);
+                this.permuteSudoku(sudoku, state.board, permutation);
+
+                states.push(state);
+            }
+        }
+
+        return states;
+    }
+
+    public static testEdgeRegion(): void {
+        let states = this.edgeRegionGetSudoku();
+        for (let i = 0; i < states.length; i++) {
+            let ids = this.prepareDivs(`Edge Region ${i}`);
+            let state = states[i];
+            let result = EdgeStrategy.region(state);
 
             this.renderStrategy(ids, state, result);
         }

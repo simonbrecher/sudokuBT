@@ -26,6 +26,7 @@ class Debug {
                 case "region":              StrategyTests.testRegion();                 break;
                 case "pointing":            StrategyTests.testPointing();               break;
                 case "intersection":        StrategyTests.testIntersection();           break;
+                case "edge_region":         StrategyTests.testEdgeRegion();             break;
 
                 case "debug":               Debug.debug();                              break;
                 case "ng_perfect_match":    PerfectMatchingTest.main();                 break;

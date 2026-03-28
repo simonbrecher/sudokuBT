@@ -172,4 +172,13 @@ class ArrayUtils {
         }
         return output;
     }
+
+    public static setIntersection(sets: Set<any>[]): Set<any> {
+        if (sets.length == 0) {
+            return new Set();
+        }
+        return sets.reduce((acc, set) =>
+            new Set(Array.from(acc).filter(x => set.has(x)))
+        );
+    }
 }
