@@ -76,6 +76,32 @@
     \addcontentsline{toc}{section}{#1}
 }
 
+% This macro defines two images next each other with one description
+\newcommand{\twoimages}[4]{
+    \begin{center}
+        \noindent\begin{minipage}{\textwidth}
+            \begin{center}
+                \begin{minipage}{#4}
+                    \centering
+                    \includegraphics[width=\linewidth]{img/#1.png}
+                \end{minipage}
+                \hspace{0.5cm}
+                \begin{minipage}{#4}
+                    \centering
+                    \includegraphics[width=\linewidth]{img/#2.png}
+                \end{minipage}
+                \par\smallskip
+                #3
+            \end{center}
+        \end{minipage}
+    \end{center}
+}
+
+% This macro defines two images (task and solution) as used in chapter 1 for showing example of rule
+\newcommand{\twoimagesruleexample}[2]{
+    \twoimages{rule-example/#1-task}{rule-example/#1-solution}{#2}{0.4\textwidth}
+}
+
 % Draw black "slugs" whenever a line overflows, so that we can spot it easily.
 \overfullrule=1mm
 

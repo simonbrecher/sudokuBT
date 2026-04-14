@@ -1,3 +1,53 @@
 \chapter{Sudoku Rules}
 
-.
+\section{Basic sudoku}
+
+Fill one number $1\text{--}n$ to every empty cell such that each region
+contains every number exactly once.
+Every row and column is a region by default.
+Additional regions may be defined by the puzzle, such as boxes separated by a stronger border,
+diagonals, or custom regions highlighted by an outline around a set of cells.
+
+\twoimagesruleexample{latin-square}{Latin square $6 \times 6$}
+\twoimagesruleexample{sudoku}{Sudoku $6 \times 6$}
+\twoimagesruleexample{jigsaw}{Jigsaw sudoku $6 \times 6$}
+\twoimagesruleexample{diagonal}{Diagonal sudoku $6 \times 6$}
+\twoimagesruleexample{extra-region}{Sudoku $6 \times 6$ with one extra region}
+
+\section{Variants}
+
+\subsection*{Consecutive}
+
+If there is a white dot between two adjacent cells, the absolute difference of their values equals 1.
+If there is no dot between two adjacent cells, the difference of their value is not 1.
+
+\twoimagesruleexample{consecutive}{Consecutive sudoku $6 \times 6$}
+
+\subsection*{Kropki}
+
+If there is a white dot between two adjacent cells, the absolute difference of their values equals 1.
+If there is a black dot between two adjacent cells, one value is exactly twice the other.
+If both conditions hold, there is either black or white dot, but not both.
+If there is no dot between two adjacent cells, neither condition holds.
+
+\twoimagesruleexample{kropki}{Kropki sudoku $6 \times 6$}
+
+\subsection*{VX}
+
+If there is a V between two adjacent cells, the sum of their values equals 5.
+If there is an X between two adjacent cells, the sum of their values equals 10.
+If no V or X is present, the sum of their values is not 5 or 10.
+
+\twoimagesruleexample{vx}{VX sudoku $6 \times 6$}
+
+\subsection*{Comparative}
+
+Some adjacent cells are connected by an inequality sign, values of the two cells must satisfy it.
+
+\twoimagesruleexample{comparative}{Comparative sudoku $6 \times 6$}
+
+\subsection*{Sum}
+
+Some adjacent cells are connected by a number, sum of the values in the two cells must equal that number.
+
+\twoimagesruleexample{sum}{Sum sudoku $6 \times 6$}
