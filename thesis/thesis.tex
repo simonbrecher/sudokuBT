@@ -125,45 +125,45 @@
 \tableofcontents
 
 %%% Each chapter is kept in a separate file
-\include{preface}
-\include{chap01}
-\include{chap02}
-\include{chap03}
-\include{chap04}
-\include{chap05}
-
-\include{epilog}
+\include{chapter-00}
+\include{chapter-01}
+\include{chapter-02}
+\include{chapter-03}
+\include{chapter-04}
+\include{chapter-05}
+\include{chapter-99}
 
 %%% Bibliography
 \include{bibliography}
 
-%%% Figures used in the thesis (consider if this is needed)
-\listoffigures
-
-%%% Tables used in the thesis (consider if this is needed)
-%%% In mathematical theses, it could be better to move the list of tables to the beginning of the thesis.
-\listoftables
-
-%%% Abbreviations used in the thesis, if any, including their explanation
-%%% In mathematical theses, it could be better to move the list of abbreviations to the beginning of the thesis.
-\chapwithtoc{List of Abbreviations}
-
-%%% Doctoral theses must contain a list of author's publications
-\ifx\ThesisType\TypePhD
-\chapwithtoc{List of Publications}
-\fi
-
-%%% Attachments to the thesis, if any. Each attachment must be referred to
-%%% at least once from the text of the thesis. Attachments are numbered.
-%%%
-%%% The printed version should preferably contain attachments, which can be
-%%% read (additional tables and charts, supplementary text, examples of
-%%% program output, etc.). The electronic version is more suited for attachments
-%%% which will likely be used in an electronic form rather than read (program
-%%% source code, data files, interactive charts, etc.). Electronic attachments
-%%% should be uploaded to SIS. Allowed file formats are specified in provision
-%%% of the rector no. 72/2017. Exceptions can be approved by faculty's coordinator.
 \appendix
-\chapter{Attachments}
+
+%%% Documentations are in appendix
+\include{chapter-A}
+\include{chapter-B}
+\include{chapter-C}
+
+%%%% Figures used in the thesis (consider if this is needed)
+%\listoffigures
+
+%%%% Tables used in the thesis (consider if this is needed)
+%%%% In mathematical theses, it could be better to move the list of tables to the beginning of the thesis.
+%\listoftables
+
+%%%% Abbreviations used in the thesis, if any, including their explanation
+%%%% In mathematical theses, it could be better to move the list of abbreviations to the beginning of the thesis.
+%\chaptoc{List of Abbreviations}
+
+%%%% Attachments to the thesis, if any. Each attachment must be referred to
+%%%% at least once from the text of the thesis. Attachments are numbered.
+%%%%
+%%%% The printed version should preferably contain attachments, which can be
+%%%% read (additional tables and charts, supplementary text, examples of
+%%%% program output, etc.). The electronic version is more suited for attachments
+%%%% which will likely be used in an electronic form rather than read (program
+%%%% source code, data files, interactive charts, etc.). Electronic attachments
+%%%% should be uploaded to SIS. Allowed file formats are specified in provision
+%%%% of the rector no. 72/2017. Exceptions can be approved by faculty's coordinator.
+%\appendix
 
 \end{document}

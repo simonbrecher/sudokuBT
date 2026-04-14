@@ -64,9 +64,16 @@
 
 % This macro defines a chapter, which is not numbered, but is included
 % in the table of contents.
-\def\chapwithtoc#1{
-\chapter*{#1}
-\addcontentsline{toc}{chapter}{#1}
+\def\chaptoc#1{
+    \chapter*{#1}
+    \addcontentsline{toc}{chapter}{#1}
+}
+
+% This macro defines a section, which is not numbered, but is included
+% in the table of contents.
+\def\sectoc#1{
+    \section*{#1}
+    \addcontentsline{toc}{section}{#1}
 }
 
 % Draw black "slugs" whenever a line overflows, so that we can spot it easily.
