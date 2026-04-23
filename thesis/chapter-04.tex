@@ -1,3 +1,95 @@
 \chapter{Formal Solving Strategies}
 
-.
+\section{Solving a Sudoku Puzzle}
+
+Let us have a sudoku puzzle with task $T$ and $k \in \mathbb{N}_0$ valid solutions $S_i$.
+Let $S_{ALL} := \bigcup_{i=1}^k S_i$ be union of all valid solutions.
+
+\subsection*{State Relations}
+
+We define some state relations: substate, proper substate, state difference and state union.
+
+\begin{align*}
+    U \succeq V &:= \forall i, j \in [n]: U_{i, j} \supseteq V_{i, j} \\
+    U \succ V &:= U \succeq V \land U \neq V \\
+    (U \setminus V)_{i, j} &:= U_{i, j} \setminus V_{i, j} \\
+    (U \cup V)_{i, j} &:= U_{i, j} \cup V_{i, j}
+\end{align*}
+
+\subsection*{Strategy}
+
+Strategy is an algorithm that takes state $U_1$ and tries to find a state $U_2$, so that:
+$U_1 \succ U_2$ and $U_2 \succeq S_{ALL}$.
+
+If strategy is able to find $U_2$ and explain why all numbers in $U_1 \setminus U_2$
+can not be part of any valid solution, it returns $U_1 \setminus U_2$.
+If it is unable to do so, it returns null.
+
+\subsection*{Solving Sequence}
+
+The goal of solving is to find a sequence $T = U_0 \succ U_1 \succ ... \succ U_l \succeq S_{ALL}$,
+such that for all $i \in \mathbb{N}_0$ you can obtain $U_{i + 1}$ from $U_i$ using any strategy.
+
+\section{Used Strategies}
+
+This section describes all strategies used in the software.
+
+\subsection{Pointing}
+
+Let $R_1$ and $R_2$ be any two sudoku regions,
+such that $R_1 \setminus R_2 \neq \emptyset \land R_2 \setminus R_1 \neq \emptyset \land R_1 \cap R_2 \neq \emptyset$.
+
+Strategy Pointing says: If a number can not be in any cell from $R_1 \setminus R_2$,
+then it can not be in any cell from $R_2 \setminus R_1$.
+
+Proof: The number has to be in $R_1$, but can not be in $R_1 \setminus R_2$, which means it has to be in $R_1 \cap R_2$.
+It also has to be in $R_2$ at most once, which means it can not be in $R_2 \setminus R_1$.
+
+\subsection{Perfect matching strategies}
+
+This subsection lists all strategies that can be obtained by converting part of sudoku to
+perfect matching of a bipartite graph and using Hall's theorem.
+
+The proof of the strategy correctness and algorithm to find them is described in chapter (TODO: link).
+
+\subsubsection*{Naked Candidates}
+
+If there is $k$ cells in a region that together only contain $k$ numbers,
+the numbers can not be in any other cell in the region.
+
+\subsubsection*{Hidden Candidates}
+
+If there are $k$ numbers in a region that together only appear in $k$ cells,
+the numbers can not be in any other cell in the region.
+
+\subsubsection*{Generalised X Wing}
+
+Let $P$ and $Q$ be two sets of $n$ regions, such that each set of regions contains every cell of sudoku exactly once.
+(In the software it is rows+columns, rows+rectangular/jigsaw regions, columns+rectangular/jigsaw regions.)
+If all occurrences of a number in $k$ regions from $P$ appear only in $k$ regions in $Q$,
+the number can not appear in these regions in $Q$ anywhere else.
+
+\subsection{Edge Label}\label{subsec:formal-edge-label}
+
+This strategy can be used on a sudoku puzzle with an edge variant.
+
+Let $a$ and $b$ be two edge-adjacent sudoku cells with a label $l$, $S$ a sudoku state
+and $L_N$ the label-neighbourhood function from the edge variant.
+If there exists a number $c \in S_a$, such that no number in $S_b$ can result in a label $l$,
+$\forall d \in S_b: (c, d) \notin L_N(l)$,
+then the number $c$ can be removed from $S_a$.
+
+\subsection{Edge Region}
+
+This strategy can be used on a sudoku puzzle with an edge variant.
+
+Let $R$ be a sudoku region, $S$ be a sudoku state, $E$ be set of all edge-adjacent cells with a label
+and $m \in [n]$ be a sudoku number.
+Let $Q := \{r \in R \mid m \in S_r\}$ be set of all occurrences of number $m$ in $R$.
+Let $P := \{c \in [n]^2 \mid \forall d \in Q: (c, d) \in E \lor (d, c) \in E\}$ be set of all cells
+that are edge-adjacent with a label or equal to all occurrences of $m$ in $R$.
+
+In a valid solution, any cell $p$ in $P$ must either contain number $m$
+or be edge-adjacent with a label to a cell with number $m$.
+In a valid solution, the cell $p$ can only contain $m$
+or numbers that are allowed by Strategy~\ref{subsec:formal-edge-label} for at least one occurrence of $m$ in $Q$.
