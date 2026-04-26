@@ -1,224 +1,78 @@
-\chapter{Solving Strategies}
+\chapter{Formal Sudoku Rules}
 
-There are many generally known human-style strategies to solve a sudoku puzzle.
-This chapter describes all the strategies used in the software.
-All of them are either generally known, or generalised version of some.
+\section{State}\label{sec:state}
 
-In the beginning of solving an $n \times n$ sudoku puzzle,
-the software fills each empty cell with all numbers from 1 to n.
-These numbers are written in smaller font, to represent all possible numbers that can be in an empty cell.
-Then the software repeatedly tries to use all strategies, from the most simple to the most complicated,
-to remove some numbers that can not be part of the solution.
+\paragraph{Size}
+Size of an $n \times n$ sudoku is a positive integer $n$.
 
-The following pictures show examples of all strategies.
-Each strategy uses colored backgrounds to explain what numbers can be removed and why.
-Yellow background behind a number always means,
-that the number can be removed, because it can not be part of any solution.
-Green background behind a number has different meaning for each strategy,
-but generally it is the reason why the yellow number can be removed.
-Red background behind a number means, that the number is a reason why the sudoku puzzle can not have any solutions.
-Cells in the region where the strategy is applied have a blue background.
-If a strategy needs to highlight more than one type of region, it can use yellow and green background for a cell.
+\paragraph{State}
+State $S := \{S_{i,j} \mid i, j \in [n]\}$.
+Each element $S_{i,j} \subseteq [n]$.
 
-\section{Basic Strategies}\label{sec:basic-strategies}
+\subsection{Task}
 
-\subsection*{Naked Single}
+Task $T := \{T_{i,j} \mid i, j \in [n]\}$ is the initial state of an unsolved sudoku puzzle.
+Each element $T_{i,j}$ represents what numbers can be in the cell $(i, j)$ of a sudoku puzzle.
 
-If there can only be one number in a cell, this number can not be in any other cell in the same region.
+\subsection{Solution}
 
-\oneimagestrategyexample{naked-single}{Naked single}
+Solution is a sudoku state, such that every element $S_i$ has exactly one element.
+It represents solved sudoku puzzle.
+Each element $S_{i, j}$ represents what number is in the cell $(i, j)$ of a solved sudoku puzzle.
 
-\subsection*{Hidden Single}
+Solution $S$ is a valid solution of a sudoku puzzle with task $T$, if $S_{i,j} \subseteq T_{i,j}$ for every $(i, j)$.
 
-If a number can only be in one cell of a region, there can not be any other number in that cell.
+\section{Rules}
 
-\oneimagestrategyexample{hidden-single}{Hidden single}
+Section~\ref{sec:state} only requires valid solution to choose one number for each cell from task.
+Sudoku rules further restrict what a valid solution can be.
 
-\subsection*{Unsolvable sudoku}
+\subsection*{Regions}
 
-It is possible for a sudoku to not have any solution.
-Ideally sudoku puzzle has a single solution,
-but it is possible that the author made a mistake and there is none or multiple.
-Another way to arrive at a sudoku with no solutions is making a mistake while solving it and removing number
-that is in the solution.
+Let us have a sudoku puzzle with task $T$ and solution $S$.
 
-The software implements 4 different strategies to find out when sudoku does not have any solution.
+Sudoku puzzle has a finite set of regions $R := {R_1, R_2, ..., R_r}$.
+Each region $R_i$ is a set of n coordinates of cells of the puzzle.
+\[
+    \left|R_i\right| = n \land R_i \subseteq \{(i, j) \mid i, j \in [n]\}
+\]
 
-\oneimagestrategyexample{error-naked-0}{
-    There can not be any number in a cell. \\
-    (! means that all numbers have been removed and there is no number left.)
-}
-\oneimagestrategyexample{error-naked-1}{
-    Two cells in a region can only have one number.
-}
-\oneimagestrategyexample{error-hidden-0}{
-    A number can not be in any cell in a region. (5)
-}
-\oneimagestrategyexample{error-hidden-1}{
-    In a region there are multiple numbers that can only be in a single cell. (4 and 5)
-}
+Each region $R_i$ adds an extra requirement on a valid solution of the puzzle:
+Cells in a region must contain each number exactly once.
 
-\section{Harder Strategies}
+\subsection*{Variants}
 
-\subsection*{Pointing}
+Variant can add extra requirements for a valid solution, that can not be encoded by regions.
 
-If all occurrences of a number in a region are in another region,
-the number can not be in the second region in any other cells.
+A variant only needs to contain one validation function $v(S)$,
+which takes a puzzle's solution and returns true if the solution does not break any rule of the variant
+and returns false it does.
+If validation function returns false, the solution can not be valid.
 
-Because if you were to put the number in the second region but not in the first region,
-it would be impossible to put the number anywhere in the first region anymore.
+\subsection*{Edge variant}
 
-\twoimagesstrategyexample{pointing-row-rectangle}{pointing-rectangle-diagonal}{Two examples of Pointing strategy}
+An edge variant is a specific type of variant.
+All variants implemented in the software are edge variants.
 
-\subsection*{Naked candidates}
+Edge variant is $E := (L, E, E_L, L_N, V)$.
 
-If in $k$ cells of a region, there can only be $k$ different numbers,
-these numbers can not be in any other cell in the region.
+$L := [l]$
+is a set of labels.
 
-Because if you were to put the number in any other cell,
-there would be only $k - 1$ numbers that can be in the $k$ cells,
-which means that at least one cell would have to be empty.
+$E \subseteq \{(a, b) \mid a, b \in [n] \times [n] \land a \text{ is edge-adjacent to } b\}$ is a set of some edge-adjacent cells.
+If a pair of cells $(a, b) \in E$, then the cells $a$ and $b$ are label-adjacent.
 
-\twoimagesstrategyexample{naked-pair}{naked-triple}{Naked pair (left), Naked triple (right)}
+$E_L : E \to L$
+is an edge-label function, that for an edge-adjacent pair of cells with a label returns the label.
 
-\subsection*{Hidden candidates}
+$L_N : L \to 2^{[n] \times [n]}$
+is a label-neighbourhood function, that for a label returns set of all (oriented) allowed pairs of numbers for that label.
 
-If $k$ numbers can only be in $k$ cells of a region,
-there can not be any other numbers in these cells.
-
-This strategy works, because if you were to put any other number in one of these cells,
-there would be only $k - 1$ cells that can have the $k$ numbers,
-which means that at least one number could not be in any cell.
-
-\twoimagesstrategyexample{hidden-pair}{hidden-triple}{Hidden pair (left), Hidden triple (right)}
-
-\subsection*{X Wing}
-
-If all occurrences of a number in 2 rows are in 2 columns,
-that number can not be in the two columns anywhere else.
-That is because there has to be two occurrences of a number in the intersection of the 2 rows and columns,
-but each of them has to be in a different column.
-Which means that the number can not be in the 2 columns anywhere else.
-
-\twoimagesstrategyexample{x-wing-2-row}{x-wing-2-column}{
-    X Wing Row$\to$Column (left), X Wing Column$\to$Row (right)
-}
-
-\subsection*{Swordfish}
-
-Swordfish is another name for an X Wing, that instead of 2 rows and columns uses 3 of each.
-The same strategy exists for any amount of rows + columns.
-
-\twoimagesstrategyexamplebig{x-wing-3-row}{x-wing-3-column}{
-    Swordfish Row$\to$Column (left), Swordfish Column$\to$Row (right)
-}
-
-\subsection{X Wing for Other Regions}
-
-X Wing does not only work with row + column combination.
-It works with row/column + rectangular/jigsaw regions as well.
-The more general strategy is:
-If all occurrences of a number in $k$ regions of one type are in $k$ regions of another type,
-that number can not be in the second group of regions anywhere else.
-
-\oneimagestrategyexample{x-wing-jigsaw}{
-    X Wing Jigsaw region$\to$Row \\
-    (The 2 jigsaw regions on top can have number 3 only on the top 2 rows.)
-}
-
-\section{Variants}
-
-All sudoku variants implemented in the software are similar to each other,
-which means they can use the same generalised solving strategies.
-
-\subsection*{Edge Label}
-
-If there is a label on an edge, it means that only some combinations of numbers are allowed in the two adjacent cells.
-If there is a number in one of the cells that can not pair with any number in the other cell to create the label,
-you can remove it.
-Depending on what variant it is, there can be many ways to search for it.
-
-This subsection shows few examples of usage of this strategy.
-
-\twoimagesstrategyexample{consecutive-1-1}{consecutive-1-2}{
-    In consecutive sudoku, white dot can only be between two cells with different parity.
-    This works on chains of white dots.
-}
-
-\twoimagesstrategyexample{consecutive-2-1}{consecutive-2-2}{
-    In consecutive sudoku, if there is no dot on an edge, it means that the difference of the two numbers is not 1
-    (or 0 because it is in the same row/column).
-}
-
-\threeimagesstrategyexample{comparative-1-1}{comparative-1-2}{comparative-1-3}{
-    In comparative sudoku, the inequality sign means,
-    that one number can not be less/greater than the least/greatest number in the other cell.
-}
-
-\twoimagesstrategyexamplebig{kropki-1-1}{kropki-1-2}{
-    In kropki sudoku $9 \times 9$ black dot can not contain numbers 5, 7 or 9. (left image) \\
-    If in a kropki sudoku $9 \times 9$ three black dots cover 6 cells of a region,
-    the last three cells can only contain 3 numbers: 5, 7 and 9, because of Hidden triple strategy. (right image)
-}
-
-\subsection*{Edge Region}
-
-If all cells that can have the number $m$ in a region are adjacent or equal to a cell $c$,
-then regardless of where the number $m$ is in the region,
-it is either in the cell $c$ or in a cell that is adjacent to the cell $c$.
-Depending on what labels are between the cell $c$ and adjacent cells,
-it is possible that some numbers can not be in the cell $c$, no matter where the number $m$ is in the region.
-
-Look at the following two images, they show more specific examples of this strategy.
-
-\oneimagestrategyexample{region-consecutive-1-1}{
-    Consecutive sudoku $6 \times 6$ \\
-    In the second column, the number 2 can only appear in the three bottom rows (green number),
-    all of which border the cell in the fifth row (yellow cell). \\
-    Regardless of which of the 3 possible cells contains the number 2, the numbers 4,~5,~and~6
-    can not be in the yellow cell due to the white dots -- meaning only 2~and~3 can appear in the yellow cell.
-}
-
-\oneimagestrategyexample{region-consecutive-2-1}{
-    Consecutive sudoku $6 \times 6$ \\
-    In the second row, the number 4 can only appear in the second or third column (green number).
-    One of the two cells will have the number 4 and the other one will have 1,~2~or~6,
-    because in consecutive sudoku if there is no dot between two adjacent cells,
-    then there can not be number 4 next to 3~or~5.
-    We do not know which cell has 4 and which cell has 1,~2~or~6, but neither cell can have 3~or~5.
-}
-
-\section{Strategies On Paper}
-
-This section introduces strategies that might be more practical while solving a printed version of a sudoku.
-Unlike the strategies implemented by the software,
-these strategies do not require to write all numbers 1 to n in each empty cell at the beginning.
-Instead, they only search for cells that can be filled with the correct number directly.
-The software does not use them,
-because everything they can do can be done by strategies from Section~\ref{sec:basic-strategies}.
-
-Not needing to write all numbers 1 to n in each empty cell at beginning is useful for a printed version of a sudoku,
-because it takes less time.
-If the sudoku is simple enough, it might not even be necessary to write all possible numbers to all cells,
-maybe just write them to some cells instead.
-
-Another case is solving a big sudoku, for example $16 \times 16$,
-where writing all possible numbers in each cell becomes very impractical.
-
-\subsection*{Full House}
-
-If one cell is in a region with all but one number, the missing number has to be in the cell.
-
-The same can be done by Naked single strategy.
-
-\oneimagestrategyexample{full-house}{Full house}
-
-\subsection*{Hidden Single with Naked Single}
-
-Choose one number and look at what cells it can be.
-(What cells do not get eliminated using Naked single strategy.)
-If there is a region where it can only be on one position, it has to be there.
-
-The same can be done by Naked single strategy followed by Hidden single strategy.
-
-\oneimagestrategyexample{hidden-naked}{Hidden Single with Naked Single}
+$V$ is a validation function.
+For a solution $S$:
+\[
+    V(S) := \bigwedge_{(a, b) \in E} (S_a, S_b) \in L_N(E_L((a, b)))
+\]
+That means $V(S)$ returns true, if for each pair of label-adjacent cells $(a, b) \in E$:
+The pair of numbers $(S_a, S_b)$ in the solution $S$ is allowed by the label-neighbourhood function
+for the label $E_L((a, b))$.
