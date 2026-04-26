@@ -7,13 +7,13 @@ Let $S_{ALL} := \bigcup_{i=1}^k S_i$ be union of all valid solutions.
 
 \subsection*{State Relations}
 
-We define some state relations: substate, proper substate, state difference and state union.
+We define some state relations and operations:
 
 \begin{align*}
-    U \succeq V &:= \forall i, j \in [n]: U_{i, j} \supseteq V_{i, j} \\
-    U \succ V &:= U \succeq V \land U \neq V \\
-    (U \setminus V)_{i, j} &:= U_{i, j} \setminus V_{i, j} \\
-    (U \cup V)_{i, j} &:= U_{i, j} \cup V_{i, j}
+    \text{$V$ is a substate of $U$}: U \succeq V &:= \forall i, j \in [n]: U_{i, j} \supseteq V_{i, j} \\
+    \text{$V$ is a proper substate of $U$}: U \succ V &:= U \succeq V \land U \neq V \\
+    \text{The difference of $U$ and $V$}: (U \setminus V)_{i, j} &:= U_{i, j} \setminus V_{i, j} \\
+    \text{The union of $U$ and $V$}: (U \cup V)_{i, j} &:= U_{i, j} \cup V_{i, j}
 \end{align*}
 
 \subsection*{Strategy}
@@ -27,8 +27,10 @@ If it is unable to do so, it returns null.
 
 \subsection*{Solving Sequence}
 
+The software is only allowed to progress in solving the sudoku using available strategies.
+
 The goal of solving is to find a sequence $T = U_0 \succ U_1 \succ ... \succ U_l \succeq S_{ALL}$,
-such that for all $i \in \mathbb{N}_0$ you can obtain $U_{i + 1}$ from $U_i$ using any strategy.
+such that for all $i \in \mathbb{N}_0$, $U_{i + 1}$ can be obtained from $U_i$ using any available strategy.
 
 \section{Used Strategies}
 
@@ -51,6 +53,8 @@ This subsection lists all strategies that can be obtained by converting part of 
 perfect matching of a bipartite graph and using Hall's theorem.
 
 The proof of the strategy correctness and algorithm to find them is described in chapter (TODO: link).
+
+Number $k \in [n - 1]$ is called strategy size.
 
 \subsubsection*{Naked Candidates}
 
@@ -83,13 +87,13 @@ then the number $c$ can be removed from $S_a$.
 
 This strategy can be used on a sudoku puzzle with an edge variant.
 
-Let $R$ be a sudoku region, $S$ be a sudoku state, $E$ be set of all edge-adjacent cells with a label
+Let $R$ be a sudoku region, $S$ be a sudoku state, $E$ be the set of all label-adjacent pairs of cells
 and $m \in [n]$ be a sudoku number.
-Let $Q := \{r \in R \mid m \in S_r\}$ be set of all occurrences of number $m$ in $R$.
-Let $P := \{c \in [n]^2 \mid \forall d \in Q: (c, d) \in E \lor (d, c) \in E\}$ be set of all cells
-that are edge-adjacent with a label or equal to all occurrences of $m$ in $R$.
+Let $Q := \{r \in R \mid m \in S_r\}$ be the set of all cells of region $R$ containing the number $m$.
+Let $P := \{c \in [n] \times [n] \mid \forall d \in Q:  c = d \lor (c, d) \in E \lor (d, c) \in E\}$ be set of all cells
+that are label-adjacent or equal to all cells in $Q$.
 
-In a valid solution, any cell $p$ in $P$ must either contain number $m$
-or be edge-adjacent with a label to a cell with number $m$.
-In a valid solution, the cell $p$ can only contain $m$
+In a valid solution, regardless of where in $R$ is the number $m$, any cell $p$ in $P$ must either contain number $m$
+or be label-adjacent to a cell containing the number $m$.
+Because of that, in a valid solution, the cell $p$ can only contain $m$
 or numbers that are allowed by Strategy~\ref{subsec:formal-edge-label} for at least one occurrence of $m$ in $Q$.

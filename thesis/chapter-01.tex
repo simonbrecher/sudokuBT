@@ -2,52 +2,97 @@
 
 \section{Basic sudoku}
 
-Fill one number $1\text{--}n$ to every empty cell such that each region
-contains every number exactly once.
-Every row and column is a region by default.
-Additional regions may be defined by the puzzle, such as boxes separated by a stronger border,
-diagonals, or custom regions highlighted by an outline around a set of cells.
+\begin{itemize}
+    \item In sudoku $n \times n$ fill one number $1\text{--}n$ to every empty cell
+    such that each region contains every number exactly once.
+    \item Every row and column is a region by default.
+    \item Additional regions may be defined by the puzzle, such as boxes separated by a stronger border,
+    diagonals, or custom regions highlighted by an outline around a set of cells.
+\end{itemize}
 
+\subsection*{Latin square}
+\begin{itemize}
+    \item Fill one number $1\text{--}6$ to every empty cell.
+    \item Each row and column must contain every number exactly once.
+\end{itemize}
 \twoimagesruleexample{latin-square}{Latin square $6 \times 6$}
+
+\subsection*{Sudoku}
+\begin{itemize}
+    \item Fill one number $1\text{--}6$ to every empty cell.
+    \item Each row, column and rectangle $3 \times 2$ must contain every number exactly once.
+\end{itemize}
 \twoimagesruleexample{sudoku}{Sudoku $6 \times 6$}
+
+\subsection*{Jigsaw sudoku}
+\begin{itemize}
+    \item Fill one number $1\text{--}6$ to every empty cell.
+    \item Each row, column and region must contain every number exactly once.
+\end{itemize}
 \twoimagesruleexample{jigsaw}{Jigsaw sudoku $6 \times 6$}
+
+\subsection*{Diagonal sudoku}
+\begin{itemize}
+    \item Fill one number $1\text{--}6$ to every empty cell.
+    \item Each row, column, rectangle $3 \times 2$ and diagonal must contain every number exactly once.
+\end{itemize}
 \twoimagesruleexample{diagonal}{Diagonal sudoku $6 \times 6$}
+
+\subsection*{Sudoku with extra regions}
+\begin{itemize}
+    \item Fill one number $1\text{--}6$ to every empty cell.
+    \item Each row, column, rectangle $3 \times 2$ and gray extra region must contain every number exactly once.
+\end{itemize}
 \twoimagesruleexample{extra-region}{Sudoku $6 \times 6$ with one extra region}
 
 \section{Variants}
 
+Variants add extra rules on top of basic sudoku rules.
+
+You can find all the variants mentioned in this thesis (TODO: link).
+
 \subsection*{Consecutive}
 
-If there is a white dot between two adjacent cells, the absolute difference of their values equals 1.
-If there is no dot between two adjacent cells, the difference of their value is not 1.
+\begin{itemize}
+    \item If there is a white dot between two adjacent cells, the absolute difference of their values equals 1.
+    \item If there is no dot between two adjacent cells, the difference of their value is not 1.
+\end{itemize}
 
 \twoimagesruleexample{consecutive}{Consecutive sudoku $6 \times 6$}
 
 \subsection*{Kropki}
 
-If there is a white dot between two adjacent cells, the absolute difference of their values equals 1.
-If there is a black dot between two adjacent cells, one value is exactly twice the other.
-If both conditions hold, there is either black or white dot, but not both.
-If there is no dot between two adjacent cells, neither condition holds.
+\begin{itemize}
+    \item If there is a white dot between two adjacent cells, the absolute difference of their values equals 1.
+    \item If there is a black dot between two adjacent cells, one value is exactly twice the other.
+    \item If both conditions hold, there is either black or white dot, but not both.
+    \item If there is no dot between two adjacent cells, neither condition holds.
+\end{itemize}
 
 \twoimagesruleexample{kropki}{Kropki sudoku $6 \times 6$}
 
 \subsection*{VX}
 
-If there is a V between two adjacent cells, the sum of their values equals 5.
-If there is an X between two adjacent cells, the sum of their values equals 10.
-If no V or X is present, the sum of their values is not 5 or 10.
+\begin{itemize}
+    \item If there is a V between two adjacent cells, the sum of their values equals 5.
+    \item If there is an X between two adjacent cells, the sum of their values equals 10.
+    \item If no V or X is present, the sum of their values is not 5 or 10.
+\end{itemize}
 
 \twoimagesruleexample{vx}{VX sudoku $6 \times 6$}
 
 \subsection*{Comparative}
 
-Some adjacent cells are connected by an inequality sign, values of the two cells must satisfy it.
+\begin{itemize}
+    \item Some adjacent cells are connected by an inequality sign, values of the two cells must satisfy it.
+\end{itemize}
 
 \twoimagesruleexample{comparative}{Comparative sudoku $6 \times 6$}
 
 \subsection*{Sum}
 
-Some adjacent cells are connected by a number, sum of the values in the two cells must equal that number.
+\begin{itemize}
+    \item Some adjacent cells are connected by a number, sum of the values in the two cells must equal that number.
+\end{itemize}
 
 \twoimagesruleexample{sum}{Sum sudoku $6 \times 6$}

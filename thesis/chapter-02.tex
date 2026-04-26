@@ -6,12 +6,12 @@
 Size of an $n \times n$ sudoku is a positive integer $n$.
 
 \paragraph{State}
-State $S := \{S_{i,j} | i, j \in [n]\}$.
+State $S := \{S_{i,j} \mid i, j \in [n]\}$.
 Each element $S_{i,j} \subseteq [n]$.
 
 \subsection{Task}
 
-Task $T := \{T_{i,j} | i, j \in [n]\}$ is the initial state of an unsolved sudoku puzzle.
+Task $T := \{T_{i,j} \mid i, j \in [n]\}$ is the initial state of an unsolved sudoku puzzle.
 Each element $T_{i,j}$ represents what numbers can be in the cell $(i, j)$ of a sudoku puzzle.
 
 \subsection{Solution}
@@ -34,7 +34,7 @@ Let us have a sudoku puzzle with task $T$ and solution $S$.
 Sudoku puzzle has a finite set of regions $R := {R_1, R_2, ..., R_r}$.
 Each region $R_i$ is a set of n coordinates of cells of the puzzle.
 \[
-    \left|R_i\right| = n \land R_i \subseteq \{(i, j) | i, j \in [n]\}
+    \left|R_i\right| = n \land R_i \subseteq \{(i, j) \mid i, j \in [n]\}
 \]
 
 Each region $R_i$ adds an extra requirement on a valid solution of the puzzle:
@@ -46,21 +46,21 @@ Variant can add extra requirements for a valid solution, that can not be encoded
 
 A variant only needs to contain one validation function $v(S)$,
 which takes a puzzle's solution and returns true if the solution does not break any rule of the variant
-and returns false it it does.
+and returns false it does.
 If validation function returns false, the solution can not be valid.
 
 \subsection*{Edge variant}
 
-Edge variant is a specific type of variant.
+An edge variant is a specific type of variant.
 All variants implemented in the software are edge variants.
 
-Edge variant $E := (L, E, E_L, L_N, V)$.
+Edge variant is $E := (L, E, E_L, L_N, V)$.
 
 $L := [l]$
 is a set of labels.
 
-$E \subseteq \{(a, b) | a, b \in [n] \times [n] \land a \text{ is edge-adjacent to } b\}$
-is a set of edge-adjacent cells with a label.
+$E \subseteq \{(a, b) \mid a, b \in [n] \times [n] \land a \text{ is edge-adjacent to } b\}$ is a set of some edge-adjacent cells.
+If a pair of cells $(a, b) \in E$, then the cells $a$ and $b$ are label-adjacent.
 
 $E_L : E \to L$
 is an edge-label function, that for an edge-adjacent pair of cells with a label returns the label.
@@ -68,7 +68,11 @@ is an edge-label function, that for an edge-adjacent pair of cells with a label 
 $L_N : L \to 2^{[n] \times [n]}$
 is a label-neighbourhood function, that for a label returns set of all (oriented) allowed pairs of numbers for that label.
 
-$V$ is a validation function that returns true, if for each pair of edge-adjacent cells $(a, b) \in E$ with a label $E_L((a, b))$:
-The pair of numbers $\{S_a, S_b\}$ in solution $S$ is allowed by the label-neighbourhood function for the label.
-
-In other words: $V(S) := \bigwedge_{(a, b) \in E} (S_a, S_b) \in L_N(E_L((a, b)))$
+$V$ is a validation function.
+For a solution $S$:
+\[
+    V(S) := \bigwedge_{(a, b) \in E} (S_a, S_b) \in L_N(E_L((a, b)))
+\]
+That means $V(S)$ returns true, if for each pair of label-adjacent cells $(a, b) \in E$:
+The pair of numbers $(S_a, S_b)$ in the solution $S$ is allowed by the label-neighbourhood function
+for the label $E_L((a, b))$.

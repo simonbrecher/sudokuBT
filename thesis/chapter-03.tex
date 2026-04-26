@@ -4,11 +4,21 @@ There are many generally known human-style strategies to solve a sudoku puzzle.
 This chapter describes all the strategies used in the software.
 All of them are either generally known, or generalised version of some.
 
-In the beginning of solving an $n \times n$ sudoku puzzle
-the software fills in small numbers $1 \text{--} n$ to all empty cells
-and then repeatedly uses solving strategies to remove them.
-Yellow background means, that the number can be removed.
-Green background means, that the number is a reason why yellow numbers can be removed.
+In the beginning of solving an $n \times n$ sudoku puzzle,
+the software fills each empty cell with all numbers from 1 to n.
+These numbers are written in smaller font, to represent all possible numbers that can be in an empty cell.
+Then the software repeatedly tries to use all strategies, from the most simple to the most complicated,
+to remove some numbers that can not be part of the solution.
+
+The following pictures show examples of all strategies.
+Each strategy uses colored backgrounds to explain what numbers can be removed and why.
+Yellow background behind a number always means,
+that the number can be removed, because it can not be part of any solution.
+Green background behind a number has different meaning for each strategy,
+but generally it is the reason why the yellow number can be removed.
+Red background behind a number means, that the number is a reason why the sudoku puzzle can not have any solutions.
+Cells in the region where the strategy is applied have a blue background.
+If a strategy needs to highlight more than one type of region, it can use yellow and green background for a cell.
 
 \section{Basic Strategies}\label{sec:basic-strategies}
 
@@ -26,13 +36,27 @@ If a number can only be in one cell of a region, there can not be any other numb
 
 \subsection*{Unsolvable sudoku}
 
-Some sudoku puzzles might not have any solution.
-There are strategies that can prove that a sudoku puzzle does not have any solution.
+It is possible for a sudoku to not have any solution.
+Ideally sudoku puzzle has a single solution,
+but it is possible that the author made a mistake and there is none or multiple.
+Another way to arrive at a sudoku with no solutions is making a mistake while solving it and removing number
+that is in the solution.
 
-\oneimagestrategyexample{error-naked-0}{There can not be any number in a cell.}
-\oneimagestrategyexample{error-naked-1}{Two cells in a region can only have one number.}
-\oneimagestrategyexample{error-hidden-0}{A number can not be in any cell in a region.}
-\oneimagestrategyexample{error-hidden-1}{In a region there are multiple numbers that can only be in a single cell.}
+The software implements 4 different strategies to find out when sudoku does not have any solution.
+
+\oneimagestrategyexample{error-naked-0}{
+    There can not be any number in a cell. \\
+    (! means that all numbers have been removed and there is no number left.)
+}
+\oneimagestrategyexample{error-naked-1}{
+    Two cells in a region can only have one number.
+}
+\oneimagestrategyexample{error-hidden-0}{
+    A number can not be in any cell in a region. (5)
+}
+\oneimagestrategyexample{error-hidden-1}{
+    In a region there are multiple numbers that can only be in a single cell. (4 and 5)
+}
 
 \section{Harder Strategies}
 
@@ -48,11 +72,11 @@ it would be impossible to put the number anywhere in the first region anymore.
 
 \subsection*{Naked candidates}
 
-If in $n$ cells of a region, there can only be $n$ different numbers,
+If in $k$ cells of a region, there can only be $k$ different numbers,
 these numbers can not be in any other cell in the region.
 
 Because if you were to put the number in any other cell,
-there would be only $n - 1$ numbers that can be in the $n$ cells,
+there would be only $k - 1$ numbers that can be in the $k$ cells,
 which means that at least one cell would have to be empty.
 
 \twoimagesstrategyexample{naked-pair}{naked-triple}{Naked pair (left), Naked triple (right)}
@@ -62,7 +86,7 @@ which means that at least one cell would have to be empty.
 If $k$ numbers can only be in $k$ cells of a region,
 there can not be any other numbers in these cells.
 
-Because if you were to put any other number in one of these cells,
+This strategy works, because if you were to put any other number in one of these cells,
 there would be only $k - 1$ cells that can have the $k$ numbers,
 which means that at least one number could not be in any cell.
 
@@ -107,28 +131,22 @@ that number can not be in the second group of regions anywhere else.
 All sudoku variants implemented in the software are similar to each other,
 which means they can use the same generalised solving strategies.
 
-\subsection*{All Label Combinations}
+\subsection*{Edge Label}
 
 If there is a label on an edge, it means that only some combinations of numbers are allowed in the two adjacent cells.
-If there is a number in one of the cells, that can not pair with any number in the other cell to create the label,
+If there is a number in one of the cells that can not pair with any number in the other cell to create the label,
 you can remove it.
 Depending on what variant it is, there can be many ways to search for it.
 
-This subsection shows few examples of usage of the strategy.
-
-\twoimagesstrategyexamplebig{kropki-1-1}{kropki-1-2}{
-    In kropki $9 \times 9$ black dot can not contain numbers 5, 7 or 9. \\
-    If there is 3 dots in a single region, there will be only 3 cells left that can have these numbers. (Hidden triple.)
-}
+This subsection shows few examples of usage of this strategy.
 
 \twoimagesstrategyexample{consecutive-1-1}{consecutive-1-2}{
-    In consecutive sudoku (or kropki), white dot can only be between two cells with different parity.
+    In consecutive sudoku, white dot can only be between two cells with different parity.
     This works on chains of white dots.
 }
 
 \twoimagesstrategyexample{consecutive-2-1}{consecutive-2-2}{
-    In consecutive sudoku (or kropki), if there is no dot on an edge,
-    it means that the absolute difference of the two numbers is not 1
+    In consecutive sudoku, if there is no dot on an edge, it means that the difference of the two numbers is not 1
     (or 0 because it is in the same row/column).
 }
 
@@ -137,33 +155,61 @@ This subsection shows few examples of usage of the strategy.
     that one number can not be less/greater than the least/greatest number in the other cell.
 }
 
-\subsection*{All Occurrences of a Number in a Region}
+\twoimagesstrategyexamplebig{kropki-1-1}{kropki-1-2}{
+    In kropki sudoku $9 \times 9$ black dot can not contain numbers 5, 7 or 9. (left image) \\
+    If in a kropki sudoku $9 \times 9$ three black dots cover 6 cells of a region,
+    the last three cells can only contain 3 numbers: 5, 7 and 9, because of Hidden triple strategy. (right image)
+}
 
-If all occurrences of a number in a region border a cell, then we know that the cell has to be adjacent to the number.
-That means, that only numbers that can border that number can be in that cell.
+\subsection*{Edge Region}
+
+If all cells that can have the number $m$ in a region are adjacent or equal to a cell $c$,
+then regardless of where the number $m$ is in the region,
+it is either in the cell $c$ or in a cell that is adjacent to the cell $c$.
+Depending on what labels are between the cell $c$ and adjacent cells,
+it is possible that some numbers can not be in the cell $c$, no matter where the number $m$ is in the region.
+
+Look at the following two images, they show more specific examples of this strategy.
 
 \oneimagestrategyexample{region-consecutive-1-1}{
     Consecutive sudoku $6 \times 6$ \\
-    In the second column, the number 2 can only appear in the three bottom rows (green),
-    all of which border the cell in the fifth row (yellow). \\
+    In the second column, the number 2 can only appear in the three bottom rows (green number),
+    all of which border the cell in the fifth row (yellow cell). \\
     Regardless of which of the 3 possible cells contains the number 2, the numbers 4,~5,~and~6
-    can not be in the yellow cell due to the white dots --
-    meaning only 2~and~3 can appear in the yellow cell.
+    can not be in the yellow cell due to the white dots -- meaning only 2~and~3 can appear in the yellow cell.
+}
+
+\oneimagestrategyexample{region-consecutive-2-1}{
+    Consecutive sudoku $6 \times 6$ \\
+    In the second row, the number 4 can only appear in the second or third column (green number).
+    One of the two cells will have the number 4 and the other one will have 1,~2~or~6,
+    because in consecutive sudoku if there is no dot between two adjacent cells,
+    then there can not be number 4 next to 3~or~5.
+    We do not know which cell has 4 and which cell has 1,~2~or~6, but neither cell can have 3~or~5.
 }
 
 \section{Strategies On Paper}
 
-This section introduces strategies that can be used while solving sudoku on paper.
-The strategies do not require any small numbers.
-They are not used by the software,
-because any progress they make can be done using basic strategies from Section \ref{sec:basic-strategies}.
+This section introduces strategies that might be more practical while solving a printed version of a sudoku.
+Unlike the strategies implemented by the software,
+these strategies do not require to write all numbers 1 to n in each empty cell at the beginning.
+Instead, they only search for cells that can be filled with the correct number directly.
+The software does not use them,
+because everything they can do can be done by strategies from Section~\ref{sec:basic-strategies}.
 
-When solving a big sudoku, for example $16 \times 16$, writing in all small numbers becomes impractical.
-It is better to only use the next 2 strategies.
+Not needing to write all numbers 1 to n in each empty cell at beginning is useful for a printed version of a sudoku,
+because it takes less time.
+If the sudoku is simple enough, it might not even be necessary to write all possible numbers to all cells,
+maybe just write them to some cells instead.
+
+Another case is solving a big sudoku, for example $16 \times 16$,
+where writing all possible numbers in each cell becomes very impractical.
 
 \subsection*{Full House}
 
 If one cell is in a region with all but one number, the missing number has to be in the cell.
+
+The same can be done by Naked single strategy.
 
 \oneimagestrategyexample{full-house}{Full house}
 
@@ -172,5 +218,7 @@ If one cell is in a region with all but one number, the missing number has to be
 Choose one number and look at what cells it can be.
 (What cells do not get eliminated using Naked single strategy.)
 If there is a region where it can only be on one position, it has to be there.
+
+The same can be done by Naked single strategy followed by Hidden single strategy.
 
 \oneimagestrategyexample{hidden-naked}{Hidden Single with Naked Single}
