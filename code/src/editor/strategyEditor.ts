@@ -39,7 +39,7 @@ class StrategyEditor {
             isUsable: (sudoku: Sudoku) => sudoku.hasEdgeVariant(),
         },
         {
-            name: "X Wing",
+            name: "X-Wing",
             strategy: SudokuStrategy.intersection.bind(SudokuStrategy),
             isUsable: (sudoku: Sudoku) => true,
         },

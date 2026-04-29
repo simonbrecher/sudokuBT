@@ -2,93 +2,97 @@
 
 \section{Solving a Sudoku Puzzle}
 
-Let us have a sudoku puzzle with task $T$ and $k \in \mathbb{N}_0$ valid solutions $S_i$.
-Let $S_{ALL} := \bigcup_{i=1}^k S_i$ be union of all valid solutions.
-
-\subsection*{State Relations}
-
-We define some state relations and operations:
-
-\begin{align*}
-    \text{$V$ is a substate of $U$}: U \succeq V &:= \forall i, j \in [n]: U_{i, j} \supseteq V_{i, j} \\
-    \text{$V$ is a proper substate of $U$}: U \succ V &:= U \succeq V \land U \neq V \\
-    \text{The difference of $U$ and $V$}: (U \setminus V)_{i, j} &:= U_{i, j} \setminus V_{i, j} \\
-    \text{The union of $U$ and $V$}: (U \cup V)_{i, j} &:= U_{i, j} \cup V_{i, j}
-\end{align*}
+Let us have a Sudoku puzzle with size $n$ and task $T$.
+Let $S_{ALL}$ be the union of all valid solutions.
 
 \subsection*{Strategy}
 
-Strategy is an algorithm that takes state $U_1$ and tries to find a state $U_2$, so that:
+Strategy is an algorithm that takes a state $U_1$ and tries to find a state $U_2$, so that:
 $U_1 \succ U_2$ and $U_2 \succeq S_{ALL}$.
 
 If strategy is able to find $U_2$ and explain why all numbers in $U_1 \setminus U_2$
-can not be part of any valid solution, it returns $U_1 \setminus U_2$.
+cannot be part of any valid solution, it returns $U_1 \setminus U_2$.
 If it is unable to do so, it returns null.
 
 \subsection*{Solving Sequence}
 
-The software is only allowed to progress in solving the sudoku using available strategies.
+The software is only allowed to progress in solving the Sudoku using available strategies.
 
-The goal of solving is to find a sequence $T = U_0 \succ U_1 \succ ... \succ U_l \succeq S_{ALL}$,
-such that for all $i \in \mathbb{N}_0$, $U_{i + 1}$ can be obtained from $U_i$ using any available strategy.
+The goal of solving is to find a sequence $T = U_0 \succ U_1 \succ \dots \succ U_l \succeq S_{ALL}$,
+such that for all $i$, $0 \leq i < l$,
+the state $U_{i + 1}$ can be obtained from the state $U_i$ by at least one available strategy, and
+it is not possible to obtain any following state from $U_l$ by any available strategy.
 
 \section{Used Strategies}
 
-This section describes all strategies used in the software.
+This section defines all strategies used in the software.
 
 \subsection{Pointing}
 
-Let $R_1$ and $R_2$ be any two sudoku regions,
-such that $R_1 \setminus R_2 \neq \emptyset \land R_2 \setminus R_1 \neq \emptyset \land R_1 \cap R_2 \neq \emptyset$.
+Let $R_1$ and $R_2$ be two different Sudoku regions, that have non-empty intersectin.
+Since the size of all Sudoku regions is $n$, there are three non-empty parts of $R_1 \cup R_2$ ---
+$R_1 \setminus R_2$, $R_2 \setminus R_1$, and $R_1 \cap R_2$.
 
-Strategy Pointing says: If a number can not be in any cell from $R_1 \setminus R_2$,
-then it can not be in any cell from $R_2 \setminus R_1$.
+\begin{thm}[Pointing Strategy]
+    If a Sudoku number $m$ cannot be in any cell of $R_1 \setminus R_2$,
+    it cannot be in any cell of $R_2 \setminus R_1$.
+\end{thm}
 
-Proof: The number has to be in $R_1$, but can not be in $R_1 \setminus R_2$, which means it has to be in $R_1 \cap R_2$.
-It also has to be in $R_2$ at most once, which means it can not be in $R_2 \setminus R_1$.
+\begin{proof}
+    According to the Sudoku rules, in each region, the Sudoku number $m$ must appear in exactly one cell.
+    Since $m$ cannot be in $R_1 \setminus R_2$, it has to be in $R_1 \cap R_2$,
+    hence it cannot be in $R_2 \setminus R_1$.
+\end{proof}
 
-\subsection{Perfect matching strategies}
+\subsection{Perfect Matching Strategies}
 
-This subsection lists all strategies that can be obtained by converting part of sudoku to
+This subsection lists all strategies that can be explained by transforming a part of a Sudoku state to
 perfect matching of a bipartite graph and using Hall's theorem.
 
-The proof of the strategy correctness and algorithm to find them is described in chapter (TODO: link).
+The proof of correctness of these strategy and an algorithm that can find them is in Chapter~\ref{chap:5}.
 
-Number $k \in [n - 1]$ is called strategy size.
+\begin{defn}
+    The \emph{Strategy size} of a Perfect matching strategy is a number $k \in [n - 1]$, where $n$ is the Sudoku size.
+\end{defn}
 
 \subsubsection*{Naked Candidates}
 
-If there is $k$ cells in a region that together only contain $k$ numbers,
-the numbers can not be in any other cell in the region.
+If there is $k$ cells in a Sudoku region that together only contain $k$ numbers,
+these numbers cannot be in any other cell in the region.
 
 \subsubsection*{Hidden Candidates}
 
-If there are $k$ numbers in a region that together only appear in $k$ cells,
-the numbers can not be in any other cell in the region.
+If there are $k$ numbers in a Sudoku region that together only appear in $k$ cells,
+these numbers cannot be in any other cell in the region.
 
-\subsubsection*{Generalised X Wing}
+\subsubsection*{Generalised X-Wing}
 
-Let $P$ and $Q$ be two sets of $n$ regions, such that each set of regions contains every cell of sudoku exactly once.
+Let $m$ be a Sudoku number and
+let $P$ and $Q$ be two sets of $n$ Sudoku regions
+such that each cell of the Sudoku appears in exactly one region of each set.
 (In the software it is rows+columns, rows+rectangular/jigsaw regions, columns+rectangular/jigsaw regions.)
-If all occurrences of a number in $k$ regions from $P$ appear only in $k$ regions in $Q$,
-the number can not appear in these regions in $Q$ anywhere else.
+If all occurrences of the Sudoku number $m$ in $k$ regions from $P$ appear only in $k$ regions in $Q$,
+$m$ cannot appear in these regions in $Q$ anywhere else.
+(TODO: is this clear?)
 
 \subsection{Edge Label}\label{subsec:formal-edge-label}
 
-This strategy can be used on a sudoku puzzle with an edge variant.
+This strategy can be used on a Sudoku puzzle with an edge variant.
 
-Let $a$ and $b$ be two edge-adjacent sudoku cells with a label $l$, $S$ a sudoku state
+Let $a$ and $b$ be two edge-adjacent Sudoku cells with a label $l$, $S$ a Sudoku state
 and $L_N$ the label-neighbourhood function from the edge variant.
-If there exists a number $c \in S_a$, such that no number in $S_b$ can result in a label $l$,
+If there exists a number $c \in S_a$ such that no number in $S_b$ can result in a label $l$,
 $\forall d \in S_b: (c, d) \notin L_N(l)$,
 then the number $c$ can be removed from $S_a$.
 
+% TODO: check again
+
 \subsection{Edge Region}
 
-This strategy can be used on a sudoku puzzle with an edge variant.
+This strategy can be used on a Sudoku puzzle with an edge variant.
 
-Let $R$ be a sudoku region, $S$ be a sudoku state, $E$ be the set of all label-adjacent pairs of cells
-and $m \in [n]$ be a sudoku number.
+Let $R$ be a Sudoku region, $S$ be a Sudoku state, $E$ be the set of all label-adjacent pairs of cells
+and $m \in [n]$ be a Sudoku number.
 Let $Q := \{r \in R \mid m \in S_r\}$ be the set of all cells of region $R$ containing the number $m$.
 Let $P := \{c \in [n] \times [n] \mid \forall d \in Q:  c = d \lor (c, d) \in E \lor (d, c) \in E\}$ be set of all cells
 that are label-adjacent or equal to all cells in $Q$.
@@ -97,3 +101,5 @@ In a valid solution, regardless of where in $R$ is the number $m$, any cell $p$ 
 or be label-adjacent to a cell containing the number $m$.
 Because of that, in a valid solution, the cell $p$ can only contain $m$
 or numbers that are allowed by Strategy~\ref{subsec:formal-edge-label} for at least one occurrence of $m$ in $Q$.
+
+% TODO: check again

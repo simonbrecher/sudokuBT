@@ -2,52 +2,79 @@
 
 \section{State}\label{sec:state}
 
-\paragraph{Size}
-Size of an $n \times n$ sudoku is a positive integer $n$.
+\begin{defn}
+    The \emph{Sudoku size} of an $n \times n$ Sudoku puzzle is a positive integer $n$.
+\end{defn}
 
-\paragraph{State}
-State $S := \{S_{i,j} \mid i, j \in [n]\}$.
-Each element $S_{i,j} \subseteq [n]$.
+\begin{defn}
+    A \emph{Sudoku state} $U := \{U_{i,j} \mid i, j \in [n]\}$.
+    Each element $U_{i,j} \subseteq [n]$.
+\end{defn}
 
-\subsection{Task}
+\begin{defn}
+    The \emph{Sudoku task} $T := \{T_{i,j} \mid i, j \in [n]\}$ is the initial state of an unsolved Sudoku puzzle.
+    Each element $T_{i,j}$ represents what Sudoku numbers can be in the cell $(i, j)$ of a Sudoku puzzle.
+\end{defn}
 
-Task $T := \{T_{i,j} \mid i, j \in [n]\}$ is the initial state of an unsolved sudoku puzzle.
-Each element $T_{i,j}$ represents what numbers can be in the cell $(i, j)$ of a sudoku puzzle.
+\begin{defn}
+    A \emph{Sudoku solution} $S$ is a Sudoku state such that every element $S_i$ has exactly one Sudoku number.
+    It represents solved Sudoku puzzle.
+    Each element $S_{i, j}$ represents what Sudoku number is in the cell $(i, j)$ of a solved Sudoku puzzle.
+\end{defn}
 
-\subsection{Solution}
+\begin{defn}
+    A Sudoku solution $S$ is \emph{valid} for a Sudoku puzzle with a task $T$, if
+    $S_{i,j} \subseteq T_{i,j}$ for every $(i, j)$, and
+    all Sudoku rules (all Sudoku regions and the variant) are satisfied.
+\end{defn}
 
-Solution is a sudoku state, such that every element $S_i$ has exactly one element.
-It represents solved sudoku puzzle.
-Each element $S_{i, j}$ represents what number is in the cell $(i, j)$ of a solved sudoku puzzle.
+\begin{defn}
+    \emph{$V$ is a substate of $U$}: $U \succeq V := \forall i, j \in [n]: U_{i, j} \supseteq V_{i, j}$
+\end{defn}
 
-Solution $S$ is a valid solution of a sudoku puzzle with task $T$, if $S_{i,j} \subseteq T_{i,j}$ for every $(i, j)$.
+\begin{defn}
+    \emph{$V$ is a proper substate of $U$}: $U \succ V := U \succeq V \land U \neq V$
+\end{defn}
+
+\begin{defn}
+    \emph{The difference of $U$ and $V$}: $(U \setminus V)_{i, j} := U_{i, j} \setminus V_{i, j}$
+\end{defn}
+
+\begin{defn}
+    \emph{The union of $U$ and $V$}: $(U \cup V)_{i, j} := U_{i, j} \cup V_{i, j}$
+\end{defn}
+
+\begin{defn}
+    \emph{The union of all valid solutions} is $S_{ALL} := \bigcup S_i$, where
+    $S_i$ are all the valid solutions for a Sudoku puzzle with a task $T$.
+\end{defn}
 
 \section{Rules}
 
-Section~\ref{sec:state} only requires valid solution to choose one number for each cell from task.
-Sudoku rules further restrict what a valid solution can be.
+The definition in Section~\ref{sec:state} only specifies that
+a valid solution chooses one number for each cell from the task.
+Sudoku rules further restrict which solutions can be a valid solution.
+
+Let us have a Sudoku puzzle with size $n$, task $T$, and a solution $S$.
+Let $S_{ALL}$ be the union of all valid solutions.
 
 \subsection*{Regions}
 
-Let us have a sudoku puzzle with task $T$ and solution $S$.
-
-Sudoku puzzle has a finite set of regions $R := {R_1, R_2, ..., R_r}$.
-Each region $R_i$ is a set of n coordinates of cells of the puzzle.
-\[
-    \left|R_i\right| = n \land R_i \subseteq \{(i, j) \mid i, j \in [n]\}
-\]
+A Sudoku puzzle has a finite set of Sudoku regions $R := {R_1, R_2, \dots, R_r}$,
+where a region $R_i \in ([n] \times [n])^n$ is an array of $n$ coordinates of cells of the Sudoku puzzle.
 
 Each region $R_i$ adds an extra requirement on a valid solution of the puzzle:
-Cells in a region must contain each number exactly once.
+Cells in a region must contain each Sudoku number exactly once.
+(TODO: highlight the text of the rule?)
 
 \subsection*{Variants}
 
-Variant can add extra requirements for a valid solution, that can not be encoded by regions.
+A variant adds extra requirements for a valid solution that cannot be encoded by regions.
 
-A variant only needs to contain one validation function $v(S)$,
+A variant only needs to include one validation function $V(S)$,
 which takes a puzzle's solution and returns true if the solution does not break any rule of the variant
 and returns false it does.
-If validation function returns false, the solution can not be valid.
+If validation function returns false, the solution is not valid.
 
 \subsection*{Edge variant}
 
@@ -59,20 +86,22 @@ Edge variant is $E := (L, E, E_L, L_N, V)$.
 $L := [l]$
 is a set of labels.
 
-$E \subseteq \{(a, b) \mid a, b \in [n] \times [n] \land a \text{ is edge-adjacent to } b\}$ is a set of some edge-adjacent cells.
-If a pair of cells $(a, b) \in E$, then the cells $a$ and $b$ are label-adjacent.
-
+$E \subseteq \{(a, b) \mid a, b \in [n] \times [n] \land
+\text{the cell } a \text{ is adjacent on the left or the top side of the cell } b\}$
+is the set of some (oriented) pairs of edge-adjacent cells.
+If $(a, b) \in E$, then the cells $a$ and $b$ are label-adjacent.
+(TODO: definition?)
 $E_L : E \to L$
-is an edge-label function, that for an edge-adjacent pair of cells with a label returns the label.
-
+is an edge-label function that for a label-adjacent pair of cells returns a label.
 $L_N : L \to 2^{[n] \times [n]}$
-is a label-neighbourhood function, that for a label returns set of all (oriented) allowed pairs of numbers for that label.
+is a label-neighbourhood function that for a label $l$ returns
+the set of all (oriented) pairs of Sudoku numbers allowed in a
+label-adjacent pair of cells with the label $l$.
 
-$V$ is a validation function.
-For a solution $S$:
+$V$ is the validation function.
 \[
     V(S) := \bigwedge_{(a, b) \in E} (S_a, S_b) \in L_N(E_L((a, b)))
 \]
-That means $V(S)$ returns true, if for each pair of label-adjacent cells $(a, b) \in E$:
-The pair of numbers $(S_a, S_b)$ in the solution $S$ is allowed by the label-neighbourhood function
-for the label $E_L((a, b))$.
+That means $V(S)$ returns true, if and only if for each pair of label-adjacent cells $(a, b) \in E$:
+The pair of Sudoku numbers $(S_a, S_b)$ in the solution $S$ is allowed by the label-neighbourhood $L_N$ function
+for the label $l := E_L((a, b))$.

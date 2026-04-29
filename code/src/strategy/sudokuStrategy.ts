@@ -639,7 +639,7 @@ class SudokuStrategy {
                 },
                 isUpdated: true,
                 isValid: true,
-                name: "X Wing",
+                name: "X-Wing",
                 message: `
                 If all occurrences of a number in ${result.size} regions are inside another ${result.size} regions,
                 this number can not be in those regions anywhere else.
