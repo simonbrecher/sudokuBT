@@ -10,27 +10,7 @@ class Debug {
         if (urlParams.has("test")) {
             document.getElementById("test-types")?.classList.add("display-none");
             switch(urlParams.get("test")) {
-                case "region_class":        GraphicsTests.testRegionsClass();           break;
-                case "builder_solution":    GraphicsTests.testSolver();                 break;
-                case "builder_task":        GraphicsTests.testBuildSolution();          break;
-                case "canvas":              GraphicsTests.testCanvas();                 break;
-                case "basket_borders":      GraphicsTests.testBasketBorders();          break;
-                case "background_color":    GraphicsTests.testTextBackgroundColor();    break;
-                case "edge_wrapper":        GraphicsTests.testEdgeWrapper();            break;
-                case "edge_label":          GraphicsTests.testEdgeLabel();              break;
-
-                case "naked_single":        StrategyTests.testNakedSingle();            break;
-                case "hidden_single":       StrategyTests.testHiddenSingle();           break;
-                case "perfect_match":       PerfectMatchingTest.mainGraphic();          break;
-                case "perfectly_matchable": PerfectMatchingTest.perfectlyMatchable();   break;
-                case "region":              StrategyTests.testRegion();                 break;
-                case "pointing":            StrategyTests.testPointing();               break;
-                case "intersection":        StrategyTests.testIntersection();           break;
-                case "edge_region":         StrategyTests.testEdgeRegion();             break;
-
                 case "debug":               Debug.debug();                              break;
-                case "ng_perfect_match":    PerfectMatchingTest.main();                 break;
-                case "edge_connection":     EdgeTests.testEdgeConnection();             break;
 
                 default: console.log(`unknown test type ${urlParams.get("test")}`);
             }

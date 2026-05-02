@@ -9,9 +9,6 @@ class Sudoku {
     public readonly regions: Regions;
     private edgeVariant: EdgeVariant | null = null;
 
-    public hasSolution = false;
-    public hasTask = false;
-
     public solution: State;
     public task: State;
 
