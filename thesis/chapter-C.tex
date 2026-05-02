@@ -1,3 +1,268 @@
-\chapter{Programmer documentation}
+\chapter{Programmer Documentation}
 
-.
+\section{Modules and Classes}
+
+The software is divided into six logical modules.
+Each module groups related classes by responsibility and could theoretically be used independently,
+though the modules are not separated at the source code level.
+
+Module \texttt{Graphics} could be used to render puzzles similar to Sudoku into HTML.
+Modules \texttt{Renderer}, \texttt{Data}, and \texttt{Graphics} could be used to
+configure a Sudoku task or solution and render it to HTML\@.
+Modules \texttt{Strategy} and \texttt{Data} could be used to configure a Sudoku puzzle and
+look for a way to solve it.
+
+Module \texttt{Graphics} alone is sufficient to render grid-based puzzles into HTML\@.
+Adding \texttt{Renderer} and \texttt{Data} allows configuring and rendering a full Sudoku task or solution.
+Adding \texttt{Strategy} instead allows configuring a Sudoku puzzle and applying solving strategies.
+
+\oneimage{documentation/modules}{
+    Diagram of all modules and their classes.
+    Arrows indicate that one module depends on another.
+}{0.8\textwidth}
+
+\subsection*{Graphics}
+
+This module acts as a layer between the \texttt{DOM API} and the rest of the software.
+It implements common graphical operations, allowing callers to add or modify visual elements
+through a single method call instead of calling multiple \texttt{HTMLElement}s directly.
+
+\begin{description}
+    \item[\texttt{Frame}]
+    The class representing a whole Sudoku puzzle.
+    It creates all instances of \texttt{Cell}, \texttt{Edge}, and \texttt{Canvas} needed for the puzzle.
+    It provides coordinate-based access to the instances of \texttt{Cell} and \texttt{Edge}.
+    Some changes need to be batched and only applied when the method \texttt{Frame.Update()} is called,
+    avoiding the cost of updating after every call.
+
+    \item[\texttt{Cell}]
+    The class representing a single cell of a Sudoku puzzle, managing the text and styles inside.
+    Cells are accessed by a 2D coordinate system \texttt{(y, x)}.
+
+    \item[\texttt{Edge}]
+    The class representing a single label of an edge variant.
+    All instances of this class are created by \texttt{Frame} and allow the addition of a single label.
+    Edges are accessed by a 3D coordinate system \texttt{(direction, y, x)} where
+    \texttt{direction} is either \texttt{0} for edges on right side of a cell or \texttt{1} for edges on left side.
+
+    \item[\texttt{Canvas}]
+    The class representing graphical elements spanning multiple cells, rendered onto an \texttt{HTMLCanvasElement}.
+    It adds two types of graphical elements:
+    lines going through cell centers, used to mark diagonal Sudoku regions;
+    and borders around groups of cells, used to highlight extra Sudoku regions.
+    Elements are added by specifying a set of cells using either the 2D coordinate system
+    of \texttt{Frame} or the 1D coordinate system of \texttt{State}.
+    The coordinates are then converted to pixel positions on the \texttt{HTMLCanvasElement}.
+\end{description}
+
+\subsection*{Data}
+
+This module stores the data representing a Sudoku puzzle's rules, task, and current solving state.
+
+\begin{description}
+    \item[\texttt{Sudoku}]
+    The class representing a whole Sudoku puzzle.
+    It contains \texttt{Regions},
+    two instances of \texttt{State} representing the puzzle task and the current solving state,
+    and optionally \texttt{EdgeVariant}.
+
+    \item[\texttt{State}]
+    The class representing a Sudoku state.
+    For each cell, it stores the set of candidate numbers that can be placed in that cell.
+    It also provides few methods to update the state.
+    \texttt{State} is designed to contain only data that changes during solving.
+    Currently, this is limited to the set of candidate numbers for each cell,
+    but the class is intended to accommodate additional solving data in the future.
+
+
+    \item[\texttt{Regions}]
+    The class representing Sudoku regions.
+    It stores all regions categorized in five types: rows, columns, irregular, diagonal, and extra.
+    It provides convenience methods for adding regions and retrieving them by type.
+
+    \item[\texttt{EdgeVariant}]
+    The class representing an Edge variant.
+    It stores all the information about the variant rules, graphics, and the current labels on each edge.
+
+    \item[\texttt{EdgeVariantFactory}]
+    A static class used to create instances of \texttt{EdgeVariant}.
+\end{description}
+
+\subsection*{Strategy}
+
+This module implements all available strategies.
+Each strategy accepts a \texttt{State} and returns a \texttt{StrategyResult},
+which describes how to visualize the result in the editor and which candidate numbers are eliminated.
+
+\begin{description}
+    \item[\texttt{SudokuStrategy}]
+    The class implementing strategies for basic Sudoku.
+
+    \item[\texttt{PerfectMatching}]
+    The class implementing Algorithm~\ref{alg:algorithm} that is needed by Perfect matching strategies.
+
+    \item[\texttt{EdgeStrategy}]
+    The class implementing strategies for Edge variants.
+
+    \item[\texttt{StrategyUtils}]
+    A class containing methods that are needed by multiple classes in this module.
+\end{description}
+
+\subsection*{Editor}
+
+This module implements the editor.
+
+\begin{description}
+    \item[\texttt{MainEditor}]
+    The class responsible for the editor menu.
+    It handles menu button interactions and tracks which section of the menu is currently open.
+
+    \item[\texttt{RegionEditor}]
+    The class responsible for editing Jigsaw and Extra regions.
+    It handles user input and graphics while the \texttt{Edit Regions} menu is active,
+    covering both the \texttt{Jigsaw} and \texttt{Rectangular} subpanels.
+
+    \item[\texttt{NumberEditor}]
+    The class responsible for editing Sudoku numbers.
+    It handles user input.
+
+    \item[\texttt{EdgeEditor}]
+    The class responsible for editing Edge variant.
+    It handles user input and configures the Edge variant.
+
+    \item[\texttt{StrategyEditor}]
+    The class responsible for strategies.
+    It manages a list of all available strategies, runs them on demand, and renders the strategy result.
+
+    \item[\texttt{EditorUtils}]
+    A class containing methods that are needed by multiple classes in this module.
+\end{description}
+
+\subsection*{Renderer}
+
+This module only contains one class.
+It acts as a bridge between the modules \texttt{Data} and \texttt{Graphics}.
+User can configure a sudoku using the classes from the module \texttt{Data} and then
+
+\begin{description}
+    \item[\texttt{Renderer}]
+    The class responsible for drawing a whole Sudoku from a \texttt{State} into HTML using a single method call.
+\end{description}
+
+\subsection*{Utils}
+
+This module contains all methods that can be used by multiple modules.
+
+\begin{description}
+    \item[\texttt{ArrayUtils}]
+    Useful methods for working with arrays.
+
+    \item[\texttt{BinaryUtils}]
+    Useful methods for working with binary representation of candidates.
+    See Chapter~\ref{sec:data}.
+
+    \item[\texttt{GraphicsUtils}]
+    Useful methods for working with HTML\@.
+
+    \item[\texttt{PositionUtils}]
+    Useful methods for working with 1D and 2D coordinate systems.
+    See Chapter~\ref{sec:data}.
+\end{description}
+
+\section{Representation of Data}\label{sec:data}
+
+\subsection*{Binary Representation of Candidates}
+
+The class \texttt{State} stores all candidate numbers in a Sudoku state.
+Each cell is encoded as a 31-bit bitset stored as a JavaScript \texttt{number},
+where a Sudoku number $m$ is a candidate if and only if \texttt{1 << ($m$ - 1)} is a 1-bit.
+The most significant bit is always 0 to prevent the number from being negative.
+This binary representation limits the Sudoku size to $31$, though the editor enforces a stricter limit of $16$.
+
+\subsection*{Coordinate Systems}
+
+\subsubsection*{Cell}
+
+The module \texttt{Graphics} uses a 2D coordinate system \texttt{(y, x)} for cells in the HTML \texttt{<table>}.
+The module \texttt{Data} uses a 1D coordinate system \texttt{index = y * Sudoku.size + x} for Sudoku cells.
+The class \texttt{Renderer} decides the mapping of \texttt{State} into \texttt{Frame}.
+
+\subsubsection*{Edge}
+
+Edge variant labels use a 3D coordinate system \texttt{(direction, y, x)},
+where \texttt{direction} is either \texttt{0} for the right side of a cell or \texttt{1} for the bottom.
+
+\section{Extensibility}
+
+\subsection*{Variants}
+
+To add a new variant, add a field to \texttt{Sudoku} that represents the variant's data
+and implement a solving strategy for it.
+To add the necessary UI to the editor, add the needed buttons to \texttt{editor.html}
+and implement their event handlers in \texttt{MainEditor}.
+
+(TODO: more explanation?)
+
+\subsection*{Edge variants}
+A new Edge variant strategy can be added by appending an element to \texttt{EdgeVariantFactory.variants}.
+Each element should be created using the \texttt{EdgeVariantFactory} constructor,
+which requires four parameters.
+The last step is to implement all CSS classes specified in the third parameter.
+
+(TODO: more explanation?)
+
+\texttt{EdgeEditor} iterates over all elements of \texttt{EdgeVariantFactory.variants}
+and generates the corresponding buttons for adding Edge variants in the editor.
+When an Edge variant is added, \texttt{EdgeVariantFactory.build} converts the data into
+the format expected by the \texttt{EdgeVariant} constructor,
+and \texttt{EdgeEditor} adds it to \texttt{Sudoku}.
+
+(TODO: more explanation?)
+
+\begin{lstlisting}[language=JavaScript]
+vx: new EdgeVariantFactory(
+    "VX",
+    (size: number, value1: number, value2: number): number[] => {
+        switch (value1 + value2) {
+            case 5:     return [1];
+            case 10:    return [2];
+            default:    return [0];
+        }
+    },
+    (size: number): (EdgeLabelStyle | null)[] => [
+        null,
+        { css: ["vx-v"] },
+        { css: ["vx-x"] },
+    ],
+    (size: number): boolean => true,
+),
+\end{lstlisting}
+
+\subsection*{Solving Strategies}
+
+A strategy can be added by appending an element of type \texttt{StrategyTypeData}
+to the array \texttt{StrategyEditor.strategyTypeData}.
+The strategies are in the array in the same order in which they are tried.
+The first strategy that returns a \texttt{StrategyResult}
+with \texttt{isUpdated} equal to \texttt{true} will be applied.
+
+(TODO: more explanation?)
+
+\begin{lstlisting}[language=JavaScript]
+{ // example of a strategy
+    name: "Edge Region",
+    strategy: EdgeStrategy.region.bind(EdgeStrategy),
+    isUsable: (sudoku: Sudoku) => sudoku.hasEdgeVariant(),
+},
+\end{lstlisting}
+
+\subsection*{Bigger Sudoku}
+
+The size of a Sudoku puzzle is limited to $16$ by \texttt{MainEditor.MAX\_SIZE}.
+The main reason is that the number of candidates in a Sudoku state is $n^3$,
+as there are $n^2$ cells each with up to $n$ candidate numbers.
+To add support for larger Sudoku puzzles,
+it is better to avoid candidate numbers and use the strategies described in Section~\ref{sec:paper}.
+Additionally, larger Sudoku puzzles are generally too complex for humans to solve
+using strategies that require candidate numbers,
+making candidate-free strategies more practical for puzzles beyond size $16 \times 16$.

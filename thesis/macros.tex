@@ -173,6 +173,17 @@
 \algrenewcommand\algorithmicrequire{\textbf{Input:}}
 \algrenewcommand\algorithmicensure{\textbf{Output:}}
 
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{jsComment}{HTML}{888888}
+
+\lstdefinelanguage{JavaScript}{
+    morecomment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    commentstyle=\color{jsComment}\itshape
+}
+
 %%% Macros for definitions, theorems, claims, examples, ... (requires amsthm package)
 
 \theoremstyle{plain}

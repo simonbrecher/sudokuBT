@@ -7,7 +7,7 @@
                 null,
                 { css: ["small-circle"] },
             ],
-            (size: number): boolean => 2 <= size && size <= 31,
+            (size: number): boolean => true,
         ),
         kropki: new EdgeVariantFactory(
             "Kropki",
@@ -30,7 +30,7 @@
                 { css: ["small-circle"] },
                 { css: ["small-circle", "black-background"] },
             ],
-            (size: number): boolean => 2 <= size && size <= 31,
+            (size: number): boolean => true,
         ),
         vx: new EdgeVariantFactory(
             "VX",
@@ -46,7 +46,7 @@
                 { css: ["vx-v"] },
                 { css: ["vx-x"] },
             ],
-            (size: number): boolean => 2 <= size && size <= 31,
+            (size: number): boolean => true,
         ),
         comparative: new EdgeVariantFactory(
             "Comparative",
@@ -55,7 +55,7 @@
                 { css: ["greater"] },
                 { css: ["lesser"] },
             ],
-            (size: number): boolean => 2 <= size && size <= 31,
+            (size: number): boolean => true,
         ),
         sum: new EdgeVariantFactory(
             "Sum",
@@ -69,7 +69,7 @@
                 }
                 return output;
             },
-            (size: number): boolean => 2 <= size && size <= 17,
+            (size: number): boolean => true,
         ),
     };
 

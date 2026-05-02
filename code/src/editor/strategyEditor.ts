@@ -1,7 +1,7 @@
 ﻿type StrategyTypeData = {
-    name: string,
-    strategy: (state: State) => StrategyResult,
-    isUsable: (sudoku: Sudoku) => boolean,
+    name: string, // The display name of the strategy, shown on the strategy button
+    strategy: (state: State) => StrategyResult, // Method implementing the strategy
+    isUsable: (sudoku: Sudoku) => boolean, // Whether the strategy is applicable to the given puzzle
 }
 
 class StrategyEditor {

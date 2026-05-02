@@ -1,15 +1,19 @@
 ﻿type StrategyColors = {
-    removed?: { index: number, shift: number }[], // numbers that will be removed
-    reason?: { index: number, shift: number }[],  // numbers that are the reason for other numbers being removed
-    error?: { index: number, shift: number }[],   // numbers that cause error
-    regions?: { region: number[], css: string }[],  // cells of a region (1st color)
+    removed?: { index: number, shift: number }[], // Numbers that will be removed (yellow)
+    reason?: { index: number, shift: number }[],  // Numbers that are the reason for other numbers being removed (green)
+    error?: { index: number, shift: number }[],   // Numbers that cause error (red)
+    regions?: {
+        region: number[], // cells in the region
+        css: string // CSS style used for each cell
+    }[],
 };
+
 type StrategyResult = {
-    colors: StrategyColors,
-    name: string,
-    message: string,
-    isUpdated: boolean,
-    isValid: boolean,
+    colors: StrategyColors, // Numbers and cells to color
+    name: string, // Name of strategy result (for example Region - Naked Pair)
+    message: string, // Message of explanation of the strategy result
+    isUpdated: boolean, // true iff the strategy can make any progress
+    isValid: boolean, // false iff no solution can exist
 };
 
 class StrategyUtils {
