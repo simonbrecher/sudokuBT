@@ -1,3 +1,109 @@
 \chapter{User documentation}
 
+\section{What is Sudoku}
+
+In an $n \times n$ Sudoku, place a number from $1$ to $n$ in every empty cell
+such that each region contains every number exactly once.
+Sudoku variants add more rules.
+For more detailed explanation of all the rules, read the Chapter~\ref{ch:chap-1}.
+
+\section{Creating a Sudoku Puzzle}
+
+\subsection*{New Sudoku}
+
+Before you can start solving a Sudoku puzzle, you have to start by creating the Sudoku task.
+First step is to click the button "New Sudoku" and specify the size of the Sudoku, which can be from 3 to 16.
+
+After you create the Sudoku task, press the button "Start Solving".
+
+\subsection*{Regions}
+
+According to the rules of Sudoku, every number has to be in each region exactly once.
+Each row and column is a region by default, but you might add up to 3 more types of regions.
+To add more regions, click the button "Edit Regions".
+
+\subsubsection*{Rectangular/Jigsaw Regions}
+
+To add Jigsaw regions, press the button "Jigsaw".
+Hold the left mouse button to choose cells in a new Jigsaw region.
+Right-click a Jigsaw region to remove it.
+In an $n \times n$ Sudoku puzzle with Jigsaw regions,
+there has to be exactly $n$ Jigsaw regions and each region has to have exactly $n$ cells.
+All cells in a Jigsaw region must be edge-adjacent and no cell can be in two different Jigsaw regions at once.
+
+If the size of the Sudoku puzzle is not a prime number, you can press the button "Rectangular",
+which will let you choose any size of regions and the software will automatically add all of them.
+For example $16 \times 16$ Sudoku can have Rectangular regions $2 \times 8$, $4 \times 4$, or $8 \times 2$.
+
+To remove all Rectangular or Jigsaw regions, press the button "None".
+
+\subsubsection*{Diagonal Regions}
+
+To add or remove diagonal regions, press the button "Diagonal".
+
+\subsubsection*{Extra Regions}
+
+To add Extra regions, click the button "Custom".
+Hold the left mouse button to choose cells in a new Extra region.
+Right-click an Extra region to remove it.
+In an $n \times n$ Sudoku puzzle with Extra regions, each Extra region has to have exactly $n$ cells, but
+unlike the Jigsaw regions, there can be any amount of Extra regions.
+All cells in an Extra region must be edge-adjacent and no cell can be in two different Extra regions at once.
+
+If the size of the Sudoku puzzle is $4 \times 4$, $9 \times 9$, or $16 \times 16$,
+you can press the "Windoku" button, which adds the specific pattern of Extra regions for Windoku Sudoku.
+
+\subsection*{Numbers}
+
+To add numbers, press the button "Edit Numbers".
+To add a single number in a cell, left click it and press a number on the keyboard.
+An empty cell can contain any number in the solution.
+If you want to specify what combination of number can be in a cell, right click it,
+then you can add or remove individual numbers.
+Press the \texttt{Delete} or the \texttt{Backspace} to make a cell empty again.
+In a $10 \times 10$ or bigger Sudoku puzzle, you can press the "+10" button to add numbers bigger than 9.
+
+\subsection*{Variants}
+
+To add a Sudoku variant, press the button "Edit Variant".
+You can choose one of five different variants to add.
+To add labels to the edges, left-click the square on the edge, which will toggle it to the next label.
+To toggle labels in the opposite direction, right-click it instead.
+
+\subsection*{Empty Labels}
+
 .
+
+\section{Solving a Sudoku}
+
+After you create a Sudoku task, press the button "Start Solving".
+The software will automatically fill every empty cell with all possible numbers.
+
+The goal of solving is to remove numbers from cells using different strategies,
+until there is only one number in each cell.
+For list and explanation of all the strategies used by the software, read the Chapter~\ref{ch:chap-2}.
+
+The available strategies are ordered from the most simple to the most complicated.
+If you want to turn off a strategy, press its button in the right menu.
+
+To solve the Sudoku puzzle, press the button "Apply Step".
+The software will go through all the strategies from the most simple to the most complicated and
+find the first one that can prove that some of the numbers can not be a part of the solution.
+Then it will show you the explanation of the strategy.
+To continue, press the button "Apply Step" again, and the software will remove all numbers with yellow background.
+For explanation of the colors that the software uses, read the first part of Chapter~\ref{ch:chap-2}.
+(TODO: make it a section)
+
+You can edit the numbers manually.
+To set a cell to have a single number, left-click it.
+To add or remove a single number from a cell, right-click it.
+Press the \texttt{Delete} or the \texttt{Backspace} to reset a cell to what it was in the task.
+In a $10 \times 10$ or bigger Sudoku puzzle, you can press the "+10" button to add or remove numbers bigger than 9.
+
+If the task has no solution, or you have manually removed a number that has to be in the solution,
+you can end up with some cells not being able to have any numbers.
+If there is a cell with "!", it meas that the cell can not have any number.
+
+\section{Examples of Sudoku Puzzles}
+
+Visit Chapter~\ref{ch:chap-1} for examples of Sudoku tasks with unique solution.
