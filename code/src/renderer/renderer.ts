@@ -12,9 +12,9 @@ class Renderer {
     public doRenderCellBorders: boolean = true;
         public cellBordersStyle: string = "normal";
     public doRenderDiagonals: boolean = true;
-        public diagonalsLineStyle: LineStyle = LineStyle.styles.diagonals;
+        public diagonalsLineStyle: LineStyle = { thickness: 0.2, color: "#0002", cap: "round" };
     public doRenderExtraRegionsBorder: boolean = true;
-        public extraRegionsBorderStyle: BasketBorderStyle = BasketBorderStyle.styles.extraRegions;
+        public extraRegionsBorderStyle: BasketBorderStyle = { color: "#0006", dash: null, cap: "round" };
     public doRenderExtraRegionsBackgroundColor: boolean = true;
         public extraRegionsBackgroundColor: string = "#EEE";
     public doRenderEdgeVariant: boolean = true;

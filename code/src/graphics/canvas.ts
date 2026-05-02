@@ -8,6 +8,18 @@ type CanvasContext = {
     context: CanvasRenderingContext2D,
 }
 
+type LineStyle = {
+    thickness: number,
+    color: string,
+    cap: CanvasLineCap,
+}
+
+type BasketBorderStyle = {
+    color: string,
+    dash: [number, number] | null,
+    cap: CanvasLineCap,
+}
+
 /**
  * Class managing canvas HTML element, used for drawing lines
  */
