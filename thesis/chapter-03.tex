@@ -7,65 +7,46 @@
 \end{defn}
 
 \begin{defn}
-    A \emph{Sudoku state} $U := \{U_{i,j} \mid i, j \in [n]\}$.
-    Each element $U_{i,j} \subseteq [n]$.
+    A \emph{Sudoku state} is a matrix $U := \{U_{i,j} \subseteq [n] \mid i, j \in [n]\}$,
+    where each element $U_{i, j}$ represents the set of candidate numbers
+    in the cell in the $i$-th row and $j$-th column.
 \end{defn}
 
 \begin{defn}
     The \emph{Sudoku task} $T := \{T_{i,j} \mid i, j \in [n]\}$ is the initial state of an unsolved Sudoku puzzle.
-    Each element $T_{i,j}$ represents what Sudoku numbers can be in the cell $(i, j)$ of a Sudoku puzzle.
+    Each element $T_{i,j}$ represents the set of candidate numbers
+    in the cell in the $i$-th row and $j$-th column.
 \end{defn}
 
 \begin{defn}
     A \emph{Sudoku solution} $S$ is a Sudoku state such that every element $S_i$ has exactly one Sudoku number.
     It represents solved Sudoku puzzle.
-    Each element $S_{i, j}$ represents what Sudoku number is in the cell $(i, j)$ of a solved Sudoku puzzle.
+    Each element $S_{i, j}$ represents what Sudoku number is in the cell in the $i$-th row and $j$-th column.
 \end{defn}
 
-\begin{defn}
+\begin{defn}\label{def:valid}
     A Sudoku solution $S$ is \emph{valid} for a Sudoku puzzle with a task $T$, if
-    $S_{i,j} \subseteq T_{i,j}$ for every $(i, j)$, and
+    $S_{i,j} \subseteq T_{i,j}$ for every $i, j \in [n]$, and
     all Sudoku rules (all Sudoku regions and the variant) are satisfied.
-\end{defn}
-
-\begin{defn}
-    \emph{$V$ is a substate of $U$}: $U \succeq V := \forall i, j \in [n]: U_{i, j} \supseteq V_{i, j}$
-\end{defn}
-
-\begin{defn}
-    \emph{$V$ is a proper substate of $U$}: $U \succ V := U \succeq V \land U \neq V$
-\end{defn}
-
-\begin{defn}
-    \emph{The difference of $U$ and $V$}: $(U \setminus V)_{i, j} := U_{i, j} \setminus V_{i, j}$
-\end{defn}
-
-\begin{defn}
-    \emph{The union of $U$ and $V$}: $(U \cup V)_{i, j} := U_{i, j} \cup V_{i, j}$
-\end{defn}
-
-\begin{defn}
-    \emph{The union of all valid solutions} is $S_{ALL} := \bigcup S_i$, where
-    $S_i$ are all the valid solutions for a Sudoku puzzle with a task $T$.
 \end{defn}
 
 \section{Rules}
 
-The definition in Section~\ref{sec:state} only specifies that
-a valid solution chooses one number for each cell from the task.
+The Definition~\ref{def:valid} only specifies that a valid solution chooses one number for each cell from the task.
 Sudoku rules further restrict which solutions can be a valid solution.
-
-Let us have a Sudoku puzzle with size $n$, task $T$, and a solution $S$.
-Let $S_{ALL}$ be the union of all valid solutions.
 
 \subsection*{Regions}
 
-A Sudoku puzzle has a finite set of Sudoku regions $R := {R_1, R_2, \dots, R_r}$,
+A Sudoku puzzle has a finite set of Sudoku regions $R := (R_1, R_2, \dots, R_r)$,
 where a region $R_i \in ([n] \times [n])^n$ is an array of $n$ coordinates of cells of the Sudoku puzzle.
 
 Each region $R_i$ adds an extra requirement on a valid solution of the puzzle:
-Cells in a region must contain each Sudoku number exactly once.
-(TODO: highlight the text of the rule?)
+\begin{quote}
+    \textit{
+        Cells in a region must contain each Sudoku number exactly once.
+    }
+\end{quote}
+
 
 \subsection*{Variants}
 
@@ -86,11 +67,10 @@ Edge variant is $E := (L, E, E_L, L_N, V)$.
 $L := [l]$
 is a set of labels.
 
-$E \subseteq \{(a, b) \mid a, b \in [n] \times [n] \land
-\text{the cell } a \text{ is adjacent on the left or the top side of the cell } b\}$
+$E \subseteq \{(a, b) \mid a, b \in [n] \times [n]
+\text{ such that the cell } a \text{ is adjacent on the left or the top side of the cell } b\}$
 is the set of some (oriented) pairs of edge-adjacent cells.
 If $(a, b) \in E$, then the cells $a$ and $b$ are label-adjacent.
-(TODO: definition?)
 $E_L : E \to L$
 is an edge-label function that for a label-adjacent pair of cells returns a label.
 $L_N : L \to 2^{[n] \times [n]}$
@@ -102,6 +82,7 @@ $V$ is the validation function.
 \[
     V(S) := \bigwedge_{(a, b) \in E} (S_a, S_b) \in L_N(E_L((a, b)))
 \]
-That means $V(S)$ returns true, if and only if for each pair of label-adjacent cells $(a, b) \in E$:
+That means that for a Sudoku solution $S$, validation function $V(S)$ returns true,
+if and only if for each pair of label-adjacent cells $(a, b) \in E$:
 The pair of Sudoku numbers $(S_a, S_b)$ in the solution $S$ is allowed by the label-neighbourhood $L_N$ function
 for the label $l := E_L((a, b))$.
