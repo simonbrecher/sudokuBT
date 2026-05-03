@@ -18,8 +18,9 @@ type StrategyIntersectionProof = {
     size: number,
     reason: { index: number, shift: number }[],
     removed: { index: number, shift: number }[],
-    regionDifference: number[],
-    regionIntersection: number[],
+    region1: number[],
+    region2: number[],
+    intersection: number[],
     priority: number, // lower number = higher priority, -1 for error and 1000 for non-updated
 }
 
@@ -77,8 +78,8 @@ class SudokuStrategy {
                     colors: {
                         error: [{ index: i, shift: -1 }],
                     },
-                    name: "Naked Single - Error",
-                    message: "There is no number in a cell.",
+                    name: "Naked Single - No Solution",
+                    message: "There is a cell which cannot have any number.",
                     isUpdated: true,
                     isValid: false,
                 }
@@ -121,8 +122,8 @@ class SudokuStrategy {
                         error: error,
                         regions: [{ region: region, css: "background-region-1" }],
                     },
-                    name: "Naked Single - Error",
-                    message: "Two cells in a region have the same number.",
+                    name: "Naked Single - No Solution",
+                    message: "Two cells in a region can only have the same number.",
                     isUpdated: true,
                     isValid: false,
                 };
@@ -159,7 +160,7 @@ class SudokuStrategy {
                 removed: removed,
             },
             name: "Naked Single",
-            message: `Removed ${removed.length} numbers.`,
+            message: `If there is only one number in a cell, that number cannot appear in any other cell in the same region.`,
             isUpdated: true,
             isValid: true,
         }
@@ -243,12 +244,14 @@ class SudokuStrategy {
                 resultRegion = region;
                 if (! result.isValid) {
                     if (result.missing !== undefined) {
+                        let numberText = result.missing.length > 1 ? "Numbers" : "Number;"
+                        let listText = StrategyUtils.joinShiftsToText(result.missing);
                         return {
                             colors: {
                                 error: StrategyUtils.mergeIndicesAndShift(region, -1),
                             },
-                            name: "Hidden Single - Error",
-                            message: `Number${result.missing.length > 1 ? 's' : ''} ${StrategyUtils.joinShiftsToText(result.missing)} can not be in any cell in the region.`,
+                            name: "Hidden Single - No Solution",
+                            message: `${numberText} ${listText} cannot be in any cell in the region.`,
                             isUpdated: true,
                             isValid: false,
                         }
@@ -259,13 +262,14 @@ class SudokuStrategy {
                             error.push({ index: index, shift: shift });
                         }
 
+                        let missingText = StrategyUtils.joinShiftsToText(result.multiple.shifts);
                         return {
                             colors: {
                                 error: error,
                                 regions: [{ region: region, css: "background-region-1" }],
                             },
-                            name: "Hidden Single - Error",
-                            message: `Numbers ${StrategyUtils.joinShiftsToText(result.multiple.shifts)} can be only in the same cell in the region.`,
+                            name: "Hidden Single - No Solution",
+                            message: `Numbers ${missingText} can only be in the same cell in the region.`,
                             isUpdated: true,
                             isValid: false,
                         }
@@ -284,10 +288,10 @@ class SudokuStrategy {
         for (let reasonOne of result.reason!) {
             reason.push(reasonOne.index);
         }
-        let reasonNumberText = result.reason!.length > 1 ? 'Numbers' : 'Number';
-        let reasonListText = StrategyUtils.joinShiftsToText(StrategyUtils.extractShifts(result.reason!));
+        let numberText = result.reason!.length > 1 ? 'Numbers' : 'Number';
+        let listText = StrategyUtils.joinShiftsToText(StrategyUtils.extractShifts(result.reason!));
+        let eachText = result.reason!.length > 1 ? 'each ' : '';
         let cellText = result.reason!.length > 1 ? 'these cells' : 'this cell';
-        let removedNumberText = result.removed!.length > 1 ? 'numbers' : 'number';
         return {
             colors: {
                 reason: StrategyUtils.regionIndexShiftToIndexShift(result.reason!, resultRegion!),
@@ -296,8 +300,8 @@ class SudokuStrategy {
             },
             name: "Hidden Single",
             message: `
-                ${reasonNumberText} ${reasonListText} can be only in one cell from the region.
-                The other ${result.removed!.length} ${removedNumberText} in ${cellText} can be removed.
+                ${numberText} ${listText} can ${eachText}only be in one cell from the region.
+                All other numbers in ${cellText} can be removed.
             `,
             isUpdated: true,
             isValid: true,
@@ -496,14 +500,14 @@ class SudokuStrategy {
                     reason: reason,
                     regions: [
                         { region: result.region1, css: "background-region-1" },
-                        { region: result.region2, css: "background-region-1" },
-                        { region: result.intersection, css: "background-region-2" },
+                        { region: result.region2, css: "background-region-2" },
+                        { region: result.intersection, css: "background-region-3" },
                     ],
                 },
                 name: "Pointing",
                 message: `
-                If all occurrences of a number in a region are inside another region,
-                this number can not be in that region anywhere else.
+                If all occurrences of a number in a region (blue+green) are inside another region (green+yellow),
+                this number cannot be in that region anywhere else (yellow).
                 `,
             };
         }
@@ -593,8 +597,9 @@ class SudokuStrategy {
             size: proof.set.length,
             reason: reason,
             removed: removed,
-            regionDifference: ArrayUtils.union(proofR1, proofR2),
-            regionIntersection: proofIntersection,
+            region1: isSource ? proofR1 : proofR2,
+            region2: isSource ? proofR2 : proofR1,
+            intersection: proofIntersection,
             priority: proof.set.length,
         };
     }
@@ -633,16 +638,18 @@ class SudokuStrategy {
                     reason: result.reason,
                     removed: result.removed,
                     regions: [
-                        { region: result.regionDifference, css: "background-region-1" },
-                        { region: result.regionIntersection, css: "background-region-2" },
+                        { region: result.region1, css: "background-region-1" },
+                        { region: result.region2, css: "background-region-2" },
+                        { region: result.intersection, css: "background-region-3" },
                     ]
                 },
                 isUpdated: true,
                 isValid: true,
                 name: "X-Wing",
                 message: `
-                If all occurrences of a number in ${result.size} regions are inside another ${result.size} regions,
-                this number can not be in those regions anywhere else.
+                If all occurrences of a number in ${result.size} regions (blue+green)
+                are inside another ${result.size} regions (green+yellow),
+                this number cannot be in those regions anywhere else (yellow).
                 `,
             };
 

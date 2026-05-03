@@ -92,6 +92,8 @@ class StrategyUtils {
                 throw "ERROR: SudokuStrategy.joinShiftsToText : shifts=[]";
             case 1:
                 return `${copyShifts[0] + 1}`;
+            case 2:
+                return `${copyShifts[0] + 1} and ${copyShifts[1] + 1}`;
             default:
                 let texts = [];
                 for (let shift of copyShifts) {
@@ -99,7 +101,7 @@ class StrategyUtils {
                 }
                 let last = texts.pop();
                 let text = texts.join(", ");
-                return `${text} and ${last}`;
+                return `${text}, and ${last}`;
         }
     }
 }
