@@ -71,6 +71,8 @@
                     } else {
                         if (! isSolve && board[index] == MainEditor.sudoku.fullBinary) {
                             board[index] = newValue;
+                        } else if (! isSolve && board[index] == newValue) {
+                            board[index] = MainEditor.sudoku.fullBinary;
                         } else {
                             board[index] ^= newValue;
                         }

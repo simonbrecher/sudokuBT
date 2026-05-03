@@ -2,14 +2,6 @@
  * Class representing list of all regions in sudoku. (Regions that use default sudoku rules)
  */
 class Regions {
-    private static readonly WINDOKU_REGIONS = [
-        [10, 11, 12, 19, 20, 21, 28, 29, 30],
-        [14, 15, 16, 23, 24, 25, 32, 33, 34],
-        [46, 47, 48, 55, 56, 57, 64, 65, 66],
-        [50, 51, 52, 59, 60, 61, 68, 69, 70],
-    ];
-    private static readonly WINDOKU_REGIONS_MATRIX = PositionUtils.regionsToMatrix(81, this.WINDOKU_REGIONS);
-
     private static throwAccessErrorIf(condition: boolean, accessName: string, conditionString: string): void {
         if (condition) {
             throw `ACCESS ERROR: cannot access ${accessName} if ${conditionString}`;
@@ -22,49 +14,66 @@ class Regions {
     private readonly _rows: number[][];
     private readonly _columns: number[][];
     private readonly _lines: number[][];
+
     public get rows(): number[][] {
         return this.hasLines ? this._rows : [];
     }
+
     public get columns(): number[][] {
         return this.hasLines ? this._columns : [];
     }
+
     public get lines(): number[][] {
         return this.hasLines ? this._lines : [];
     }
+
     public hasDiagonals: boolean = false;
     private readonly _diagonals: number[][];
+
     public get diagonals(): number[][] {
         return this.hasDiagonals ? this._diagonals : [];
     }
+
     private _rectangles: { height: number, width: number } | null = null;
+
     public isRectangular(): boolean {
         return this._regions !== null && this._rectangles !== null;
     }
+
     public get rectangleHeight(): number {
         Regions.throwAccessErrorIf(this._rectangles === null, "Regions.rectangleHeight", "Regions._rectangles === null");
         return this._rectangles!.height;
     }
+
     public get rectangleWidth(): number {
         Regions.throwAccessErrorIf(this._rectangles === null, "Regions.rectangleWidth", "Regions._rectangles === null");
         return this._rectangles!.width;
     }
+
     private _regions: number[][] | null = null;
+
     public hasRegions(): boolean {
         return this._regions !== null;
     }
+
     public get regions(): number[][] {
         return this._regions !== null ? this._regions! : [];
     }
+
     private _extraRegions: number[][] | null = null;
+
     public hasExtraRegions(): boolean {
         return this._extraRegions !== null;
     }
+
     public get extraRegions(): number[][] {
         return this._extraRegions !== null ? this._extraRegions! : [];
     }
+
     public removeExtraRegions(): void {
         this._extraRegions = null;
     }
+
     public addExtraRegions(regions: number[][]): void {
         if (this._extraRegions === null) {
             this._extraRegions = [];
@@ -73,19 +82,12 @@ class Regions {
             this._extraRegions.push(region);
         }
     }
+
     public setExtraRegions(regions: number[][] | null): void {
         this._extraRegions = null;
         if (regions !== null) {
             this.addExtraRegions(regions);
         }
-    }
-    public isWindoku(): boolean {
-        if (this.size !== 9 || ! this.hasExtraRegions()) {
-            return false;
-        }
-        let regionsMatrix = PositionUtils.regionsToMatrix(81, this.extraRegions);
-        regionsMatrix = PositionUtils.countConnectedAreas(regionsMatrix, this.size, this.size, PositionUtils.DIRECTIONS_4);
-        return ArrayUtils.equals1d(regionsMatrix, Regions.WINDOKU_REGIONS_MATRIX);
     }
 
     constructor(size: number) {
@@ -158,15 +160,49 @@ class Regions {
         this._regions = regions;
     }
 
-    /**
-     * Set extra regions to be windoku. Works only if size=9
-     */
+    public static isValidWindokuSize(size: number): boolean {
+        return size >= 4 && Number.isInteger(Math.sqrt(size));
+    }
+
+    private getWindokuRegions(): number[][] {
+        let regions: number[][] = [];
+        let size = Math.sqrt(this.size);
+        for (let ry = 0; ry < size - 1; ry++) {
+            for (let rx = 0; rx < size - 1; rx++) {
+                let region: number[] = [];
+                for (let dy = 0; dy < size; dy++) {
+                    for (let dx = 0; dx < size; dx++) {
+                        let y = ry * (size + 1) + dy + 1;
+                        let x = rx * (size + 1) + dx + 1;
+                        region.push(y * this.size + x);
+                    }
+                }
+                regions.push(region);
+            }
+        }
+        return regions;
+    }
+
+    public isWindoku(): boolean {
+        if (! Regions.isValidWindokuSize(this.size) || ! this.hasExtraRegions()) {
+            return false;
+        }
+
+        let regionsMatrix = PositionUtils.regionsToMatrix(this.size * this.size, this.extraRegions);
+        regionsMatrix = PositionUtils.countConnectedAreas(regionsMatrix, this.size, this.size, PositionUtils.DIRECTIONS_4);
+
+        let windokuRegionsMatrix = PositionUtils.regionsToMatrix(this.size * this.size, this.getWindokuRegions());
+        windokuRegionsMatrix = PositionUtils.countConnectedAreas(windokuRegionsMatrix, this.size, this.size, PositionUtils.DIRECTIONS_4);
+
+        return ArrayUtils.equals1d(regionsMatrix, windokuRegionsMatrix);
+    }
+
     public setWindoku(): void {
-        if (this.size !== 9) {
+        if (! Regions.isValidWindokuSize(this.size)) {
             throw `ERROR: Windoku sudoku cannot exist on size=${this.size}`;
         }
 
-        this.setExtraRegions(Regions.WINDOKU_REGIONS);
+        this.setExtraRegions(this.getWindokuRegions());
     }
 
     /**

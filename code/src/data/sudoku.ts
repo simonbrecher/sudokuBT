@@ -32,6 +32,10 @@ class Sudoku {
         }
     }
 
+    public setFinishedEdgeVariant(variant: EdgeVariant | null): void {
+        this.edgeVariant = variant;
+    }
+
     public getEdgeVariant(): EdgeVariant | null {
         return this.edgeVariant;
     }

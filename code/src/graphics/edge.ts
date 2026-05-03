@@ -157,17 +157,23 @@ class Edge {
         let oldLeftStyle = this.wrapperElement.style.getPropertyValue("--x");
         let oldTopStyle = this.wrapperElement.style.getPropertyValue("--y");
 
-        let newLeft = GraphicsUtils.pxToNumber(oldLeftStyle) + left - oldLeft;
-        let newTop = GraphicsUtils.pxToNumber(oldTopStyle) + top - oldTop;
-
         let wrapperSizePX = `${wrapperSize}px`;
         let sizePX = `${size}px`;
-        let xPX = `${newLeft}px`;
-        let yPX = `${newTop}px`;
-
         GraphicsUtils.setProperty(this.wrapperElement, "--wrapper-size", wrapperSizePX);
         GraphicsUtils.setProperty(this.wrapperElement, "--size", sizePX);
-        GraphicsUtils.setProperty(this.wrapperElement, "--x", xPX);
-        GraphicsUtils.setProperty(this.wrapperElement, "--y", yPX);
+
+        let leftOffset = left - oldLeft;
+        if (Math.abs(leftOffset) >= 1) {
+            let newLeft = GraphicsUtils.pxToNumber(oldLeftStyle) + leftOffset;
+            let xPX = `${newLeft}px`;
+            GraphicsUtils.setProperty(this.wrapperElement, "--x", xPX);
+        }
+
+        let topOffset = top - oldTop;
+        if (Math.abs(topOffset) >= 1) {
+            let newTop = GraphicsUtils.pxToNumber(oldTopStyle) + topOffset;
+            let yPX = `${newTop}px`;
+            GraphicsUtils.setProperty(this.wrapperElement, "--y", yPX);
+        }
     }
 }

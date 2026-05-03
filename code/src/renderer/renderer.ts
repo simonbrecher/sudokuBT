@@ -16,7 +16,7 @@ class Renderer {
     public doRenderExtraRegionsBorder: boolean = true;
         public extraRegionsBorderStyle: BasketBorderStyle = { color: "#0006", dash: null, cap: "round" };
     public doRenderExtraRegionsBackgroundColor: boolean = true;
-        public extraRegionsBackgroundColor: string = "#EEE";
+        public extraRegionsBackgroundColor: string = "#DDD";
     public doRenderEdgeVariant: boolean = true;
         public doRenderEdgeNone: boolean = true;
         public edgeNoneStyle: EdgeLabelStyle = { css: ["none"] };

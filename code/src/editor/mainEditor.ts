@@ -122,7 +122,7 @@ class MainEditor {
         }
         GraphicsUtils.addOrRemoveClass("menu-button-regions-rectangular", "display-none", isPrime);
 
-        GraphicsUtils.addOrRemoveClass("menu-button-regions-windoku", "display-none", this.size !== 9);
+        GraphicsUtils.addOrRemoveClass("menu-button-regions-windoku", "display-none", ! Regions.isValidWindokuSize(this.size));
 
         GraphicsUtils.addOrRemoveClass("text-plus10", "display-none", this.size < 10 || this.size >= 20);
         GraphicsUtils.addOrRemoveClass("text-plus20", "display-none", this.size < 20);
@@ -207,8 +207,6 @@ class MainEditor {
      */
     private static changeMenuPosition(leftPosition: string | null, rightPosition: string | null): boolean {
         let {left: previousLeftPosition, right: previousRightPosition} = this.menuPosition;
-
-        console.log(`${previousLeftPosition} ${previousRightPosition} -> ${leftPosition} ${rightPosition}`);
 
         // Change what button is selected
         if (leftPosition !== previousLeftPosition) {

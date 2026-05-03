@@ -29,7 +29,7 @@ class Frame {
         let container = document.getElementById(containerId)!;
 
         this.puzzleWrapper = document.createElement("div");
-        container.appendChild(this.puzzleWrapper)
+        container.appendChild(this.puzzleWrapper);
         this.puzzleWrapper.classList.add("puzzle-wrapper");
 
         this.table = document.createElement("table");

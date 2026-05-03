@@ -6,12 +6,6 @@ type RegionsSudokuData = {
 }
 
 class RegionEditor {
-    private static readonly backgroundColors = {
-        inRegion: "#FFF",
-        inNextRegion: "#FA0",
-        inNoRegion: "#CCC",
-    }
-
     private static jigsaw: RegionsSudokuData;
 
     private static extraRegions: RegionsSudokuData;
@@ -32,15 +26,26 @@ class RegionEditor {
      * Render sudoku while editing jigsaw regions
      */
     private static renderJigsaw(): void {
-        Renderer.renderer.render(this.jigsaw.sudoku.solution, MainEditor.frame);
+        let sudoku = this.jigsaw.sudoku;
+        let mainSudoku = MainEditor.sudoku;
 
+        // copy other settings from MainEditor.sudoku
+        sudoku.regions.setExtraRegions(mainSudoku.regions.extraRegions);
+        sudoku.regions.hasDiagonals = mainSudoku.regions.hasDiagonals;
+        sudoku.task.board = ArrayUtils.deepcopyArray1d(mainSudoku.task.board);
+        sudoku.setFinishedEdgeVariant(mainSudoku.getEdgeVariant());
+
+        // render sudoku
+        Renderer.renderer.render(sudoku.task, MainEditor.frame);
+
+        // render gray cells
         for (let y = 0; y < MainEditor.size; y++) {
             for (let x = 0; x < MainEditor.size; x++) {
                 let value = this.jigsaw.regionsMatrix[y * MainEditor.size + x]
-                let backgroundColor = value === -1 ? this.backgroundColors.inNoRegion : this.backgroundColors.inRegion;
-
-                let cell = MainEditor.frame.getCell(y, x);
-                cell.setBackgroundColor(backgroundColor);
+                if (value === -1) {
+                    let cell = MainEditor.frame.getCell(y, x);
+                    cell.setBackgroundColor("#CCC");
+                }
             }
         }
     }
@@ -49,7 +54,17 @@ class RegionEditor {
      * Render sudoku while editing extra regions
      */
     private static renderExtraRegions(): void {
-        Renderer.renderer.render(this.extraRegions.sudoku.solution, MainEditor.frame);
+        let sudoku = this.extraRegions.sudoku;
+        let mainSudoku = MainEditor.sudoku;
+
+        // copy other settings from MainEditor.sudoku
+        sudoku.regions.setJigsaw(mainSudoku.regions.regions);
+        sudoku.regions.hasDiagonals = mainSudoku.regions.hasDiagonals;
+        sudoku.task.board = ArrayUtils.deepcopyArray1d(mainSudoku.task.board);
+        sudoku.setFinishedEdgeVariant(mainSudoku.getEdgeVariant());
+
+        // render sudoku
+        Renderer.renderer.render(sudoku.task, MainEditor.frame);
     }
 
     public static renderSudoku(): void {
