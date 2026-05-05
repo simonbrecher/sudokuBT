@@ -2,10 +2,9 @@
 
 \sectoc{Problem Description}
 
-The goal of an $n \times n$ Sudoku puzzle is to fill one number $1\text{--}n$,
+The goal of an $n \times n$ Sudoku puzzle is to fill each cell with a number $1$ to $n$,
 so that all rows, columns, and regions have the same number exactly once.
-Variant of a Sudoku has some additional rules.
-(TODO: link)
+Variant of a Sudoku adds some additional rules.
 
 \sectoc{State of the Art}
 
@@ -15,45 +14,45 @@ There are multiple ways to solve a Sudoku puzzle.
 
 Humans solve Sudoku using easy-to-explain strategies.
 The goal of a strategy is to find a cell that cannot contain some numbers and explain why.
-These strategies might not always be easy to find, because they sometimes require to go through many possible combinations to find them.
+These strategies might not always be easy to find,
+because they sometimes require to go through many possible combinations to find them.
 However once a strategy is found, it should be easy explain why certain cells cannot contain certain numbers.
-Humans can often use intuition to speed up solving, for example look at places with more numbers or search around numbers that have been recently filled in.
-The two most simple strategies are Naked Single and Hidden Single.
-(TODO: link section)
-(TODO: depending on linked text, change last sentence, to show example)
+Humans can often use intuition to speed up solving,
+for example by looking at places with more numbers or searching around numbers that have been recently filled in.
 
 \subsection*{Backtracking Algorithm}
 
 A recursive trial-and-error algorithm that solves an $n \times n$ Sudoku puzzle.
-For each empty cell, the algorithm attempts to place every number $1\text{--}n$.
+For each empty cell, the algorithm attempts to place every number from $1$ to $n$.
 If a placement is valid, the algorithm recurses to the next empty cell.
 If a solution is found, it is added to the list of solutions.
 If no valid number exists for a cell, the algorithm backtracks to the previous cell and tries the next candidate.
 
-The algorithm can be significantly sped up by applying basic solving strategies (TODO: link section),
+The algorithm can be significantly sped up by applying basic solving strategies Chapter~\ref{sec:basic-strategies},
 which eliminate impossible candidates from cells before any trial placement is made.
-
-\subsection*{Constraint-based methods}
-
-Basic Sudoku can be encoded in constraint-based methods, such as SAT and CSP\@.
-(TODO: source)
-Advantage of such methods is that there are algorithms to solve them.
-(TODO: source?)
-
-Depending on the Sudoku variant, it might be possible to encode it as well.
 
 \sectoc{Goals of the Thesis}
 
-The goal of this thesis is to find human-style logical strategies to get progress in solving a Sudoku puzzle.
-There already exist some solvers that find those strategies.
-(TODO: source)
-To differentiate itself from other solvers, the thesis adds few Sudoku variants with their strategies.
-It also works with more general definition of Sudoku, allowing any size and more region types, for example extra regions.
+The main goal of this thesis is to develop software that helps people solve Sudoku variants
+by applying strategies from simplest to most complex.
+A user can configure a Sudoku task in the UI\@.
+The software then provides step-by-step explanation of how the puzzle can be solved.
+The software is programmed in TypeScript, HTML and CSS and can be opened in an internet browser.
 
-\sectoc{Comparison to SAT/CSP}
+\sectoc{Thesis Structure}
 
-.
+Chapter~\ref{ch:chap-1} explains rules of Sudoku and the variants implemented by the software.
+Chapter~\ref{ch:chap-2} explains solving strategies implemented by the software.
+These two chapters are meant to be used as part of User documentation,
+to explain Sudoku rules, variants, and solving strategies to people who never solved a Sudoku before
+and only want to know how to use the software.
 
-\sectoc{Thesis Overview}
+Chapters~\ref{ch:3}~and~\ref{ch:4} explain Sudoku rules and solving strategies formally.
+They are meant to explain things that are not possible to explain without using mathematical text.
+They also set up theory which is used in Chapter~\ref{chap:5}.
 
-.
+Chapter~\ref{chap:5} talks about Perfect matching strategies,
+which are strategies that can be explained by converting a part of Sudoku state to a bipartite graph,
+and then finding edges that are not part of a perfect matching.
+The main objective of this chapter is to prove Algorithm~\ref{alg:algorithm},
+which can find the smallest application of Perfect matching strategies in polynomial time.
