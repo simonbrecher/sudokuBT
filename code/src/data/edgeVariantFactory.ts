@@ -92,7 +92,7 @@
 
     public build(sudoku: Sudoku): EdgeVariant {
         if (! this.canBeAdded(sudoku.size)) {
-            throw "EdgeVariantFactory.build: Can not be added to sudoku";
+            throw "EdgeVariantFactory.build: Cannot be added to sudoku";
         }
 
         let neighbours: number[][] = [];

@@ -100,29 +100,28 @@ such that each cell of the Sudoku appears in exactly one region in $P$ and in ex
 
 \subsection{Edge Label}\label{subsec:formal-edge-label}
 
-This strategy can be used on a Sudoku puzzle with an edge variant.
-
+The strategy Edge label can be used on a Sudoku puzzle with an Edge variant.
 Let $U$ be a Sudoku state.
 Let $E$ be the set of all label-adjacent pairs of cells from the Edge variant,
 let $E_L$ be the edge-label function from the Edge variant,
 and let $L_N$ be the label-neighbourhood function from the edge variant.
-Let $(a, b) \in E$ be a pair of label-adjacent cells with the label $l := L_N((a, b))$.
+Let $(a, b) \in E$ be a pair of label-adjacent cells with the label $l := E_L((a, b))$.
 
-\begin{quote}
-    \textit{
-        If for $c \in U_a$, there is no $d \in U_b$ such that $(c, d) \in L_N(l)$, \\
-        then $c \notin (S_{ALL})_a$. \\
-        If for $d \in U_b$, there is no $c \in U_c$ such that $(c, d) \in L_N(l)$, \\
-        then $d \notin (S_{ALL})_b$.
-    }
-\end{quote}
+\begin{list}{}{
+    \setlength{\leftmargin}{1cm}
+    \setlength{\parindent}{0pt}
+}
+\item{
+    \itshape{If for $c \in U_a$, there is no $d \in U_b$ such that $(c, d) \in L_N(l)$, then $c \notin (S_{ALL})_a$. \\
+    If for $d \in U_b$, there is no $c \in U_c$ such that $(c, d) \in L_N(l)$, then $d \notin (S_{ALL})_b$.}
+}
+\end{list}
 
 See Section~\ref{sec:variants-strategies} for more specific examples of usage.
 
 \subsection{Edge Region}
 
-This strategy can be used on a Sudoku puzzle with an edge variant.
-
+The strategy Edge region can be used on a Sudoku puzzle with an edge variant.
 Let $R$ be a Sudoku region, $S$ be a Sudoku state, $E$ be the set of all label-adjacent pairs of cells
 and $m \in [n]$ be a Sudoku number.
 Let $Q := \{r \in R \mid m \in S_r\}$ be the set of all cells of region $R$ containing the number $m$.
@@ -132,6 +131,7 @@ that are label-adjacent or equal to all cells in $Q$.
 In a valid solution, regardless of where in $R$ is the number $m$, any cell $p$ in $P$ must either contain number $m$
 or be label-adjacent to a cell containing the number $m$.
 Because of that, in a valid solution, the cell $p$ can only contain $m$
-or numbers that are allowed by Strategy~\ref{subsec:formal-edge-label} for at least one occurrence of $m$ in $Q$.
+or numbers that are allowed by strategy Edge label in Section~\ref{subsec:formal-edge-label}
+for at least one occurrence of $m$ in $Q$.
 
 See Section~\ref{sec:variants-strategies} for more specific examples of usage.

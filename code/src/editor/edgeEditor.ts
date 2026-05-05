@@ -8,6 +8,8 @@
 
     private static areEventListenersOn: boolean = false;
 
+    private static variantName: string | null = null;
+
     private static removeVariantButtons(): void {
         let section = document.getElementById("right-menu-subsection-edge-add")!;
         for (let child of Array.from(section.children)) {
@@ -40,9 +42,11 @@
 
     public static updateMenu(): void {
         if (MainEditor.sudoku.hasEdgeVariant()) {
+            document.getElementById("variant-title")!.textContent = this.variantName;
             GraphicsUtils.addClass("right-menu-subsection-edge-add", "display-none");
             GraphicsUtils.removeClass("right-menu-subsection-edge-remove", "display-none");
         } else {
+            document.getElementById("variant-title")!.textContent = "Add";
             GraphicsUtils.addClass("right-menu-subsection-edge-remove", "display-none");
             GraphicsUtils.removeClass("right-menu-subsection-edge-add", "display-none");
             this.removeVariantButtons();
@@ -59,7 +63,9 @@
     }
 
     public static addVariant(variantId: number): void {
-        MainEditor.sudoku.setEdgeVariant(this.factories[variantId]);
+        let factory = this.factories[variantId];
+        this.variantName = factory.name;
+        MainEditor.sudoku.setEdgeVariant(factory);
         let variant = MainEditor.sudoku.getEdgeVariant()!;
         let setToZero = variant.labelStyle[0] === null;
 

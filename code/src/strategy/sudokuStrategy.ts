@@ -171,8 +171,8 @@ class SudokuStrategy {
      * @param binaries 1d array with binary representations of cells in region
      * @return reason:      all values that caused any other value to be removed
      * @return removed:     all values that will be removed
-     * @return multiple:    cell and all shifts that can not be in any other cell
-     * @return missing:     all shifts that can not be in any cell
+     * @return multiple:    cell and all shifts that cannot be in any other cell
+     * @return missing:     all shifts that cannot be in any cell
      * @return isUpdated:   true if any progress was made, or isValid==false
      * @return isValid:     false if region is known to have no solution
      */
@@ -335,7 +335,7 @@ class SudokuStrategy {
     }
 
     /**
-     * Try to find any smallest proof using hall's theorem, that some edges are perfectly unmatchable.
+     * Try to find any smallest proof using hall's theorem, that some edges are perfectly-unmatchable.
      * Source -> naked candidate - on positions <set> there can only be numbers <matched>.
      * Sink -> hidden candidate - numbers <matched> can only be on positions <set>.
      */

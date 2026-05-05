@@ -3,25 +3,17 @@
 \section{State}\label{sec:state}
 
 \begin{defn}
-    The \emph{Sudoku size} of an $n \times n$ Sudoku puzzle is a positive integer $n$.
-\end{defn}
-
-\begin{defn}
-    A \emph{Sudoku state} is a matrix $U := \{U_{i,j} \subseteq [n] \mid i, j \in [n]\}$,
-    where each element $U_{i, j}$ represents the set of candidate numbers
-    in the cell in the $i$-th row and $j$-th column.
-\end{defn}
-
-\begin{defn}
-    The \emph{Sudoku task} $T := \{T_{i,j} \mid i, j \in [n]\}$ is the initial state of an unsolved Sudoku puzzle.
-    Each element $T_{i,j}$ represents the set of candidate numbers
-    in the cell in the $i$-th row and $j$-th column.
-\end{defn}
-
-\begin{defn}
-    A \emph{Sudoku solution} $S$ is a Sudoku state such that every element $S_i$ has exactly one Sudoku number.
-    It represents solved Sudoku puzzle.
-    Each element $S_{i, j}$ represents what Sudoku number is in the cell in the $i$-th row and $j$-th column.
+    The following terms are used to describe a Sudoku puzzle:
+    \begin{itemize}
+        \item The \emph{Sudoku size} is a positive integer $n$, meaning the Sudoku puzzle has an $n \times n$ grid.
+        \item A \emph{Sudoku state} is a matrix $U := \{U_{i,j} \subseteq [n] \mid i, j \in [n]\}$,
+            where each element $U_{i,j}$ represents the set of candidate numbers
+            in the cell in the $i$-th row and $j$-th column.
+        \item The \emph{Sudoku task} $T := \{T_{i,j} \mid i, j \in [n]\}$ is the initial
+            Sudoku state of an unsolved puzzle.
+        \item A \emph{Sudoku solution} $S$ is a Sudoku state where every element $S_{i,j}$ contains exactly one number,
+            representing a solved puzzle.
+    \end{itemize}
 \end{defn}
 
 \begin{defn}\label{def:valid}
@@ -32,7 +24,7 @@
 
 \section{Rules}
 
-The Definition~\ref{def:valid} only specifies that a valid solution chooses one number for each cell from the task.
+Definition~\ref{def:valid} only specifies that a valid solution chooses one number for each cell from the task.
 Sudoku rules further restrict which solutions can be a valid solution.
 
 \subsection*{Regions}

@@ -1,24 +1,23 @@
 \chapter{Installation}
 
-This chapter explains how to install the software from source code.
+The attachment includes all \texttt{.html}, \texttt{.css}, and \texttt{.ts} source files.
+It also includes all compiled \texttt{.js} files, so compilation is not required to run the software.
 
-If you do not want to install it, you can visit (TODO: link), no setup needed.
+If you wish to run the software, see Section~\ref{sec:running}.
+If you wish to recompile the \texttt{.ts} source files, see Section~\ref{sec:compilation}.
 
-\section{Prerequisites}
+\section{Running}\label{sec:running}
 
-Install typescript compiler.
+Open the file \texttt{code/editor.html} in a browser.
 
-\section{Compilation}
+\section{Compilation of TypeScript}\label{sec:compilation}
+
+This section explains, how to compile \texttt{.ts} source files into \texttt{.js} files.
 
 \begin{itemize}
-    \item Open terminal.
-    \item Run command \texttt{tsc -}\texttt{-version} to check if you have installed typescript compiler correctly.
-    \item Open directory \texttt{code/}
-    \item Run command \texttt{tsc -w} to compile all \texttt{.ts} files to \texttt{.js} files.
-    \item You can check, that previous step generated \texttt{.js} file for each \texttt{.ts} file.
+    \item Install Node.js
+    \item Install TypeScript compiler
+    \item Run \texttt{tsc -{}-version} to verify the installation.
+    \item Open the directory \texttt{code/}.
+    \item Run \texttt{tsc} to compile all \texttt{.ts} files into \texttt{.js} files.
 \end{itemize}
-
-\section{Running}
-
-If you have successfully compiled \texttt{.ts} files into \texttt{.js} files,
-you can open the file \texttt{code/editor.html} in an internet browser.

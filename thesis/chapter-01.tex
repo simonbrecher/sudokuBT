@@ -3,59 +3,67 @@
 \section{Basic Sudoku}
 
 \begin{itemize}
-    \item In Sudoku $n \times n$ fill one number $1\text{--}n$ to every empty cell
+    \item In an $n \times n$ Sudoku puzzle, fill in each empty cell with a number from $1$ to $n$
     such that each region contains every number exactly once.
     \item Each row and column is a region by default.
-    \item Additional regions may be defined by the puzzle, such as boxes separated by a stronger border,
-    diagonals, or custom regions highlighted by an outline around a set of cells.
+    \item Additional regions may be defined by the puzzle, such as boxes separated by a thicker border,
+    diagonal lines, or custom regions highlighted by an outline around a group of cells.
 \end{itemize}
+
+The following images show examples of Sudoku puzzles.
+Each puzzle contains an image of the unsolved puzzle and image of its solution.
+All the puzzles are guaranteed to only have a single solution.
 
 \subsection*{Latin square}
 \begin{itemize}
-    \item Fill in every empty cell with a number from 1 to 6.
+    \item Fill in each empty cell with a number from $1$ to $6$.
     \item Each row and column must contain every number exactly once.
 \end{itemize}
 \twoimagesruleexample{latin-square}{Latin square $6 \times 6$}
 
 \subsection*{Sudoku}
 \begin{itemize}
-    \item Fill in every empty cell with a number from 1 to 6.
-    \item Each row, column, and rectangle $3 \times 2$ must contain every number exactly once.
+    \item Fill in each empty cell with a number from $1$ to $6$.
+    \item Each row, column, and $3 \times 2$ rectangle must contain every number exactly once.
 \end{itemize}
 \twoimagesruleexample{Sudoku}{Sudoku $6 \times 6$}
 
 \subsection*{Jigsaw Sudoku}
 \begin{itemize}
-    \item Fill in every empty cell with a number from 1 to 6.
+    \item Fill in every empty cell with a number from $1$ to $6$.
     \item Each row, column, and region must contain every number exactly once.
 \end{itemize}
 \twoimagesruleexample{jigsaw}{Jigsaw Sudoku $6 \times 6$}
 
 \subsection*{Diagonal Sudoku}
 \begin{itemize}
-    \item Fill in every empty cell with a number from 1 to 6.
-    \item Each row, column, rectangle $3 \times 2$, and diagonal must contain every number exactly once.
+    \item Fill in every empty cell with a number from $1$ to $6$.
+    \item Each row, column, $3 \times 2$ rectangle, and diagonal must contain every number exactly once.
 \end{itemize}
 \twoimagesruleexample{diagonal}{Diagonal Sudoku $6 \times 6$}
 
 \subsection*{Sudoku with extra regions}
 \begin{itemize}
-    \item Fill in every empty cell with a number from 1 to 6.
-    \item Each row, column, rectangle $3 \times 2$, and gray extra region must contain every number exactly once.
+    \item Fill in every empty cell with a number from $1$ to $6$.
+    \item Each row, column, $3 \times 2$ rectangle, and gray extra region must contain every number exactly once.
 \end{itemize}
 \twoimagesruleexample{extra-region}{Sudoku $6 \times 6$ with one extra region}
 
 \section{Variants}\label{sec:variant-rules}
 
 Variants add extra rules on top of basic Sudoku rules.
+Both Sudoku puzzle and all of its variants mentioned in this thesis are well known.
+You can find some more examples of Sudoku variants in~\cite{logika2024}.
 
-You can find all the variants mentioned in this thesis (TODO: link).
+The following images show examples of Sudoku variants mentioned in this thesis.
+Each puzzle contains an image of the unsolved puzzle and image of its solution.
+All the puzzles are guaranteed to only have a single solution.
 
 \subsection*{Consecutive}
 
 \begin{itemize}
-    \item If there is a white dot between two adjacent cells, the absolute difference of their values equals 1.
-    \item If there is no dot between two adjacent cells, the difference of their value is not 1.
+    \item If there is a white dot between two adjacent cells, the difference of their values equals $1$.
+    \item If there is no dot between two adjacent cells, the difference of their values is not $1$.
 \end{itemize}
 
 \twoimagesruleexample{consecutive}{Consecutive Sudoku $6 \times 6$}
@@ -63,7 +71,7 @@ You can find all the variants mentioned in this thesis (TODO: link).
 \subsection*{Kropki}
 
 \begin{itemize}
-    \item If there is a white dot between two adjacent cells, the absolute difference of their values equals 1.
+    \item If there is a white dot between two adjacent cells, the difference of their values equals $1$.
     \item If there is a black dot between two adjacent cells, one value is exactly twice the other.
     \item If both conditions hold, there is either black or white dot, but not both.
     \item If there is no dot between two adjacent cells, neither condition holds.
@@ -74,9 +82,9 @@ You can find all the variants mentioned in this thesis (TODO: link).
 \subsection*{VX}
 
 \begin{itemize}
-    \item If there is a V between two adjacent cells, the sum of their values equals 5.
-    \item If there is an X between two adjacent cells, the sum of their values equals 10.
-    \item If no V or X is present, the sum of their values is not 5 or 10.
+    \item If there is a V between two adjacent cells, the sum of their values equals $5$.
+    \item If there is an X between two adjacent cells, the sum of their values equals $10$.
+    \item If no V or X is present, the sum of their values is not $5$ or $10$.
 \end{itemize}
 
 \twoimagesruleexample{vx}{VX Sudoku $6 \times 6$}

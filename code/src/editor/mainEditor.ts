@@ -37,7 +37,6 @@ class MainEditor {
      */
     public static main(): void {
         this.createFrame();
-        this.showConfirmWindow("numbers", false);
         this.changeMenuPosition("numbers", null);
         this.hideConfirmWindow();
         this.render();
@@ -98,6 +97,18 @@ class MainEditor {
         this.frame = new Frame(this.size, this.size, cellSize, "container");
 
         this.sudoku = new Sudoku(this.size);
+
+        // set sudoku regions as rectangles
+        let [rectangleHeight, rectangleWidth]: (number | null)[] = [null, null];
+        for (let h = 2; h * h <= this.size; h++) {
+            if (this.size % h === 0) {
+                rectangleHeight = h;
+                rectangleWidth = this.size / h;
+            }
+        }
+        if (rectangleHeight !== null && rectangleWidth !== null) {
+            this.sudoku.regions.setRectangular(rectangleHeight, rectangleWidth);
+        }
 
         RegionEditor.onCreateFrame();
 
@@ -345,7 +356,6 @@ class MainEditor {
             if (newSize === this.size) {
                 this.hideConfirmWindow();
                 this.createFrame();
-                this.showConfirmWindow("numbers", false);
                 this.changeMenuPosition("numbers", null);
                 this.render();
             } else {
@@ -366,7 +376,6 @@ class MainEditor {
     }
 
     public static confirmTaskEdit(): void {
-        this.showConfirmWindow("numbers", false);
         this.changeMenuPosition("numbers", null);
         this.hideConfirmWindow();
         this.render();
@@ -483,7 +492,6 @@ class MainEditor {
 
     public static pressedNumbersButton(): void {
         if (! this.isConfirmOpen) {
-            this.showConfirmWindow("numbers", false);
             this.changeMenuPosition("numbers", null);
             this.numberPlus = 0;
             this.updateChecksPlus();
@@ -493,6 +501,7 @@ class MainEditor {
 
     public static pressedEdgeButton(): void {
         if (! this.isConfirmOpen) {
+            this.showConfirmWindow("variant", false);
             this.changeMenuPosition("edge", null);
             this.render();
         }

@@ -81,10 +81,7 @@
     \begin{center}
         \noindent\begin{minipage}{\textwidth}
             \begin{center}
-                \begin{minipage}{#3}
-                    \centering
-                    \includegraphics[width=\linewidth, height=\linewidth, keepaspectratio]{img/#1.png}
-                \end{minipage}
+                \includegraphics[height=#3, keepaspectratio]{img/#1.png}
                 \par\smallskip
                 #2
             \end{center}
@@ -97,15 +94,9 @@
     \begin{center}
         \noindent\begin{minipage}{\textwidth}
             \begin{center}
-                \begin{minipage}{#4}
-                    \centering
-                    \includegraphics[width=\linewidth, height=\linewidth, keepaspectratio]{img/#1.png}
-                \end{minipage}
+                \includegraphics[height=#4, keepaspectratio]{img/#1.png}
                 \hspace{#5}
-                \begin{minipage}{#4}
-                    \centering
-                    \includegraphics[width=\linewidth, height=\linewidth, keepaspectratio]{img/#2.png}
-                \end{minipage}
+                \includegraphics[height=#4, keepaspectratio]{img/#2.png}
                 \par\smallskip
                 #3
             \end{center}
@@ -113,26 +104,16 @@
     \end{center}
 }
 
-
 % This macro defines three images next to each other with one description
 \newcommand{\threeimages}[6]{
     \begin{center}
         \noindent\begin{minipage}{\textwidth}
             \begin{center}
-                \begin{minipage}{#5}
-                    \centering
-                    \includegraphics[width=\linewidth, height=\linewidth, keepaspectratio]{img/#1.png}
-                \end{minipage}
+                \includegraphics[height=#5, keepaspectratio]{img/#1.png}
                 \hspace{#6}
-                \begin{minipage}{#5}
-                    \centering
-                    \includegraphics[width=\linewidth, height=\linewidth, keepaspectratio]{img/#2.png}
-                \end{minipage}
+                \includegraphics[height=#5, keepaspectratio]{img/#2.png}
                 \hspace{#6}
-                \begin{minipage}{#5}
-                    \centering
-                    \includegraphics[width=\linewidth, height=\linewidth, keepaspectratio]{img/#3.png}
-                \end{minipage}
+                \includegraphics[height=#5, keepaspectratio]{img/#3.png}
                 \par\smallskip
                 #4
             \end{center}
@@ -182,6 +163,11 @@
     morecomment=[l]{//},
     morecomment=[s]{/*}{*/},
     commentstyle=\color{jsComment}\itshape
+}
+
+\newcommand{\editorbutton}[1]{
+  {\setlength{\fboxsep}{0pt}
+   \fbox{\hspace{3pt}\vphantom{Ag}\raisebox{-0.5pt}{\texttt{#1}}\hspace{3pt}}}
 }
 
 %%% Macros for definitions, theorems, claims, examples, ... (requires amsthm package)

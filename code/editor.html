@@ -132,8 +132,9 @@
             </div>
         </section>
         <section id="right-menu-section-edge" class="menu-section">
+            <div id="variant-title" class="menu-title">Add</div>
             <section id="right-menu-subsection-edge-add" class="menu-subsection">
-                <div class="menu-title">Add</div>
+
             </section>
             <section id="right-menu-subsection-edge-remove" class="menu-subsection">
                 <div id="menu-button-regions-edge-remove" class="menu-button" onclick="MainEditor.pressedEdgeRemoveButton();">Remove Variant</div>
@@ -146,7 +147,7 @@
 </div>
 
 <div id="confirm-window-resize" class="confirm-window">
-    <div class="confirm-text">Choose size of new sudoku</div>
+    <div class="confirm-text">Select Sudoku Size</div>
     <div class="confirm-input-wrapper">
         <input type="number" id="resize-value" value="9" oninput="validateInputLength(this, 2);">
     </div>
@@ -168,7 +169,7 @@
 </div>
 
 <div id="confirm-window-task-edit" class="confirm-window">
-    <div class="confirm-text">Edit task</div>
+    <div class="confirm-text">Edit Task</div>
     <div>If you edit task now, it will reset any progress you did while solving the sudoku.</div>
     <div class="confirm-window-button-wrapper">
         <div class="confirm" onclick="MainEditor.confirmTaskEdit();">Confirm</div>
@@ -177,7 +178,7 @@
 </div>
 
 <div id="confirm-window-solve-restart" class="confirm-window">
-    <div class="confirm-text">Restart solving</div>
+    <div class="confirm-text">Restart Solving</div>
     <div>This will reset any progress you did while solving the sudoku.</div>
     <div class="confirm-window-button-wrapper">
         <div class="confirm" onclick="MainEditor.confirmSolveRestart();">Confirm</div>
@@ -186,18 +187,17 @@
 </div>
 
 <div id="confirm-window-regions-jigsaw" class="confirm-window">
-    <div class="confirm-section">How to add jigsaw regions</div>
+    <div class="confirm-section">How to Add Jigsaw Regions</div>
     <ul>
-        <li>Hold left click to add new region.</li>
-        <li>Right click region to remove it.</li>
-        <li>Every time you add the last region, the sudoku task will update.</li>
-        <li>Press the View button to view current sudoku task.</li>
+        <li>Left-click and drag to draw a new region..</li>
+        <li>Right-click a region to remove it.</li>
+        <li>Once you add all regions, the Sudoku will update.</li>
     </ul>
-    <div class="confirm-section">Region rules</div>
+    <div class="confirm-section">Region Rules</div>
     <ul>
         <li id="text-jigsaw-1">All regions must have N cells.</li>
-        <li>All cells in a region must be orthogonally connected.</li>
-        <li>Each cell of sudoku must be part of exactly one region.</li>
+        <li>All cells in a region must be connected by and edge.</li>
+        <li>Each cell must belong to exactly one region.</li>
     </ul>
     <div class="confirm-window-button-wrapper">
         <div class="ok" onclick="MainEditor.cancel();">Ok</div>
@@ -205,17 +205,17 @@
 </div>
 
 <div id="confirm-window-regions-extraregions" class="confirm-window">
-    <div class="confirm-section">How to add extra regions</div>
+    <div class="confirm-section">How to Add Extra Regions</div>
     <ul>
-        <li>Hold left click to add new extra region.</li>
-        <li>Right click region to remove it.</li>
+        <li>Left-click and drag to draw a new extra region.</li>
+        <li>Right-click a region to remove it.</li>
     </ul>
-    <div class="confirm-section">Region rules</div>
+    <div class="confirm-section">Region Rules</div>
     <ul>
         <li id="text-extraregions-1">All regions must have N cells.</li>
-        <li>All cells in a region must be orthogonally connected.</li>
-        <li>Two regions can not intersect.</li>
-        <li>Unlike jigsaw regions, extra regions don't have to fill every cell.</li>
+        <li>All cells in a region must be connected by an edge.</li>
+        <li>Two regions cannot intersect.</li>
+        <li>Extra regions do not need to cover every cell.</li>
     </ul>
     <div class="confirm-window-button-wrapper">
         <div class="ok" onclick="MainEditor.cancel();">Ok</div>
@@ -223,24 +223,24 @@
 </div>
 
 <div id="confirm-window-regions" class="confirm-window">
-    <div class="confirm-section">What are sudoku regions</div>
-    <div>In a sudoku region, every number has to appear exactly once.</div>
-    <div>You can add regions of 3 main types: regular, diagonal and extra regions.</div>
-    <div>Every row and column of sudoku also counts as a region,<br> so each row and column must have every number exactly once as well.</div>
+    <div class="confirm-section">What are Sudoku Regions?</div>
+    <div>Every number has to appear exactly once in each region.</div>
+    <div>You can add regions of three main types: regular, diagonal, and extra regions.</div>
+    <div>Every row and column also counts as a region,<br> so each row and column must have every number exactly once as well.</div>
     <div class="confirm-window-button-wrapper">
         <div class="ok" onclick="MainEditor.cancel();">Ok</div>
     </div>
 </div>
 
-<div id="confirm-window-numbers" class="confirm-window">
-    <div class="confirm-section">What are sudoku numbers</div>
-    <div>You can fill some cells with a number.</div>
-    <div>Left click on a cell to choose it.</div>
-    <div>Press a number key to fill the cell with a number.</div>
-    <div>Press Backspace or Delete to remove a number from the cell.</div>
-    <div id="text-plus10">For numbers 10 or higher use +10 button.</div>
-    <div id="text-plus20">For numbers 10 or higher use +10 and +20 buttons.</div>
-    <div>Objective of solving sudoku is to fill all other numbers, but you can not change numbers in task.</div>
+<div id="confirm-window-variant" class="confirm-window">
+    <div class="confirm-section">Adding Variants</div>
+    <div>You can add one of five Sudoku variants.</div>
+    <div>Press button with the name of the variant you want to add.</div>
+    <div>For explanation of the variant's rules, read User documentation.</div>
+    <div>Left-click the squares between edges to toggle labels.</div>
+    <div>Right-click them to toggle the labels in the opposite direction.</div>
+    <div>If you add a transparent red X, it means that you allow all combinations of numbers in the two adjacent cells.</div>
+    <div>The transparent X will only stay visible while you are editing the variant.</div>
     <div class="confirm-window-button-wrapper">
         <div class="ok" onclick="MainEditor.cancel();">Ok</div>
     </div>

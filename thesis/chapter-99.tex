@@ -1,11 +1,20 @@
 \chaptoc{Conclusion}
 
-The main objective of this thesis was to develop software that helps people solve Sudoku puzzles
+The main objective of this thesis is to develop software that helps people solve Sudoku variants
 by applying strategies from simplest to most complex.
-This objective was achieved, the software supports multiple types of Sudoku regions and five Sudoku variants.
+This objective was achieved.
+The software supports several types of Sudoku regions --- rectangular, jigsaw, diagonal, and extra regions.
+It supports adding one of five variants: Consecutive, Kropki, VX, Comparative, and Sum.
+A user can configure a Sudoku task in the UI and then apply multiple solving strategies.
+The supported strategies are: Pointing, Naked Candidates, Hidden Candidates, and Generalised X-Wing.
+There are two general strategies applicable to all variants: Edge Label and Edge Region.
+Using these strategies, the software provides step-by-step explanation of solving the Sudoku variant.
 
-Chapter~\ref{chap:5} explains and proves an algorithm that finds the smallest application of
-Naked Candidates, Hidden Candidates, and Generalised X-Wing in polynomial time.
-This was not part of the original objectives but became significant after the algorithm was implemented.
+The thesis explains and proves Algorithm~\ref{alg:algorithm} that finds the smallest application of Naked Candidates,
+Hidden Candidates, and Generalised X-Wing with time complexity $\mathcal{O}(n^3)$ in Chapter~\ref{chap:5}.
+This algorithm is important, because the trivial method of looking through all possible combinations
+of cells would have time complexity $\mathcal{O}(p(n) \cdot 2^n)$.
+This was not part of the original objective, but became significant after the algorithm was implemented.
 
-This thesis could be extended in the future by adding more variants and strategies.
+Future work could extend this thesis by adding more Sudoku variants or by adding more solving strategies,
+as explained in Section~\ref{sec:extensibility}.

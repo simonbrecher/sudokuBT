@@ -1,109 +1,190 @@
 \chapter{User documentation}
 
+This software is a tool for solving Sudoku puzzles step by step.
+It allows you to enter a Sudoku puzzle and apply solving strategies one at a time,
+so you can follow the reasoning behind each step.
+It is meant to help explain how a Sudoku puzzle is solved, rather than produce a solution.
+
 \section{What is Sudoku}
 
-In an $n \times n$ Sudoku, place a number from $1$ to $n$ in every empty cell
-such that each region contains every number exactly once.
-Sudoku variants add more rules.
-For more detailed explanation of all the rules, read the Chapter~\ref{ch:chap-1}.
+For explanation of the rules of Sudoku puzzles, see Chapter~\ref{ch:chap-1}.
 
 \section{Creating a Sudoku Puzzle}
 
 \subsection*{New Sudoku}
 
-Before you can start solving a Sudoku puzzle, you have to start by creating the Sudoku task.
-First step is to click the button "New Sudoku" and specify the size of the Sudoku, which can be from 3 to 16.
+Before you can start solving, you must first create the Sudoku task.
+Click \editorbutton{New Sudoku} and specify the size of the puzzle, which must be between 3 and 16.
+You can then add regions, numbers, and a variant to the task.
+Once you finish creating the task, press \editorbutton{Start Solving}.
 
-After you create the Sudoku task, press the button "Start Solving".
+\oneimage{documentation/resize}{
+    Choosing the size of a new Sudoku puzzle
+}{0.5\textwidth}
 
 \subsection*{Regions}
 
 According to the rules of Sudoku, every number has to be in each region exactly once.
 Each row and column is a region by default, but you might add up to 3 more types of regions.
-To add more regions, click the button "Edit Regions".
+To add more regions, press \editorbutton{Edit Regions}.
 
 \subsubsection*{Rectangular/Jigsaw Regions}
 
-To add Jigsaw regions, press the button "Jigsaw".
-Hold the left mouse button to choose cells in a new Jigsaw region.
-Right-click a Jigsaw region to remove it.
+To add Jigsaw regions, press \editorbutton{Jigsaw}.
+Left-click and drag to draw a new region.
+Right-click a region to remove it.
 In an $n \times n$ Sudoku puzzle with Jigsaw regions,
 there has to be exactly $n$ Jigsaw regions and each region has to have exactly $n$ cells.
 All cells in a Jigsaw region must be edge-adjacent and no cell can be in two different Jigsaw regions at once.
 
-If the size of the Sudoku puzzle is not a prime number, you can press the button "Rectangular",
+If the size of the Sudoku puzzle is not a prime number, you can press \editorbutton{Rectangular},
 which will let you choose any size of regions and the software will automatically add all of them.
 For example $16 \times 16$ Sudoku can have Rectangular regions $2 \times 8$, $4 \times 4$, or $8 \times 2$.
 
-To remove all Rectangular or Jigsaw regions, press the button "None".
+To remove all Rectangular or Jigsaw regions, press \editorbutton{None}.
+
+\oneimage{documentation/jigsaw}{
+    Adding Jigsaw regions
+}{0.5\textwidth}
 
 \subsubsection*{Diagonal Regions}
 
-To add or remove diagonal regions, press the button "Diagonal".
+To turn diagonal regions on/off, press \editorbutton{Diagonal}.
+
+\oneimage{documentation/diagonal}{
+    Diagonal regions
+}{0.5\textwidth}
 
 \subsubsection*{Extra Regions}
 
-To add Extra regions, click the button "Custom".
-Hold the left mouse button to choose cells in a new Extra region.
-Right-click an Extra region to remove it.
+To add Extra regions, press \editorbutton{Custom}.
+Left-click and drag to draw a new region.
+Right-click a region to remove it.
 In an $n \times n$ Sudoku puzzle with Extra regions, each Extra region has to have exactly $n$ cells, but
 unlike the Jigsaw regions, there can be any amount of Extra regions.
 All cells in an Extra region must be edge-adjacent and no cell can be in two different Extra regions at once.
 
 If the size of the Sudoku puzzle is $4 \times 4$, $9 \times 9$, or $16 \times 16$,
-you can press the "Windoku" button, which adds the specific pattern of Extra regions for Windoku Sudoku.
+you can press \editorbutton{Windoku}, which adds the specific pattern of Extra regions for Windoku Sudoku.
+
+\oneimage{documentation/extra}{
+    Adding Extra regions
+}{0.5\textwidth}
 
 \subsection*{Numbers}
 
-To add numbers, press the button "Edit Numbers".
-To add a single number in a cell, left click it and press a number on the keyboard.
-An empty cell can contain any number in the solution.
-If you want to specify what combination of number can be in a cell, right click it,
-then you can add or remove individual numbers.
-Press the \texttt{Delete} or the \texttt{Backspace} to make a cell empty again.
-In a $10 \times 10$ or bigger Sudoku puzzle, you can press the "+10" button to add numbers bigger than 9.
+To fill cells with numbers, press \editorbutton{Edit Numbers}.
+To fill a cell with a single number, left-click it and press the number on the keyboard.
+If you want to specify a set of candidate numbers, right-click the cell.
+Press \texttt{Delete} or \texttt{Backspace} to make a cell empty again.
+In a $10 \times 10$ or bigger Sudoku puzzle, you can first add all numbers from $1$ to $9$,
+and then press \editorbutton{+10} to add the rest.
+
+\twoimages{documentation/number-big}{documentation/number-small}{
+    Adding given numbers to the task (top image) \\
+    Adding candidate numbers to the task (bottom image)
+}{0.4\textwidth}{0.2cm}
 
 \subsection*{Variants}
 
-To add a Sudoku variant, press the button "Edit Variant".
+To add a Sudoku variant, press \editorbutton{Edit Variant}.
 You can choose one of five different variants to add.
+For detailed explanation of the rules of all variants, see Section~\ref{sec:variant-rules}.
 To add labels to the edges, left-click the square on the edge, which will toggle it to the next label.
 To toggle labels in the opposite direction, right-click it instead.
 
+\twoimages{documentation/variant-1}{documentation/variant-2}{
+    Before and after adding a variant
+}{0.4\textwidth}{0.2cm}
+
 \subsection*{Empty Labels}
 
-.
+The variants Consecutive, Kropki, and VX will put a label on all edges that satisfy the condition.
+This means that if there is no label present, then none of the conditions holds,
+for example in Consecutive Sudoku, if there is no white dot, then the difference between the two cells is not $1$.
+On the other hand, variants Comparative and Sum only label some edges,
+so the absence of a label means any combination of numbers is allowed.
+
+While you edit the labels of the variant, if any combination of numbers can be contained in the pair of cells,
+then there is a transparent red X between the two cells.
+The X can only be seen while editing the variant, which means that the author of the puzzle must explain the rules,
+so that the solver knows what pairs of cells can contain all combinations of numbers.
+
+The following images show three variants of Consecutive Sudoku.
+Each puzzle contains explanation of the rules, an image of the puzzle while editing the variant (left image),
+an image of the task while not editing the variant (middle image), and an image of the solution (right image).
+
+\subsection*{Show All Dots}
+
+\begin{itemize}
+    \item If there is a white dot between two adjacent cells, the difference of their values equals $1$.
+    \item If there is no dot between two adjacent cells, the difference of their values is not $1$.
+\end{itemize}
+
+\threeimages{documentation/consecutive-1-1}{documentation/consecutive-1-2}{documentation/consecutive-1-3}{
+    Consecutive Sudoku $6 \times 6$ (all dots are shown)
+}{0.3\textwidth}{0.2cm}
+
+\subsection*{Show Only Dots in a Region}
+
+\begin{itemize}
+    \item If there is a white dot between two adjacent cells, the difference of their values equals $1$.
+    \item If there is no dot between two adjacent cells that are in the same rectangular region,
+            the difference of their values is not $1$.
+    \item Adjacent cells that are not in the same rectangular region can contain all combinations of numbers.
+\end{itemize}
+
+\threeimages{documentation/consecutive-2-1}{documentation/consecutive-2-2}{documentation/consecutive-2-3}{
+    Consecutive Sudoku $6 \times 6$ (only dots in rectangle are shown)
+}{0.3\textwidth}{0.2cm}
+
+\subsection*{Show Some Dots}
+
+\begin{itemize}
+    \item If there is a white dot between two adjacent cells, the difference of their values equals $1$.
+    \item If there is no dot between two adjacent cells, there can be all combinations of numbers.
+\end{itemize}
+
+\threeimages{documentation/consecutive-3-1}{documentation/consecutive-3-2}{documentation/consecutive-3-3}{
+    Consecutive Sudoku $6 \times 6$ (only some dots are shown)
+}{0.3\textwidth}{0.2cm}
 
 \section{Solving a Sudoku}
 
-After you create a Sudoku task, press the button "Start Solving".
+After you create a Sudoku task, press \editorbutton{Start Solving}.
 The software will automatically fill every empty cell with all possible numbers.
 
 The goal of solving is to remove numbers from cells using different strategies,
 until there is only one number in each cell.
-For list and explanation of all the strategies used by the software, read the Chapter~\ref{ch:chap-2}.
+For list and explanation of all the strategies used by the software, see Chapter~\ref{ch:chap-2}.
 
-The available strategies are ordered from the most simple to the most complicated.
+The available strategies are ordered from the simples to the most complicated.
 If you want to turn off a strategy, press its button in the right menu.
 
-To solve the Sudoku puzzle, press the button "Apply Step".
-The software will go through all the strategies from the most simple to the most complicated and
-find the first one that can prove that some of the numbers can not be a part of the solution.
+To solve the Sudoku puzzle, press \editorbutton{Apply Step}.
+The software will go through all the strategies from the simplest to the most complicated and
+find the first one that can prove that some of the numbers cannot be a part of the solution.
 Then it will show you the explanation of the strategy.
-To continue, press the button "Apply Step" again, and the software will remove all numbers with yellow background.
-For explanation of the colors that the software uses, read the first part of Chapter~\ref{ch:chap-2}.
-(TODO: make it a section)
+To continue, press \editorbutton{Apply Step} again,
+and the software will remove all numbers with yellow background.
+For explanation of the colors that the software uses, see Section~\ref{sec:color}.
 
-You can edit the numbers manually.
-To set a cell to have a single number, left-click it.
-To add or remove a single number from a cell, right-click it.
-Press the \texttt{Delete} or the \texttt{Backspace} to reset a cell to what it was in the task.
-In a $10 \times 10$ or bigger Sudoku puzzle, you can press the "+10" button to add or remove numbers bigger than 9.
+You can edit the numbers manually, for example if you see a way to progress that the software missed.
+To fill a cell with a single number, left-click it.
+To add or remove a one candidate number from a cell, right-click it.
+Press \texttt{Delete} or \texttt{Backspace} to reset a cell to what it was in the beginning of solving.
+In a $10 \times 10$ or bigger Sudoku puzzle,
+you can check \editorbutton{+10} if you want to add or remove numbers bigger than $9$.
 
 If the task has no solution, or you have manually removed a number that has to be in the solution,
 you can end up with some cells not being able to have any numbers.
-If there is a cell with "!", it meas that the cell can not have any number.
+If there is a cell with \texttt{!}, it meas that the cell cannot have any number.
+
+\twoimages{documentation/strategy-1}{documentation/strategy-2}{
+    After pressing \editorbutton{Apply Step} once (top image) \\
+    After pressing \editorbutton{Apply Step} second time (bottom image)
+}{0.4\textwidth}{0.2cm}
 
 \section{Examples of Sudoku Puzzles}
 
-Visit Chapter~\ref{ch:chap-1} for examples of Sudoku tasks with unique solution.
+For examples of Sudoku tasks with unique solution, see Chapter~\ref{ch:chap-1}.

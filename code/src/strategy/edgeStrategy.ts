@@ -86,7 +86,7 @@ class EdgeStrategy {
 
     public static label(state: State): StrategyResult {
         if (! state.sudoku.hasEdgeVariant()) {
-            throw "Can not call EdgeStrategy.label() if ! Sudoku.hadEdgeVariant()";
+            throw "Cannot call EdgeStrategy.label() if ! Sudoku.hadEdgeVariant()";
         }
 
         let board = state.board;
@@ -150,7 +150,7 @@ class EdgeStrategy {
             isUpdated: true,
             isValid: true,
             name: "Edge Label",
-            message: "In the two cells around an edge label there are some numbers that can not result in that label with any other number in the other cell."
+            message: "In the two cells around an edge label there are some numbers that cannot result in that label with any other number in the other cell."
         }
     }
 
@@ -255,7 +255,7 @@ class EdgeStrategy {
 
     public static region(state: State): StrategyResult {
         if (! state.sudoku.hasEdgeVariant()) {
-            throw "Can not call EdgeStrategy.label() if ! Sudoku.hadEdgeVariant()";
+            throw "Cannot call EdgeStrategy.label() if ! Sudoku.hadEdgeVariant()";
         }
 
         let board = state.board;
@@ -299,7 +299,7 @@ class EdgeStrategy {
             message: `
                 All occurrences of ${result.shift + 1} in a region are adjacent to a cell.
                 Number in that cell will be adjacent to ${result.shift + 1}.
-                Because of that, any number that can not be adjacent to any occurrence ${result.shift + 1} can be removed.
+                Because of that, any number that cannot be adjacent to any occurrence ${result.shift + 1} can be removed.
             `,
         };
     }

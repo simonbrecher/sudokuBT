@@ -16,7 +16,7 @@
         let cell = EditorUtils.mouseCoordinatesToCellCoordinates(event.y, event.x);
 
         if ((event.buttons & 0b11) !== 0) {
-            // if we are solving sudoku and there is a big number in the task in the cell, the cell can not be chosen
+            // if we are solving sudoku and there is a big number in the task in the cell, the cell cannot be chosen
             if (MainEditor.menuPosition.left === "solve") {
                 let index = cell.y * MainEditor.size + cell.x;
                 if (BinaryUtils.has1bit32(MainEditor.sudoku.task.board[index])) {

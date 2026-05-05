@@ -1,7 +1,7 @@
 type GraphHallProof = {
     set: number[], // S subset of A for source, P(S) subset of A for sink
     matched: number[], // P(S) subset of B for source, S subset of B for sink
-    edges: number[][], // [a, b][] edges that can be proven perfectly unmatchable, a from A, b from B
+    edges: number[][], // [a, b][] edges that can be proven perfectly-unmatchable, a from A, b from B
 }
 
 class PerfectMatching {
@@ -282,7 +282,7 @@ class PerfectMatching {
     }
 
     /**
-     * Return all perfectly matchable edges in a graph.
+     * Return all perfectly-matchable edges in a graph.
      * If there is no perfect matching, return null.
      */
     public static getPerfectlyMatchableEdges(edges: number[][]): number[][] | null {
@@ -292,14 +292,14 @@ class PerfectMatching {
             return null;
         }
 
-        // get graph used to calculate all perfectly matchable edges and its components of strong connectivity
+        // get graph used to calculate all perfectly-matchable edges and its components of strong connectivity
         let graph = this.getMatchableEdgesGraph(edges, matched);
         let components = this.getStronglyConnectedComponents(graph);
 
         // inverse of perfect matching
         let invertedMatched = ArrayUtils.invertArray1d(matched);
 
-        // get all perfectly matchable edges
+        // get all perfectly-matchable edges
         let matchable: number[][] = [];
         for (let i = 0; i < edges.length; i++) {
             let add: number[] = [];
@@ -317,11 +317,11 @@ class PerfectMatching {
     }
 
     /**
-     * If there is a perfectly unmatchable edge in bipartite graph with perfect matching, return condensation.
+     * If there is a perfectly-unmatchable edge in bipartite graph with perfect matching, return condensation.
      * @param graph Graph as returned by getMatchableEdgesGraph.
      * @param matched Perfect matching used to create graph in argument graph.
      * @param components Components of strong connectivity of graph in argument graph.
-     * @return null if there is no perfectly unmatchable edge,
+     * @return null if there is no perfectly-unmatchable edge,
      * otherwise for each component return all components to which there exists unmatchable edge.
      */
     private static getComponentGraph(graph: number[][], components: number[]): number[][] | null {
@@ -402,13 +402,13 @@ class PerfectMatching {
     }
 
     /**
-     * Get any smallest proof using hall's theorem, that some edges are perfectly unmatchable.
+     * Get any smallest proof using hall's theorem, that some edges are perfectly-unmatchable.
      * @param isSource True if we search for proof based on source of condensation, false if it is sink.
      * @param sourceSink Indices of all sources / sinks of condensation (based on value of isSource).
      * @param vertexComponents For each vertex of partition A from graph in parameter edges, index of component of connectivity.
      * @param edges Original graph that part of sudoku was converted to.
      * @param matched Perfect matching of graph in parameter edges.
-     * @return Proof that some edges are perfectly unmatchable in format of type GraphHallProof.
+     * @return Proof that some edges are perfectly-unmatchable in format of type GraphHallProof.
      */
     private static getSourceSinkProof(
         isSource: boolean, sourceSink: number[], vertexComponents: number[],
@@ -444,13 +444,13 @@ class PerfectMatching {
     }
 
     /**
-     * Try to find any smallest proof using hall's theorem, that some edges are perfectly unmatchable.
+     * Try to find any smallest proof using hall's theorem, that some edges are perfectly-unmatchable.
      * One region:      Source -> naked candidate - on positions <set> there can only be numbers <matched>.
      *                  Sink -> hidden candidate - numbers <matched> can only be on positions <set>.
      * Intersection:    Both sink and source are region -> region, it depends, what directions are partitions A and B.
      * @param edges Bipartite graph.
      * @return  "no-matching" if bipartite graph has no perfect matching.
-     *          "no-unmatchable-edge" if bipartite graph has perfect matching and all edges are perfectly matchable.
+     *          "no-unmatchable-edge" if bipartite graph has perfect matching and all edges are perfectly-matchable.
      *          otherwise, return smallest proof with hall's theorem both for a source and sink of condensation.
      */
     public static getHallProof(edges: number[][])
@@ -462,7 +462,7 @@ class PerfectMatching {
             return "no-matching";
         }
 
-        // get graph used to calculate all perfectly matchable edges and its components of strong connectivity
+        // get graph used to calculate all perfectly-matchable edges and its components of strong connectivity
         let graph = this.getMatchableEdgesGraph(edges, matched);
         let components = this.getStronglyConnectedComponents(graph);
 

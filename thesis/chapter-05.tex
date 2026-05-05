@@ -14,8 +14,8 @@ For a perfect matching $P$, a vertex $v$, and a set of vertices $S \subseteq A$,
 $P(v)$ denotes the vertex in partition $B$ that is perfectly matched to $v$ by $P$, and
 $P(S)$ denotes the set of vertices in partition $B$ that are perfectly matched to the vertices $S$ by $P$.
 
-A perfectly matchable edge is an edge that is part of at least one perfect matching.
-A perfectly unmatchable edge is an edge that is not part of any perfect matching.
+A perfectly-matchable edge is an edge that is part of at least one perfect matching.
+A perfectly-unmatchable edge is an edge that is not part of any perfect matching.
 
 A strongly connected component of a directed graph $H$ is a maximal set of vertices
 of $H$ such that for every pair of vertices $u, v \in X$,
@@ -28,8 +28,8 @@ there exists an edge in $H$ from some vertex in $X_i$ to some vertex in $X_j$.
 
 In a finite directed acyclic graph, any vertex can reach at least one sink.
 If a vertex $C_X$ in a condensation can reach a vertex $C_Y$, then in the original graph,
-any vertex in the corresponding component of strong connectivity $X$
-can reach any vertex in the corresponding component of strong connectivity $Y$.
+any vertex in the corresponding strongly connected component $X$
+can reach any vertex in the corresponding strongly connected component $Y$.
 
 A sink of a directed graph is a vertex with no outgoing edges.
 A source of a directed graph is a vertex with no incoming edges.
@@ -37,18 +37,16 @@ A non-isolated sink of a directed graph is a vertex with no outgoing edges and a
 
 \begin{thm}[Hall's Marriage Theorem]\label{thm:hall}
     A bipartite graph $G = (A \cup B, E)$ has a perfect matching if and only if
-    $\forall S \subseteq A: \left|N(S)\right| \geq \left|S\right|$.
+    $\forall S \subseteq A: \left|N(S)\right| \geq \left|S\right|$. \cite{hall1935}
 \end{thm}
 
-(TODO: source)
+\section{Perfectly-Unmatchable Edges}
 
-\section{Perfectly Unmatchable Edges}
-
-Perfect matching strategies are based on finding perfectly unmatchable edges and removing them.
+Perfect matching strategies are based on finding perfectly-unmatchable edges and removing them.
 
 \begin{thm}[Correctness of Perfect Matching Strategies]\label{thm:strategy}
     Let $G = (A \cup B, E)$ be a bipartite graph, $S \subseteq A$, and $\left|N(S)\right| = \left|S\right|$.
-    All edges $(a, b) \in E$ where $a \notin S$ and $b \in N(S)$ are perfectly unmatchable.
+    All edges $(a, b) \in E$ where $a \notin S$ and $b \in N(S)$ are perfectly-unmatchable.
 \end{thm}
 
 \begin{proof}
@@ -60,7 +58,7 @@ Perfect matching strategies are based on finding perfectly unmatchable edges and
 
 \begin{thm}[Existence of Perfect Matching Strategies]\label{thm:existence}
     Let $G = (A \cup B, E)$ be a bipartite graph with
-    a perfect matching $P$ and let $(a, b) \in E$ be a perfectly unmatchable edge.
+    a perfect matching $P$ and let $(a, b) \in E$ be a perfectly-unmatchable edge.
     Then there exists a non-empty $S \subsetneq A$ such that $\left|N(S)\right| = \left|S\right|$,
     $a \notin S$, and $b \in N(S)$.
 \end{thm}
@@ -70,7 +68,7 @@ Perfect matching strategies are based on finding perfectly unmatchable edges and
     be the bipartite graph obtained by removing the vertices $a$ and $b$ from $G$.
     For $S \subseteq A'$, let $N'(S)$ denote the set of neighbours of $S$ in $B'$.
     If $G'$ had a perfect matching $M$, then $M \cup \{(a, b)\}$ would be a perfect matching of $G$,
-    which contradicts the assumption that $(a, b)$ is perfectly unmatchable.
+    which contradicts the assumption that $(a, b)$ is perfectly-unmatchable.
     Since $G'$ does not have a perfect matching, by Theorem~\ref{thm:hall},
     we have $\exists S \subseteq A': \left|N'(S)\right| < \left|S\right|$.
     But since $G$ has a perfect matching, by Theorem~\ref{thm:hall}, we have $\left|N(S)\right| \geq \left|S\right|$.
@@ -102,19 +100,19 @@ The edge $(A_i, B_j)$ exists if $j \in U_{R_i}$, i.e., the $i$-th cell of the re
 }{0.4\textwidth}{0.5cm}
 
 If the Sudoku state $U$ is a valid solution, then the graph $G$ is a perfect matching.
-Therefore, if an edge $(A_i, B_j) \in E$ is perfectly unmatchable,
+Therefore, if an edge $(A_i, B_j) \in E$ is perfectly-unmatchable,
 then there is no valid solution $V \preceq U$ with $j \in V_{R_i}$.
 
 The statement that there exists a non-empty set $S \subsetneq A$ and an edge $(a, b) \in E$
 such that $\left|N(S)\right| = \left|S\right|$, $a \notin S$, and $b \in N(S)$ corresponds to the statement that
 there is $k := \left|S\right|$ cells in the Sudoku region $R$ that only contain $k$ different candidate numbers
 and there is at least one of these candidate numbers in a different cell.
-Then by Theorem~\ref{thm:strategy}, the edge $(a, b)$ is perfectly unmatchable,
+Then by Theorem~\ref{thm:strategy}, the edge $(a, b)$ is perfectly-unmatchable,
 which means that no cell in $R$, other than the $k$ cells, can contain any of the $k$ candidates.
 Therefore, Theorem~\ref{thm:strategy} for the graph $G$ is equivalent to Naked Candidates strategy.
 
 By Theorem~\ref{thm:existence},
-if $G$ has a perfect matching and there is at least one perfectly unmatchable edge,
+if $G$ has a perfect matching and there is at least one perfectly-unmatchable edge,
 then there is at least one set $S$ and edge $(a, b)$ satisfying the conditions of the previous paragraph.
 Hence, the Naked Candidates strategy will be able to prove that at least one candidate in $R$ can be removed.
 
@@ -144,12 +142,12 @@ $E_H = \{(A_i, B_j) \mid (A_j, B_i) \in E_N\}$.
 }{0.4\textwidth}{0.5cm}
 
 Similarly to $G_N$, if the state $U$ is a valid solution, then the graph $G_H$ is a perfect matching.
-Therefore, if an edge $(A_j, B_i) \in E$ is perfectly unmatchable,
+Therefore, if an edge $(A_j, B_i) \in E$ is perfectly-unmatchable,
 then there is no valid solution $V \preceq U$ with $j \in V_{R_i}$.
 
 Similarly to the previous subsection,
 Theorem~\ref{thm:strategy} is equivalent to Hidden Candidates strategy and
-Theorem~\ref{thm:existence} proves that if $G$ has a perfect matching and at least one perfectly unmatchable edge,
+Theorem~\ref{thm:existence} proves that if $G$ has a perfect matching and at least one perfectly-unmatchable edge,
 then Hidden Candidates strategy will be able to prove that at least one candidate in $R$ can be removed.
 
 \subsection*{Generalised X-Wing}
@@ -170,16 +168,16 @@ at least one cell in the intersection $P_i \cap Q_j$ contains a candidate for th
     All cells containing a candidate for a Sudoku number $1$ (left image) \\
     The graph $G$ for Generalised X-Wing; $m = 1$, $P =$ rows, and $Q =$ columns (middle image) \\
     The graph $G$ for Generalised X-Wing; $m = 1$, $P =$ rows, and $Q =$ rectangles (right image)
-}{0.3\textwidth}{0.2cm}
+}{0.33\textwidth}{0.2cm}
 
 Similarly to the previous two subsections, if the state $U$ is a valid solution,
 then the graph $G$ is a perfect matching.
-Therefore, if an edge $(A_i, B_j) \in E$ is perfectly unmatchable,
+Therefore, if an edge $(A_i, B_j) \in E$ is perfectly-unmatchable,
 then there is no valid solution $V \preceq U$ such that $\exists c \in P_i \cap Q_j: m \in V_c$.
 
 Similarly to the previous two subsections,
 Theorem~\ref{thm:strategy} is equivalent to Generalised X-Wing strategy and
-Theorem~\ref{thm:existence} proves that if $G$ has a perfect matching and at least one perfectly unmatchable edge,
+Theorem~\ref{thm:existence} proves that if $G$ has a perfect matching and at least one perfectly-unmatchable edge,
 then Generalised X-Wing strategy will be able to prove that
 at lest one candidate for the Sudoku number $m$ can be removed.
 
@@ -198,10 +196,11 @@ Let $G := (A \cup B, E_G)$ be a bipartite graph and let $P$ be a perfect matchin
 Oriented graph $H$ is $H := (V, E_H)$ where $V := \{V_i \mid i \in [n]\}$ and
 $E_H := \{ (V_i, V_j) \mid (A_i, P(A_j)) \in E_G \land i \neq j \}$.
 
-\twoimages{perfect-matching/g-1}{perfect-matching/h-1}{
+\threeimages{perfect-matching/g-1}{perfect-matching/h-1}{perfect-matching/c-1}{
     A graph $G$, with the partition $B$ ordered, so that edges matched by $P$ are in the same row (left image) \\
-    Corresponding graph $H$ (right image)
-}{0.4\textwidth}{0.5cm}
+    Corresponding graph $H$ (middle image) \\
+    The condensation of $H$ (right image)
+}{0.33\textwidth}{0.5cm}
 
 \section{Properties of the Condensation of H}
 
@@ -229,21 +228,21 @@ For $S \subseteq A$, let $N(S)$ denote the set of all neighbors of vertices in $
     Let $S \subseteq A$ such that $N(S) = P(S)$ and
     let there be an edge $(a, b) \in E_G$ with $a \notin S$ and $b \in N(S)$.
     Then there exists a non-isolated sink in the condensation $C$
-    corresponding to the component of strong connectivity $X \subseteq V$ in $H$
+    corresponding to the strongly connected component $X \subseteq V$ in $H$
     such that $\{A_i \mid V_i \in X\} \subseteq S$.
 \end{lemma}
 
 \begin{proof}
     Let $x, y \in [n]$ be the indices of the edge $(A_x, P(A_y)) := (a, b)$.
     The indices $x$ and $y$ are unique, because $P$ is a perfect matching.
-    Let $Y$ be the component of strong connectivity in $H$ that contains the vertex $V_y$
+    Let $Y$ be the strongly connected component in $H$ that contains the vertex $V_y$
     and let $C_Y$ be the vertex in the condensation $C$ corresponding to $Y$.
     Since $P(A_y) = b \in N(S)$ and $N(S) = P(S)$, we have $A_y \in S$.
 
     For a contradiction suppose $V_x$ is reachable in $H$ from $V_y$.
     Since $A_y \in S$ and $V_x$ is reachable from $V_y$, by Lemma~\ref{lemma:lemma-2}, we have $A_x \in S$.
     That contradicts the assumption that $A_x = a \notin S$, hence $V_x$ is not reachable in $H$ from $V_y$.
-    This means that $V_x$ is in a different component of strong connectivity than $Y$,
+    This means that $V_x$ is in a different strongly connected component than $Y$,
     and since $(A_x, P(A_y)) \in E_G$, by the definition of $E_H$, we have $(V_x, V_y) \in E_H$,
     hence $C_Y$ is not a source.
 
@@ -261,7 +260,7 @@ For $S \subseteq A$, let $N(S)$ denote the set of all neighbors of vertices in $
 \begin{thm}\label{thm:condensation}
     Let $S \subseteq A$ be the smallest non-empty set such that $\left|N(S)\right| = \left|S\right|$ and
     there exists an edge $(a, b) \in E_G$ with $a \notin S$ and $b \in N(S)$.
-    Then $X := \{V_i \mid A_i \in S\}$ is a component of strong connectivity in $G$
+    Then $X := \{V_i \mid A_i \in S\}$ is a strongly connected component in $G$
     corresponding to a non-isolated sink in the condensation $C$.
 \end{thm}
 
@@ -271,7 +270,7 @@ For $S \subseteq A$, let $N(S)$ denote the set of all neighbors of vertices in $
     Since $|N(S)| = |S| = |P(S)|$ and $P(S) \subseteq N(S)$, we have $P(S) = N(S)$.
 
     By Lemma~\ref{lemma:lemma-3}, there exists a non-isolated sink in the condensation $C$
-    corresponding to a component of strong connectivity $Y \subseteq V$ in $H$
+    corresponding to a strongly connected component $Y \subseteq V$ in $H$
     such that $S' := \{A_i \mid V_i \in Y\} \subseteq S$.
 
     For a contradiction, suppose that $S' \neq S$.
@@ -294,50 +293,60 @@ This section explains the algorithm used to find the smallest set $S$ from Theor
     \begin{algorithmic}[1]
     \Require Bipartite graph $G = (A \cup B, E)$
     \Ensure If $G$ does not have a perfect matching: \texttt{no-matching}.
-    \Ensure Else if all edges in $G$ are perfectly matchable: \texttt{no-edge}.
+    \Ensure Else if all edges in $G$ are perfectly-matchable: \texttt{no-edge}.
     \Ensure Else: The smallest non-empty $S \subsetneq A$ such that $\left|N(S)\right| = \left|S\right|$
-    and there exists a perfectly unmatchable edge $(a, b)$ in $G$ with $a \notin S$ and $b \in N(S)$.
-    \State $P \gets$ a maximum matching of $G$ using Hopcroft-Karp algorithm
+    and there exists a perfectly-unmatchable edge $(a, b)$ in $G$ with $a \notin S$ and $b \in N(S)$.
+    \State $P \gets$ a maximum matching of $G$ using Hopcroft-Karp~algorithm~\cite{hopcroft1973}
     \If{$P$ is not a perfect matching}
         \Return \texttt{no-matching}
     \EndIf
     \State $H \gets$ the graph $H$ constructed from $G$ and $P$ as described in Section~\ref{sec:graph-h}
-    \State $C \gets$ the condensation of $H$
-    \State $K \gets$ list of non-isolated sinks of $C$
+    \State $C' \gets$ list of strongly connected components of the graph $H$ using
+    Tarjan's strongly connected components algorithm~\cite{tarjan1972}
+    \State $K \gets$ components in $C'$ with no outgoing edges and at least one incoming edge
     \If{$K$ is empty}
         \Return \texttt{no-edge}
     \EndIf
-    \State $L \gets$ components of strong connectivity in $H$ corresponding to the sinks of $C$ in $K$
-    \State $l \gets$ an arbitrary smallest component in $L$
-    \State \Return the set of vertices in $A$ corresponding to the vertices in $l$
+    \State $L \gets$ an arbitrary smallest component in $K$
+    \State \Return the set of vertices in partition $A$ of the graph $G$ corresponding to the vertices in $L$
     \end{algorithmic}\label{alg:algorithm}
 \end{algorithm}
 
 \begin{thm}[Correctness of Algorithm~\ref{alg:algorithm}]
-    If the bipartite graph $G$ has a perfect matching and at least one perfectly unmatchable edge $(a, b)$,
+    If the bipartite graph $G$ has a perfect matching and at least one perfectly-unmatchable edge $(a, b)$,
     then Algorithm~\ref{alg:algorithm} has a correct output.
 \end{thm}
 
 \begin{proof}
     Let $G := (A \cup B, E)$ be a bipartite graph with a perfect matching $P$
-    and at least one perfectly unmatchable edge $(a, b)$.
+    and at least one perfectly-unmatchable edge $(a, b)$.
 
     Let $S \subsetneq A$ be the smallest non-empty set such that
     $\left|N(S)\right| = \left|S\right|$, $a \notin S$, and $b \in N(S)$.
     By Theorem~\ref{thm:existence}, the set $S$ exists.
     By Theorem~\ref{thm:condensation},
-    there exists a component of strong connectivity in $X := \{V_i \mid A_i \in S\}$ in $H$
+    there exists a strongly connected component in $X := \{V_i \mid A_i \in S\}$ in $H$
     corresponding to a non-isolated sink in $C$.
 
     By searching through all non-isolated sinks in $C$, the algorithm is able to find the one corresponding to $S$.
 \end{proof}
 
-The time complexity of Algorithm~\ref{alg:algorithm} is $\mathcal{O}(n^{2.5})$,
-because the slowest part is Hopcroft-Karp algorithm used to get a maximum matching in $G$,
-which has time complexity of $\mathcal{O}(E\sqrt{V})$ where $E <= n^2$ and $V = 2n$.
-The software only runs Algorithm~\ref{alg:algorithm} $\mathcal{O}(n)$ amount of times per Sudoku state,
-which gives us time complexity $\mathcal{O}(n^{3.5})$ for the whole Sudoku state.
-Note that a Sudoku state can have up to $n^3$ candidate numbers.
+\subsection*{Time Complexity}
+
+Time complexity of Hopcroft-Karp algorithm~\cite{hopcroft1973} is $\mathcal{O}(E\sqrt{V})$
+where $E \leq n^2$ and $V = 2n$, which equals $\mathcal{O}(n^{2.5})$.
+Time complexity of Tarjan's strongly connected components algorithm~\cite{tarjan1972} is $\mathcal{O}(E\sqrt{V})$
+where $E \leq n^2$ and $V = n$, which equals $\mathcal{O}(n^2)$.
+Every other step is at most $\mathcal{O}(n^2)$.
+Hence, the time complexity of Algorithm~\ref{alg:algorithm} is $\mathcal{O}(n^{2.5})$.
+
+The software only runs Algorithm~\ref{alg:algorithm} $\mathcal{O}(n)$ amount of times per Sudoku state
+and the transformation of the part of Sudoku state to the graph $G$ has time complexity $\mathcal{O}(n^2)$.
+This means that the time complexity of searching for the smallest application of Perfect matching strategies
+in the whole Sudoku state is $\mathcal{O}(n^{3.5})$.
+Note that a Sudoku state can have up to $n^3$ candidate numbers,
+which means the time complexity is $\mathcal{O}(x^{7/6})$ where $x := n^3$
+is the maximum amount of candidate numbers in a Sudoku state.
 
 \section{Symmetry of Strategies}
 
@@ -352,8 +361,23 @@ The same is true for Generalised X-Wing if the sets $P$ and $Q$ are switched.
 If a non-isolated sink in $C$ generates application of Generalised X-Wing,
 then a non-isolated source in the same $C$ generates application of Generalised X-Wing with $P$ and $Q$ switched.
 
-If $C$ has a non-isolated sink corresponding to a component of strong connectivity in $G$ with $k$ vertices,
-then there is also a non-isolated source in $C$ which corresponds to a component of strong connectivity in $G$
+I made Algorithm~\ref{alg:algorithm} only search for non-isolated sinks,
+because otherwise the explanation would be too complicated.
+The software searches for both non-isolated sinks and non-isolated sources.
+
+There is another observation we can make from the symmetry.
+If $C$ has a non-isolated sink corresponding to a strongly connected component in $G$ with $k$ vertices,
+then there is also a non-isolated source in $C$ which corresponds to a strongly connected component in $G$
 with at most $n - k$ vertices.
 This means, that if there is an application of a Perfect matching strategy,
 then the smallest one has the strategy size $k \leq \frac{n}{2}$.
+Hence, the software will never return an application of Perfect matching strategy with strategy size $k > \frac{n}{2}$,
+because in that case there would be a symmetric application with size $k' := n - k \leq \frac{n}{2}$.
+
+\section{Relation to Existing Work}
+
+By~\cite{tassa2012}, an edge is perfectly-matchable in the bipartite graph $G$
+if and only if in the directed graph $H$ it connects two vertices in the same strongly connected component.
+I used the same construction of $H$ in Section~\ref{sec:graph-h},
+since all perfectly-unmatchable edges lie between different strongly connected components.
+I developed the proofs in Chapter~\ref{chap:5} independently, as the proofs in~\cite{tassa2012} were not required.

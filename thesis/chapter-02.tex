@@ -10,7 +10,7 @@ to eliminate candidates that cannot be part of the solution.
 
 \section{Meaning of Colors}\label{sec:color}
 
-The following pictures show examples of all strategies.
+The following images show examples of all strategies.
 Each strategy uses colored backgrounds to explain what numbers can be removed and why.
 A yellow background always means that the number can be removed, as it cannot be part of any solution.
 A green background has different meaning for each strategy,
@@ -242,22 +242,26 @@ The following images show specific uses of the strategy.
 
 \section{How to Solve All Variants}
 
-A more general way to solve all variants mentioned in this thesis is to choose a group of cells
-and then try all combinations of numbers in them.
-A part of solving a Sudoku variant is to figure out which patterns are more likely to be useful.
-The following images show few examples of usage of this strategy.
+A more general approach to solving Sudoku variants is to choose a group of cells and
+try all combinations of candidate numbers in them.
+This strategy does not specify how to choose the region, figuring out which patterns are useful
+is part of solving a given variant, and differs between variants.
+This general strategy is not implemented directly,
+but the strategies Edge label and Edge region are special cases of it.
+More special cases could be added as new strategies, see Section~\ref{sec:extensibility}.
 
 \begin{quote}
     \textit{
-        Choose a group of adjacent cells.
+        Choose a group of cells.
         Try all combinations of numbers in these cells that satisfy the puzzle's rules.
-        If a number does not appear in any valid combination, remove it.
+        If a candidate number does not appear in any valid combination, remove it.
     }
 \end{quote}
 
-This strategy is not implemented by the software, because it does not specify how the region should be chosen.
+The following images show three examples of usage of this strategy.
+The left image is the Sudoku puzzle before this strategy was applied, and the right image is after.
 
-\oneimagestrategyexample{kropki-g-1}{
+\twoimagesstrategyexample{g-kropki-1-1}{g-kropki-1-2}{
     Kropki Sudoku \\
     Find a $2 \times 2$ square with one black dot and three white dots. \\
     If all cells are in the same region, then the difference between the two cells next to black dot is 3,
@@ -266,18 +270,17 @@ This strategy is not implemented by the software, because it does not specify ho
     hence the two cells can be 1~and~2 or 3~and~6.
 }
 
-\oneimagestrategyexample{consecutive-g-1}{
+\twoimagesstrategyexample{g-consecutive-1-1}{g-consecutive-1-2}{
     Consecutive Sudoku (or Kropki) \\
     Find a long chain of white dots. \\
     If every pair of cells with one cell between them belongs to the same region,
-    those cells cannot equal and the entire chain must be either increasing or descreasing.
+    those cells cannot be equal and the entire chain must be either increasing or descreasing.
 }
 
-\oneimagestrategyexample{consecutive-g-2}{
+\twoimagesstrategyexample{g-consecutive-2-1}{g-consecutive-2-2}{
     Consecutive Sudoku (or Kropki) \\
     You often solve a whole rectangle at once. \\
     Try to look at all possible permutations of numbers in the unfinished cells in a row or column. \\
-    (black numbers are part of the Sudoku task)
 }
 
 \section{Strategies On Paper}\label{sec:paper}
