@@ -1,6 +1,6 @@
-\chapter{Installation}
+\chapter{Installation}\label{ch:a}
 
-The attachment includes all \texttt{.html}, \texttt{.css}, and \texttt{.ts} source files.
+The attachment \texttt{code.zip} includes all \texttt{.html}, \texttt{.css}, and \texttt{.ts} source files.
 It also includes all compiled \texttt{.js} files, so compilation is not required to run the software.
 
 If you wish to run the software, see Section~\ref{sec:running}.
@@ -8,16 +8,30 @@ If you wish to recompile the \texttt{.ts} source files, see Section~\ref{sec:com
 
 \section{Running}\label{sec:running}
 
-Open the file \texttt{code/editor.html} in a browser.
+\begin{itemize}
+    \item Download the attachment \texttt{code.zip}.
+    \item Extract it.
+    \item Open the file \texttt{code/editor.html} in a browser.
+\end{itemize}
 
 \section{Compilation of TypeScript}\label{sec:compilation}
 
 This section explains, how to compile \texttt{.ts} source files into \texttt{.js} files.
 
 \begin{itemize}
-    \item Install Node.js
-    \item Install TypeScript compiler
-    \item Run \texttt{tsc -{}-version} to verify the installation.
-    \item Open the directory \texttt{code/}.
-    \item Run \texttt{tsc} to compile all \texttt{.ts} files into \texttt{.js} files.
+    \item First you need to have TypeScript compiler installed.
+
+    \begin{itemize}
+        \item Install Node.js
+        \item Install TypeScript compiler.
+        \item Run \texttt{tsc -{}-version} to verify the installation.
+    \end{itemize}
+
+    \item Then you can compile the \texttt{.ts} source files into \texttt{.js} files.
+
+    \begin{itemize}
+        \item Open the directory \texttt{code/}.
+        \item Run \texttt{tsc} to compile all \texttt{.ts} files into \texttt{.js} files.
+        \item Check that a \texttt{.js} file was created for each \texttt{.ts} file.
+    \end{itemize}
 \end{itemize}

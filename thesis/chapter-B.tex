@@ -1,13 +1,13 @@
-\chapter{User documentation}
+\chapter{User documentation}\label{ch:b}
 
 This software is a tool for solving Sudoku puzzles step by step.
 It allows you to enter a Sudoku puzzle and apply solving strategies one at a time,
 so you can follow the reasoning behind each step.
 It is meant to help explain how a Sudoku puzzle is solved, rather than produce a solution.
 
-\section{What is Sudoku}
-
 For explanation of the rules of Sudoku puzzles, see Chapter~\ref{ch:chap-1}.
+For examples of Sudoku tasks with unique solution, see Chapter~\ref{ch:chap-1}.
+For list and explanation of all the strategies used by the software, see Chapter~\ref{ch:chap-2}.
 
 \section{Creating a Sudoku Puzzle}
 
@@ -114,7 +114,7 @@ The following images show three variants of Consecutive Sudoku.
 Each puzzle contains explanation of the rules, an image of the puzzle while editing the variant (left image),
 an image of the task while not editing the variant (middle image), and an image of the solution (right image).
 
-\subsection*{Show All Dots}
+\subsubsection*{Show All Dots}
 
 \begin{itemize}
     \item If there is a white dot between two adjacent cells, the difference of their values equals $1$.
@@ -125,7 +125,7 @@ an image of the task while not editing the variant (middle image), and an image 
     Consecutive Sudoku $6 \times 6$ (all dots are shown)
 }{0.3\textwidth}{0.2cm}
 
-\subsection*{Show Only Dots in a Region}
+\subsubsection*{Show Only Dots in a Region}
 
 \begin{itemize}
     \item If there is a white dot between two adjacent cells, the difference of their values equals $1$.
@@ -138,7 +138,7 @@ an image of the task while not editing the variant (middle image), and an image 
     Consecutive Sudoku $6 \times 6$ (only dots in rectangle are shown)
 }{0.3\textwidth}{0.2cm}
 
-\subsection*{Show Some Dots}
+\subsubsection*{Show Some Dots}
 
 \begin{itemize}
     \item If there is a white dot between two adjacent cells, the difference of their values equals $1$.
@@ -156,7 +156,6 @@ The software will automatically fill every empty cell with all possible numbers.
 
 The goal of solving is to remove numbers from cells using different strategies,
 until there is only one number in each cell.
-For list and explanation of all the strategies used by the software, see Chapter~\ref{ch:chap-2}.
 
 The available strategies are ordered from the simples to the most complicated.
 If you want to turn off a strategy, press its button in the right menu.
@@ -184,7 +183,3 @@ If there is a cell with \texttt{!}, it meas that the cell cannot have any number
     After pressing \editorbutton{Apply Step} once (top image) \\
     After pressing \editorbutton{Apply Step} second time (bottom image)
 }{0.4\textwidth}{0.2cm}
-
-\section{Examples of Sudoku Puzzles}
-
-For examples of Sudoku tasks with unique solution, see Chapter~\ref{ch:chap-1}.

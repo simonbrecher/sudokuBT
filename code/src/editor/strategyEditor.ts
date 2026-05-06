@@ -2,6 +2,7 @@
     name: string, // The display name of the strategy, shown on the strategy button
     strategy: (state: State) => StrategyResult, // Method implementing the strategy
     isUsable: (sudoku: Sudoku) => boolean, // Whether the strategy is applicable to the given puzzle
+    isValidator: boolean, // true iff it should be used to validate correctness of solution
 }
 
 class StrategyEditor {
@@ -10,16 +11,19 @@ class StrategyEditor {
             name: "Naked Single",
             strategy: SudokuStrategy.nakedSingle.bind(SudokuStrategy),
             isUsable: (sudoku: Sudoku) => true,
+            isValidator: true,
         },
         {
             name: "Hidden Single",
             strategy: SudokuStrategy.hiddenSingle.bind(SudokuStrategy),
             isUsable: (sudoku: Sudoku) => true,
+            isValidator: true,
         },
         {
             name: "Edge Label",
             strategy: EdgeStrategy.label.bind(EdgeStrategy),
             isUsable: (sudoku: Sudoku) => sudoku.hasEdgeVariant(),
+            isValidator: true,
         },
         {
             name: "Pointing",
@@ -27,21 +31,25 @@ class StrategyEditor {
             isUsable: (sudoku: Sudoku) => {
                 return sudoku.regions.hasRegions() || sudoku.regions.hasExtraRegions();
             },
+            isValidator: false,
         },
         {
             name: "Region",
             strategy: SudokuStrategy.region.bind(SudokuStrategy),
             isUsable: (sudoku: Sudoku) => true,
+            isValidator: false,
         },
         {
             name: "Edge Region",
             strategy: EdgeStrategy.region.bind(EdgeStrategy),
             isUsable: (sudoku: Sudoku) => sudoku.hasEdgeVariant(),
+            isValidator: false,
         },
         {
             name: "X-Wing",
             strategy: SudokuStrategy.intersection.bind(SudokuStrategy),
             isUsable: (sudoku: Sudoku) => true,
+            isValidator: false,
         },
     ];
 
@@ -145,7 +153,7 @@ class StrategyEditor {
 
         if (result.colors.regions !== undefined) {
             for (let { region: region, css: css } of result.colors.regions) {
-                StrategyEditor.renderRegion(frame, region, css);
+                this.renderRegion(frame, region, css);
             }
         }
         if (result.colors.removed !== undefined) {
@@ -162,6 +170,39 @@ class StrategyEditor {
         this.renderText("strategy-text-2", result.message);
     }
 
+    private static checkNoSolution(): boolean {
+        for (let strategyId = 0; strategyId < this.isStrategyOn.length; strategyId++) {
+            let strategyType = this.strategyTypeData[strategyId];
+            if (strategyType.isValidator && strategyType.isUsable(MainEditor.sudoku)) {
+                let state = MainEditor.sudoku.solution;
+                let result = strategyType.strategy(state);
+                if (! result.isValid) {
+                    this.renderStrategyResult(result);
+                    this.setLastResult(result.isValid ? result : null, strategyId);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static checkIsSolution(): boolean {
+        // check if the Sudoku state is a solution
+        for (let binary of MainEditor.sudoku.solution.board) {
+            if (! BinaryUtils.has1bit32(binary)) {
+                return false;
+            }
+        }
+        // render text that the Sudoku state is a solution
+        let name = "Sudoku solved";
+        let message = "You have solved the Sudoku and it is correct.";
+        this.renderStrategyResult({colors: {}, isUpdated: false, isValid: true, name: name, message: message});
+        this.removeLastResult();
+        return true;
+    }
+
+
+
     private static tryAllStrategies(): void {
         for (let strategyId = 0; strategyId < this.isStrategyOn.length; strategyId++) {
             if (this.isStrategyOn[strategyId]) {
@@ -175,8 +216,9 @@ class StrategyEditor {
                 }
             }
         }
-        let message = "NOT UPDATED";
-        this.renderStrategyResult({colors: {}, isUpdated: false, isValid: true, name: "-", message: message});
+        let name = "No Progress";
+        let message = "No available strategy is able to remove any candidate numbers.";
+        this.renderStrategyResult({colors: {}, isUpdated: false, isValid: true, name: name, message: message});
         this.removeLastResult();
     }
 
@@ -195,9 +237,17 @@ class StrategyEditor {
 
     public static solveNext(): void {
         if (this.lastResult === null) {
-            StrategyEditor.tryAllStrategies();
+            let done = this.checkNoSolution();
+            if (done) {
+                return;
+            }
+            done = this.checkIsSolution();
+            if (done) {
+                return;
+            }
+            this.tryAllStrategies();
         } else {
-            StrategyEditor.applyLastResult();
+            this.applyLastResult();
         }
     }
 

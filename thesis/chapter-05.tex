@@ -376,8 +376,12 @@ because in that case there would be a symmetric application with size $k' := n -
 
 \section{Relation to Existing Work}
 
-By~\cite{tassa2012}, an edge is perfectly-matchable in the bipartite graph $G$
-if and only if in the directed graph $H$ it connects two vertices in the same strongly connected component.
-I used the same construction of $H$ in Section~\ref{sec:graph-h},
+By the work Tassa~\cite{tassa2012}, an edge is perfectly-matchable in the bipartite graph $G$
+if and only if in the directed graph $H$, as constructed in Section~\ref{sec:graph-h},
+it connects two vertices in the same strongly connected component.
+I used the same construction of the graph $H$ for Algorithm~\ref{alg:algorithm} as in Tassa~\cite{tassa2012},
 since all perfectly-unmatchable edges lie between different strongly connected components.
-I developed the proofs in Chapter~\ref{chap:5} independently, as the proofs in~\cite{tassa2012} were not required.
+I developed the proofs of theorems in Chapter~\ref{chap:5} independently,
+since I had to prove something different.
+I had to prove Theorem~\ref{thm:strategy}, Theorem~\ref{thm:existence}, and Theorem~\ref{thm:condensation},
+which only require Theorem~\ref{thm:hall}.

@@ -113,8 +113,8 @@ class EdgeStrategy {
                         },
                         isUpdated: true,
                         isValid: false,
-                        name: "Edge Label - Error",
-                        message: "No combination of numbers in the two cells around an edge label results in the label."
+                        name: "Edge Label - No solution",
+                        message: "There cannot be any combination of numbers in the two cells."
                     }
 
                 } else if (result.priority > bestPriority) {
@@ -150,7 +150,7 @@ class EdgeStrategy {
             isUpdated: true,
             isValid: true,
             name: "Edge Label",
-            message: "In the two cells around an edge label there are some numbers that cannot result in that label with any other number in the other cell."
+            message: "In the two edge-adjacent cells, try all combinations of numbers, some candidates can be removed."
         }
     }
 
@@ -297,9 +297,9 @@ class EdgeStrategy {
             isValid: true,
             name: "Edge Region",
             message: `
-                All occurrences of ${result.shift + 1} in a region are adjacent to a cell.
-                Number in that cell will be adjacent to ${result.shift + 1}.
-                Because of that, any number that cannot be adjacent to any occurrence ${result.shift + 1} can be removed.
+                All occurrences of the number ${result.shift + 1} (green) in a region are adjacent to a cell (yellow).
+                Regardless of where ${result.shift + 1} is in the regions (green), it will be adjacent to that cell (yellow).
+                Because of that, any number (yellow) that cannot be adjacent to any occurrence of ${result.shift + 1} (green) can be removed.
             `,
         };
     }

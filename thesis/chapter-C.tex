@@ -1,20 +1,11 @@
-\chapter{Programmer Documentation}
+\chapter{Programmer Documentation}\label{ch:c}
 
 \section{Modules and Classes}
 
-The software is divided into six logical modules.
+The software is programmed in TypeScript, HTML, and CSS\@.
+It is divided into six logical modules.
 Each module groups related classes by responsibility and could theoretically be used independently,
 though the modules are not separated at the source code level.
-
-Module \texttt{Graphics} could be used to render puzzles similar to Sudoku into HTML.
-Modules \texttt{Renderer}, \texttt{Data}, and \texttt{Graphics} could be used to
-configure a Sudoku task or solution and render it to HTML\@.
-Modules \texttt{Strategy} and \texttt{Data} could be used to configure a Sudoku puzzle and
-look for a way to solve it.
-
-Module \texttt{Graphics} alone is sufficient to render grid-based puzzles into HTML\@.
-Adding \texttt{Renderer} and \texttt{Data} allows configuring and rendering a full Sudoku task or solution.
-Adding \texttt{Strategy} instead allows configuring a Sudoku puzzle and applying solving strategies.
 
 \oneimage{documentation/modules}{
     Diagram of all modules and their classes.
@@ -169,6 +160,14 @@ This module contains all methods that can be used by multiple modules.
     See Section~\ref{sec:data}.
 \end{description}
 
+\subsection*{Combination of Modules}
+
+The software uses all modules, but it is possible to use some combinations of the modules without the rest.
+Module \texttt{Graphics} alone is sufficient to render grid-based puzzles into HTML\@.
+Modules \texttt{Graphics}, \texttt{Renderer}, and \texttt{Data} together allow
+configuring and rendering a full Sudoku task or solution.
+Modules \texttt{Data} and \texttt{Strategy} together allow configuring a Sudoku puzzle and applying solving strategies.
+
 \section{Representation of Data}\label{sec:data}
 
 \subsection*{Binary Representation of Candidates}
@@ -183,7 +182,8 @@ This binary representation limits the Sudoku size to $31$, though the editor enf
 
 \subsubsection*{Cell}
 
-The module \texttt{Graphics} uses a 2D coordinate system \texttt{(y, x)} for cells in the HTML \texttt{<table>}.
+The module \texttt{Graphics} uses a 2D coordinate system \texttt{(y, x)} for cells in the HTML \texttt{<table>},
+where \texttt{y = 0} is the top row and \texttt{x = 0} is the left-most column.
 The module \texttt{Data} uses a 1D coordinate system \texttt{index = y * Sudoku.size + x} for Sudoku cells.
 The class \texttt{Renderer} decides the mapping of \texttt{State} into \texttt{Frame}.
 
@@ -200,16 +200,52 @@ To add a new variant, add a field to \texttt{Sudoku} that represents the variant
 and implement a solving strategy for it.
 To add the necessary UI to the editor, add the needed buttons to \texttt{editor.html}
 and implement their event handlers in \texttt{MainEditor}.
-
-(TODO: more explanation?)
+To add new graphical elements, implement needed CSS styles to file \texttt{code/src/styles/puzzle.css},
+it might be necessary to update \texttt{Renderer} or the module \texttt{Graphics}
+if the graphical elements are too different.
 
 \subsection*{Edge variants}
 A new Edge variant strategy can be added by appending an element to \texttt{EdgeVariantFactory.variants}.
 Each element should be created using the \texttt{EdgeVariantFactory} constructor,
 which requires four parameters.
 The last step is to implement all CSS classes specified in the third parameter.
+The following code shows an example of adding the Edge variant VX\@.
 
-(TODO: more explanation?)
+\noindent
+\begin{minipage}{\textwidth}
+\begin{lstlisting}[language=JavaScript]
+// call EdgeVariantFactory constructor and fill the parameters
+vx: new EdgeVariantFactory(
+    // name of the variant shown on the button in editor
+    "VX",
+    // function that returns all possible labels
+    // for combination of two numbers in the edge-adjacent cells
+    // size is Sudoku.size - the size of the Sudoku puzzle
+    // value1 is the number inside the top or the left cell
+    // value2 is the number inside the bottom or the right cell
+    // output is an array with all labels
+    // that can appear between the two cells
+    (size: number, value1: number, value2: number): number[] => {
+        switch (value1 + value2) {
+            // if the sum is 5, return label V
+            case 5:     return [1];
+            // if the sum is 10, return label X
+            case 10:    return [2];
+            // otherwise return label with no graphical element
+            default:    return [0];
+        }
+    },
+    // return array of label graphics
+    (size: number): (EdgeLabelStyle | null)[] => [
+        null, // no graphical element
+        { css: ["vx-v"] }, // CSS class for V
+        { css: ["vx-x"] }, // CSS class for X
+    ],
+    // is the variant applicable for this size of sudoku?
+    (size: number): boolean => true,
+),
+\end{lstlisting}
+\end{minipage}
 
 \texttt{EdgeEditor} iterates over all elements of \texttt{EdgeVariantFactory.variants}
 and generates the corresponding buttons for adding Edge variants in the editor.
@@ -217,44 +253,32 @@ When an Edge variant is added, \texttt{EdgeVariantFactory.build} converts the da
 the format expected by the \texttt{EdgeVariant} constructor,
 and \texttt{EdgeEditor} adds it to \texttt{Sudoku}.
 
-(TODO: more explanation?)
-
-\begin{lstlisting}[language=JavaScript]
-vx: new EdgeVariantFactory(
-    "VX",
-    (size: number, value1: number, value2: number): number[] => {
-        switch (value1 + value2) {
-            case 5:     return [1];
-            case 10:    return [2];
-            default:    return [0];
-        }
-    },
-    (size: number): (EdgeLabelStyle | null)[] => [
-        null,
-        { css: ["vx-v"] },
-        { css: ["vx-x"] },
-    ],
-    (size: number): boolean => true,
-),
-\end{lstlisting}
-
 \subsection*{Solving Strategies}
 
 A strategy can be added by appending an element of type \texttt{StrategyTypeData}
 to the array \texttt{StrategyEditor.strategyTypeData}.
-The strategies are in the array in the same order in which they are tried.
-The first strategy that returns a \texttt{StrategyResult}
-with \texttt{isUpdated} equal to \texttt{true} will be applied.
+The strategies are in this array in the same order in which the \texttt{StrategyEditor} tries to apply them,
+when the user presses the \editorbutton{Apply Step}.
+The first strategy that returns a \texttt{StrategyResult} with \texttt{isUpdated = true} will be applied.
+The following code shows an example of adding the strategy Edge Region.
 
-(TODO: more explanation?)
-
+\noindent
+\begin{minipage}{\textwidth}
 \begin{lstlisting}[language=JavaScript]
-{ // example of a strategy
+{
+    // name of the strategy on the button in the editor
     name: "Edge Region",
+    // method implementing the strategy
+    // it has one parameter State and returns StrategyResult
+    // see comment on StrategyResult for more information
     strategy: EdgeStrategy.region.bind(EdgeStrategy),
+    // is the strategy applicable on the sudoku?
     isUsable: (sudoku: Sudoku) => sudoku.hasEdgeVariant(),
+    // can strategy proof that Sudoku has no solution?
+    isValidator: false,
 },
 \end{lstlisting}
+\end{minipage}
 
 \subsection*{Bigger Sudoku}
 

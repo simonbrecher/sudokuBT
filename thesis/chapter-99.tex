@@ -10,25 +10,22 @@ The supported strategies are: Pointing, Naked Candidates, Hidden Candidates, and
 There are two general strategies applicable to all variants: Edge Label and Edge Region.
 Using these strategies, the software provides step-by-step explanation of solving the Sudoku variant.
 
-Applications of Perfect matching strategies can be obtained
-by transforming a part of a Sudoku state to a bipartite graph,
+Strategies Naked Candidates, Hidden Candidates, and Generalised X-Wing are called Perfect matching strategies,
+because they can be obtained by transforming a part of a Sudoku state to a bipartite graph,
 where edges that are not part of a perfect matching correspond to candidate numbers that can be removed.
-Perfect matching strategies are: Naked Candidates, Hidden Candidates, and Generalised X-Wing.
-This thesis explains and proves Algorithm~\ref{alg:algorithm} that finds the smallest application
-of Perfect matching strategies with time complexity $\mathcal{O}(n^{3.5})$ in Chapter~\ref{chap:5}.
-This algorithm is important, because the trivial algorithm that looks through all combinations of
-cells or regions has time complexity $\mathcal{O}(p(n) \cdot 2^n)$.
-Algorithm~\ref{alg:algorithm} was not part of the original objective of this thesis,
-but became significant after it was developed.
+This thesis introduces Algorithm~\ref{alg:algorithm}, that finds the smallest application of
+Perfect matching strategies with time complexity $\mathcal{O}(n^{3.5})$ in Chapter~\ref{chap:5}.
+This is significantly better than the trivial algorithm that iterates over all $2^n$ combinations of
+cells or regions and tries to check if it contains an application of a Perfect matching strategy.
+Proving correctness of Algorithm~\ref{alg:algorithm} was not part of the original objective of this thesis,
+but became significant after the algorithm was developed.
 The main three achievements related to Perfect matching strategies are:
 \begin{itemize}
-    \item Theorem~\ref{thm:existence} ---
-            Proves that if an edge is not part of any perfect matching in the graph,
+    \item Theorem~\ref{thm:existence} shows that if an edge is not part of any perfect matching in the graph,
             then a Perfect Matching strategy can remove a candidate from the Sudoku state.
-    \item Theorem~\ref{thm:strategy} ---
-            Proves correctness of Perfect matching strategies.
-    \item Theorem~\ref{thm:condensation} ---
-            Proves that Algorithm~\ref{alg:algorithm} finds the smallest application of Perfect matching strategies.
+    \item Theorem~\ref{thm:strategy} proves correctness of Perfect matching strategies.
+    \item Theorem~\ref{thm:condensation} shows
+            that Algorithm~\ref{alg:algorithm} finds the smallest application of Perfect matching strategies.
 \end{itemize}
 
 Future work could extend this thesis by adding more Sudoku variants or by adding more solving strategies,

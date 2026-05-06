@@ -79,7 +79,7 @@ class SudokuStrategy {
                         error: [{ index: i, shift: -1 }],
                     },
                     name: "Naked Single - No Solution",
-                    message: "There is a cell which cannot have any number.",
+                    message: "There is a cell that cannot have any number.",
                     isUpdated: true,
                     isValid: false,
                 }
@@ -123,7 +123,7 @@ class SudokuStrategy {
                         regions: [{ region: region, css: "background-region-1" }],
                     },
                     name: "Naked Single - No Solution",
-                    message: "Two cells in a region can only have the same number.",
+                    message: "Two cells in a region have the same number.",
                     isUpdated: true,
                     isValid: false,
                 };
@@ -244,7 +244,7 @@ class SudokuStrategy {
                 resultRegion = region;
                 if (! result.isValid) {
                     if (result.missing !== undefined) {
-                        let numberText = result.missing.length > 1 ? "Numbers" : "Number;"
+                        let numberText = result.missing.length > 1 ? "Numbers" : "Number"
                         let listText = StrategyUtils.joinShiftsToText(result.missing);
                         return {
                             colors: {
@@ -300,8 +300,8 @@ class SudokuStrategy {
             },
             name: "Hidden Single",
             message: `
-                ${numberText} ${listText} can ${eachText}only be in one cell from the region.
-                All other numbers in ${cellText} can be removed.
+                ${numberText} ${listText} can ${eachText}only be in one cell in the region.
+                All other candidate numbers in ${cellText} can be removed.
             `,
             isUpdated: true,
             isValid: true,

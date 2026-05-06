@@ -247,17 +247,17 @@ class MainEditor {
         if (leftPosition !== previousLeftPosition || rightPosition !== previousRightPosition) {
             let hadRegionsListeners = RegionEditor.hasEventListeners(previousLeftPosition!, previousRightPosition!);
             let willHaveRegionsListeners = RegionEditor.hasEventListeners(leftPosition!, rightPosition!);
-            if (willHaveRegionsListeners && ! hadRegionsListeners) {
+            if (willHaveRegionsListeners && !hadRegionsListeners) {
                 EditorUtils.addEventListeners(RegionEditor.eventListeners);
-            } else if (hadRegionsListeners && ! willHaveRegionsListeners) {
+            } else if (hadRegionsListeners && !willHaveRegionsListeners) {
                 EditorUtils.removeEventListeners(RegionEditor.eventListeners);
             }
 
             let hadNumbersListeners = NumberEditor.hasEventListeners(previousLeftPosition!);
             let willHaveNumbersListeners = NumberEditor.hasEventListeners(leftPosition!);
-            if (willHaveNumbersListeners && ! hadNumbersListeners) {
+            if (willHaveNumbersListeners && !hadNumbersListeners) {
                 EditorUtils.addEventListeners(NumberEditor.eventListeners);
-            } else if (hadNumbersListeners && ! willHaveNumbersListeners) {
+            } else if (hadNumbersListeners && !willHaveNumbersListeners) {
                 EditorUtils.removeEventListeners(NumberEditor.eventListeners);
             }
 
@@ -300,6 +300,13 @@ class MainEditor {
         // Prepare edge variant buttons
         if (leftPosition === "edge") {
             EdgeEditor.updateMenu();
+        }
+
+        if (leftPosition !== previousLeftPosition) {
+            if (leftPosition === "solve") {
+                document.getElementById("strategy-text-1")!.textContent = "Press \"Apply Step\" to Solve";
+                document.getElementById("strategy-text-2")!.textContent = "Then press it a second time to remove candidate numbers.";
+            }
         }
 
         this.menuPosition = {left: leftPosition, right: rightPosition};

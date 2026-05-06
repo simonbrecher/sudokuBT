@@ -63,7 +63,7 @@ but it is possible that the author made a mistake and there is none or multiple.
 Another way to arrive at a Sudoku state with no solutions is making a mistake while solving it and removing a number
 that has to be in the solution.
 
-The software implements 4 different strategies to find out when Sudoku does not have any solution.
+The software implements five different ways to find out that a Sudoku state has no solution.
 
 \oneimagestrategyexample{error-naked-0}{
     There cannot be any number in a cell. \\
@@ -77,6 +77,11 @@ The software implements 4 different strategies to find out when Sudoku does not 
 }
 \oneimagestrategyexample{error-hidden-1}{
     In a region there are multiple numbers that can only be in a single cell.
+}
+\oneimagestrategyexample{error-label}{
+    Consecutive Sudoku $6 \times 6$ \\
+    There is no combination of numbers in the two adjacent cells satisfying the Sudoku variant. \\
+    In the image, candidate numbers 1/2/3 and 5/6 cannot make a difference of $1$, which is required by the white dot.
 }
 
 \section{Harder Strategies}
