@@ -1,29 +1,80 @@
-﻿type EdgeLabelStyle = {
+﻿/**
+ * Style of Edge label
+ */
+type EdgeLabelStyle = {
+    /**
+     * the css clas with the style, you can even use .svg if you want
+     */
     css?: string[],
+    /**
+     * Text that will be added in the Edge label
+     */
     text?: string,
 }
 
 class Edge {
-    public static readonly HORIZONTAL_DIRECTION = 0; // on right side of td
-    public static readonly VERTICAL_DIRECTION = 1; // on bottom side of td
+    /**
+     * if the label is on right side of td
+     */
+    public static readonly HORIZONTAL_DIRECTION = 0;
+    /**
+     * if the label is on bottom side of td
+     */
+    public static readonly VERTICAL_DIRECTION = 1;
 
+    /**
+     * Size of the wrapper, relative to the length of border on which it is
+     */
     public static readonly WRAPPER_RELATIVE_SIZE = 0.45;
 
+    /**
+     * 0 = on the right side, 1 = on the left side
+     * Use Edge.HORIZONTAL_DIRECTION and Edge.VERTICAL_DIRECTION
+     */
     public direction: number;
+    /**
+     * True if this.direction == Edge.HORIZONTAL_DIRECTION
+     */
     public isHorizontal: boolean;
+    /**
+     * row of the cell the label is next to, 0 is the top row
+     */
     public y: number;
+    /**
+     * column of the cell the label is next to, 0 is the left-most column
+     */
     public x: number;
 
+    /**
+     * Cell object of the left/top cell (the one containing the edge label)
+     */
     public cell1: Cell;
+    /**
+     * Cell object of the right/bottom cell
+     */
     public cell2: Cell;
-    public tdElement: HTMLElement;
 
+    /**
+     * <div> used to position the label
+     */
     public wrapperElement: HTMLElement | null = null;
+    /**
+     * <div> with graphics of the label, it is inside this.wrapperElement
+     */
     public labelElement: HTMLElement | null = null;
+        /**
+         * style used for this.labelElement, null means no this.labelElement
+         */
         public labelStyle: EdgeLabelStyle | null = null;
 
+    /**
+     * DOMRect of this.wrapperElement, used to move it to the correct position
+     */
     public boundingRect: DOMRect | null = null;
 
+    /**
+     * Checks of two EdgeLabelStyles are equal
+     */
     public static edgeStyleEquals(style1: EdgeLabelStyle | null, style2: EdgeLabelStyle | null): boolean {
         if (style1 === null || style2 === null) {
             return style1 === null && style2 === null;
@@ -37,6 +88,14 @@ class Edge {
         return ArrayUtils.equals1d(style1.css, style2.css);
     }
 
+    /**
+     * @param cell1 Cell object of the left/top cell (the one containing the edge label)
+     * @param cell2 Cell object of the right/bottom cell
+     * @param direction 0 = on the right side, 1 = on the left side
+     * Use Edge.HORIZONTAL_DIRECTION and Edge.VERTICAL_DIRECTION
+     * @param y row of the cell (cell1) the label is next to, 0 is the top row
+     * @param x column of the cell (cell1) the label is next to, 1 is the left-most column
+     */
     constructor(cell1: Cell, cell2: Cell, direction: number, y: number, x: number) {
         this.direction = direction;
         this.isHorizontal = direction == Edge.HORIZONTAL_DIRECTION;
@@ -45,19 +104,24 @@ class Edge {
 
         this.cell1 = cell1;
         this.cell2 = cell2;
-        this.tdElement = cell1.tdElement;
     }
 
+    /**
+     * Create this.wrapperElement
+     */
     public addWrapper(): void {
         if (this.wrapperElement === null) {
             this.wrapperElement = document.createElement("div");
-            this.tdElement.appendChild(this.wrapperElement);
+            this.cell1.tdElement.appendChild(this.wrapperElement);
 
             this.wrapperElement.classList.add("edge-wrapper");
             this.wrapperElement.classList.add(`edge-wrapper-${this.isHorizontal ? 'horizontal' : 'vertical'}`);
         }
     }
 
+    /**
+     * Remove this.wrapperElement
+     */
     public removeWrapper(): void {
         if (this.wrapperElement !== null) {
             this.removeLabel();
@@ -66,6 +130,9 @@ class Edge {
         }
     }
 
+    /**
+     * Add this.labelElement, but make it have no graphics
+     */
     private addEmptyLabel(): void {
         this.addWrapper();
 
@@ -74,12 +141,21 @@ class Edge {
         this.labelElement.classList.add("edge-label");
     }
 
+    /**
+     * Set graphics of this.labelElement
+     * @param oldStyle Styles to remove
+     * @param newStyle Styles to add
+     */
     private editLabel(oldStyle: EdgeLabelStyle, newStyle: EdgeLabelStyle): void {
         GraphicsUtils.updateCssClasses(this.labelElement!, oldStyle?.css ?? [], newStyle?.css ?? []);
         this.labelElement!.textContent = newStyle?.text ?? "";
     }
 
-    public addLabel(style: EdgeLabelStyle | null): void {
+    /**
+     * Add/remove this.labelElement or change its style, if the new style is different from the current style
+     * @param style new style, null means no this.labelElement
+     */
+    public setLabel(style: EdgeLabelStyle | null): void {
         if (style === null) {
             this.removeLabel();
             return;
@@ -95,6 +171,9 @@ class Edge {
         }
     }
 
+    /**
+     * Remove this.labelElement if it exists
+     */
     public removeLabel(): void {
         if (this.labelElement !== null) {
             this.labelElement.remove();

@@ -1,4 +1,7 @@
-﻿type EdgeRegionProof = {
+﻿/**
+ * Output of the Edge Region strategy applied on one region+number combination
+ */
+type EdgeRegionProof = {
     shift: number,
     region: number[],
     cells: number[],
@@ -9,7 +12,11 @@
 }
 
 class EdgeStrategy {
-    // [direction, y, x, index1, index2]
+    /**
+     * For each label in EdgeVariant, return its coordinates and indices of the cells next to it.
+     * @param sudoku Sudoku object (needed for Sudoku.size)
+     * @return [direction, y, x, index1, index2] for each label in Sudoku.edgeVariant
+     */
     private static getLabelCells(sudoku: Sudoku): number[][] {
         let output: number[][] = [];
         for (let y = 0; y < sudoku.size; y++) {
@@ -28,7 +35,15 @@ class EdgeStrategy {
         return output;
     }
 
-    // direction, y, x, index1, index2 (index1, index2 in correct order)
+    /**
+     * From indices of two cells that are edge-adjacent, return information about the edge label.
+     * @param index1 Index of one cell, does not have to be the top/left one.
+     * @param index2 Index of one cell, does not have to be the bottom/right one.
+     * @param size Size of the Sudoku
+     * @return [direction, y, x, index1, index2]
+     * direction, y, x - coordinates of the edge label
+     * index1, index2 - indices of the two adjacent cells in the correct order (index1 is the top/left, index2 in the bottom/right)
+     */
     private static getLabel(index1: number, index2: number, size: number): [number, number, number, number, number] {
         if (index1 > index2) {
             [index1, index2] = [index2, index1];
@@ -41,6 +56,14 @@ class EdgeStrategy {
         return [direction, y, x, index1, index2];
     }
 
+    /**
+     * For list of cells, get set of all cells that are equal or edge adjacent with label that is not -1,
+     * to all the cells in labelCells parameter
+     * @param sudoku Sudoku object
+     * @param variant Edge variant
+     * @param labelCells list of cells that each cell in the output needs to be adjacent to
+     * @return set of all cells that are equal or adjacent to all cells from labelCells parameter
+     */
     private static getCellNeighbours(sudoku: Sudoku, variant: EdgeVariant, labelCells: number[][]): Set<number>[] {
         let output: Set<number>[] = [];
         for (let index = 0; index < sudoku.size * sudoku.size; index++) {
@@ -57,6 +80,13 @@ class EdgeStrategy {
         return output;
     }
 
+    /**
+     * Implementation of the Edge Label strategy for one label
+     * @param binary1 binary representation of candidates of the top/left cell
+     * @param binary2 binary representation of candidates of the bottom/right cell
+     * @param neighbours neighbours[a] is mask of binary representation of candidates that can be in the binary2 if (1 << a) is in binary1
+     * @return binary1 and binary2 after the rule is applied
+     */
     private static _label(binary1: number, binary2: number, neighbours: number[])
         : {priority: number, binary1: number, binary2: number}
     {
@@ -84,6 +114,9 @@ class EdgeStrategy {
         return {priority: priority, binary1: output1, binary2: output2};
     }
 
+    /**
+     * Implementation of the Edge Label strategy
+     */
     public static label(state: State): StrategyResult {
         if (! state.sudoku.hasEdgeVariant()) {
             throw "Cannot call EdgeStrategy.label() if ! Sudoku.hadEdgeVariant()";
@@ -154,6 +187,15 @@ class EdgeStrategy {
         }
     }
 
+    /**
+     * Implementation of the Edge Region strategy for one region and number
+     * @param board State.board for the current state
+     * @param size Sudoku.size
+     * @param region Region in which the strategy is being applied
+     * @param shift (number - 1) for which the strategy is being applied
+     * @param cellNeighbours List of all cells that are label-adjacent or equal to cells that contain the number (shift + 1) in the region
+     * @param variant EdgeVariant of the puzzle
+     */
     public static _region(
         board: number[], size: number, region: number[], shift: number, cellNeighbours: Set<number>[], variant: EdgeVariant
     ): EdgeRegionProof | null {
@@ -253,6 +295,9 @@ class EdgeStrategy {
         };
     }
 
+    /**
+     * Implementation of the Edge Region strategy
+     */
     public static region(state: State): StrategyResult {
         if (! state.sudoku.hasEdgeVariant()) {
             throw "Cannot call EdgeStrategy.label() if ! Sudoku.hadEdgeVariant()";

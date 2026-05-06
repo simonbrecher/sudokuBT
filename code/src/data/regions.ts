@@ -2,87 +2,164 @@
  * Class representing list of all regions in sudoku. (Regions that use default sudoku rules)
  */
 class Regions {
+    /**
+     * Method used for throwing errors.
+     */
     private static throwAccessErrorIf(condition: boolean, accessName: string, conditionString: string): void {
         if (condition) {
             throw `ACCESS ERROR: cannot access ${accessName} if ${conditionString}`;
         }
     }
 
+    /**
+     * Size of Sudoku.
+     */
     private readonly size: number;
 
+    /**
+     * True if the Sudoku rows and columns are regions by default.
+     */
     public hasLines: boolean = true;
+    /**
+     * List of all rows. (even if this.hasLines is false)
+     */
     private readonly _rows: number[][];
+    /**
+     * List of all columns. (even if this.hasLines is false)
+     */
     private readonly _columns: number[][];
+    /**
+     * List of all rows and columns. (even if this.hasLines is false)
+     */
     private readonly _lines: number[][];
 
+    /**
+     * Return list of all rows.
+     */
     public get rows(): number[][] {
         return this.hasLines ? this._rows : [];
     }
 
+    /**
+     * Return list of all columns.
+     */
     public get columns(): number[][] {
         return this.hasLines ? this._columns : [];
     }
 
+    /**
+     * Return list of all rows and columns.
+     */
     public get lines(): number[][] {
         return this.hasLines ? this._lines : [];
     }
 
+    /**
+     * Does the Sudoku have diagonal regions.
+     */
     public hasDiagonals: boolean = false;
+    /**
+     * List of both diagonal regions. (even if this.hasDiagonals is false)
+     */
     private readonly _diagonals: number[][];
 
+    /**
+     * Return list of all diagonal regions.
+     */
     public get diagonals(): number[][] {
         return this.hasDiagonals ? this._diagonals : [];
     }
 
+    /**
+     * Height and width of rectangular regions, null if none exist.
+     */
     private _rectangles: { height: number, width: number } | null = null;
 
+    /**
+     * Return true if it contains rectangular regions.
+     */
     public isRectangular(): boolean {
         return this._regions !== null && this._rectangles !== null;
     }
 
+    /**
+     * Return height of rectangular regions.
+     */
     public get rectangleHeight(): number {
         Regions.throwAccessErrorIf(this._rectangles === null, "Regions.rectangleHeight", "Regions._rectangles === null");
         return this._rectangles!.height;
     }
 
+    /**
+     * Return width of rectangular regions.
+     */
     public get rectangleWidth(): number {
         Regions.throwAccessErrorIf(this._rectangles === null, "Regions.rectangleWidth", "Regions._rectangles === null");
         return this._rectangles!.width;
     }
 
+    /**
+     * List of jigsaw regions, null if none exist.
+     */
     private _regions: number[][] | null = null;
 
+    /**
+     * Return if it has any rectangular or jigsaw regions (not rows, columns, diagonal, or extra)
+     */
     public hasRegions(): boolean {
         return this._regions !== null;
     }
 
+    /**
+     * Return List of rectangular or jigsaw regions. (not rows, columns, diagonal, or extra)
+     */
     public get regions(): number[][] {
         return this._regions !== null ? this._regions! : [];
     }
 
+    /**
+     * List of extra regions, null if none exist.
+     */
     private _extraRegions: number[][] | null = null;
 
+    /**
+     * Return if it has any extra regions.
+     */
     public hasExtraRegions(): boolean {
         return this._extraRegions !== null;
     }
 
+    /**
+     * Return list of all extra regions.
+     */
     public get extraRegions(): number[][] {
         return this._extraRegions !== null ? this._extraRegions! : [];
     }
 
+    /**
+     * Remove all extra regions.
+     */
     public removeExtraRegions(): void {
         this._extraRegions = null;
     }
 
+    /**
+     * Add extra regions.
+     * @param regions List of extra regions to add.
+     */
     public addExtraRegions(regions: number[][]): void {
         if (this._extraRegions === null) {
             this._extraRegions = [];
         }
-        for (let region of regions) { // TODO: validate this
+        for (let region of regions) {
             this._extraRegions.push(region);
         }
     }
 
+    /**
+     * Set extra regions to a list.
+     * @param regions All extra regions
+     */
     public setExtraRegions(regions: number[][] | null): void {
         this._extraRegions = null;
         if (regions !== null) {
@@ -90,6 +167,10 @@ class Regions {
         }
     }
 
+    /**
+     * Create regions for a Sudoku.
+     * @param size size of the Sudoku
+     */
     constructor(size: number) {
         this.size = size;
         this._rows = [];
@@ -152,18 +233,25 @@ class Regions {
 
     /**
      * Set regions to jigsaw regions.
-     * @param regions array of regions. every regions has cells in format (y * this.size + x)
+     * @param regions array of regions.
      *      Regions must have size equal to this.size, they must be on every cell exactly once, and they need to be edge-connected.
      */
-    public setJigsaw(regions: number[][]): void { // TODO: check validity of regions
+    public setJigsaw(regions: number[][]): void {
         this._rectangles = null
         this._regions = regions;
     }
 
+    /**
+     * Can windoku extra regions be added to a Sudoku (size is a square number and not 1)
+     * @param size size of the Sudoku
+     */
     public static isValidWindokuSize(size: number): boolean {
         return size >= 4 && Number.isInteger(Math.sqrt(size));
     }
 
+    /**
+     * Generate windoku extra regions for a Sudoku
+     */
     private getWindokuRegions(): number[][] {
         let regions: number[][] = [];
         let size = Math.sqrt(this.size);
@@ -183,6 +271,9 @@ class Regions {
         return regions;
     }
 
+    /**
+     * Are extra regions equal to windoku regions?
+     */
     public isWindoku(): boolean {
         if (! Regions.isValidWindokuSize(this.size) || ! this.hasExtraRegions()) {
             return false;
@@ -197,6 +288,10 @@ class Regions {
         return ArrayUtils.equals1d(regionsMatrix, windokuRegionsMatrix);
     }
 
+    /**
+     * Set extra regions to be windoku extra regions.
+     * Size of the Sudoku must be a square number, but not 1
+     */
     public setWindoku(): void {
         if (! Regions.isValidWindokuSize(this.size)) {
             throw `ERROR: Windoku sudoku cannot exist on size=${this.size}`;
@@ -206,8 +301,8 @@ class Regions {
     }
 
     /**
-     * For every cell, get index of region that is in that cell. If there is no region (sudoku has no regions), there will be -1.
-     * On index (y * this.size + x), there is index of region that has cell [y, x].
+     * For every cell, get index of region that is in that cell.
+     * If there is no region (sudoku has no regions), there will be -1.
      */
     public getRegionsMatrix(): number[] {
         return PositionUtils.regionsToMatrix(this.size * this.size, this._regions ?? []);
@@ -215,6 +310,11 @@ class Regions {
 
     /**
      * Get array of all regions. It is possible to choose only some types.
+     * @param rows are rows added
+     * @param columns are columns added
+     * @param regions are jigsaw/rectangular regions added
+     * @param diagonals are diagonal regions added
+     * @param extraRegions are extra regiosn added
      */
     public getSomeRegions(rows: boolean, columns: boolean, regions: boolean, diagonals: boolean, extraRegions: boolean): number[][] {
         let output: number[][] = [];
@@ -238,6 +338,9 @@ class Regions {
         return output;
     }
 
+    /**
+     * Get all regions of the Sudoku puzzle
+     */
     public getAllRegions(): number[][] {
         return this.getSomeRegions(true, true, true, true, true);
     }
@@ -245,7 +348,7 @@ class Regions {
     /**
      * Add jigsaw regions by text, for example: ["0011", "0012", "3312", "3322"]
      */
-    public setRegionsByText(text: string[]): void { // TODO: validate correctness
+    public setRegionsByText(text: string[]): void {
         let regions = ArrayUtils.createArray2d(this.size, 0, undefined);
         for (let y = 0; y < this.size; y++) {
             for (let x = 0; x < this.size; x++) {

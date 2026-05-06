@@ -1,8 +1,20 @@
 ﻿type StrategyTypeData = {
-    name: string, // The display name of the strategy, shown on the strategy button
-    strategy: (state: State) => StrategyResult, // Method implementing the strategy
-    isUsable: (sudoku: Sudoku) => boolean, // Whether the strategy is applicable to the given puzzle
-    isValidator: boolean, // true iff it should be used to validate correctness of solution
+    /**
+     * The display name of the strategy, shown on the strategy button
+     */
+    name: string,
+    /**
+     * Method implementing the strategy
+     */
+    strategy: (state: State) => StrategyResult,
+    /**
+     * Whether the strategy is applicable to the given puzzle
+     */
+    isUsable: (sudoku: Sudoku) => boolean,
+    /**
+     * true iff it should be used to validate correctness of solution
+     */
+    isValidator: boolean,
 }
 
 class StrategyEditor {
@@ -53,11 +65,20 @@ class StrategyEditor {
         },
     ];
 
+    /**
+     * is strategy not turned off by the user by pressing the checkbox
+     */
     public static isStrategyOn: boolean[] = [];
 
-    // use StrategyEditor.setLastResult() or StrategyEditor.removeLastResult()
+    /**
+     * StrategyResult of the last result of the user pressing the "Apply Step" button which is rendered in the editor
+     * null if no result is currently rendered
+     */
     private static lastResult: StrategyResult | null = null;
 
+    /**
+     * Remove buttons for turning on/off all strategies in the editor
+     */
     public static removeStrategyButtons(): void {
         let section = document.getElementById("right-menu-section-strategy")!;
         for (let child of Array.from(section.children)) {
@@ -67,6 +88,10 @@ class StrategyEditor {
         }
     }
 
+    /**
+     * Add buttons for turning on/off all applicable strategies in the editor
+     * @param sudoku MainEditor.sudoku object that is used to figure out what strategies are applicable
+     */
     public static addStrategyButtons(sudoku: Sudoku): void {
         let wrapper: HTMLElement = document.getElementById("right-menu-section-strategy")!;
         let strategyId = 0;
@@ -95,6 +120,12 @@ class StrategyEditor {
         }
     }
 
+    /**
+     * Add css for list of cells in a region from StrategyColors.regions[i]
+     * @param frame Frame object representing the Sudoku puzzle
+     * @param region List of cell ids (y * frame.width + x)
+     * @param css css class that should be added to all cells
+     */
     private static renderRegion(frame: Frame, region: number[], css: string): void {
         for (let index of region) {
             let y = Math.floor(index / frame.width);
@@ -103,6 +134,13 @@ class StrategyEditor {
         }
     }
 
+    /**
+     * Add background color for candidate number from StrategyColors.removed or StrategyColors.reason
+     * @param frame Frame object representing the Sudoku puzzle
+     * @param positions Coordinates of candidate numbers to add background color to
+     * { index: (y * frame.width + x), shift: (number - 1) }
+     * @param css css class to add the background color
+     */
     private static renderColor(frame: Frame, positions: { index: number, shift: number }[], css: string): void {
         for (let position of positions) {
             let y = Math.floor(position.index / frame.width);
@@ -116,6 +154,13 @@ class StrategyEditor {
         }
     }
 
+    /**
+     * Add background color for candidate number or cell from StrategyColors.error
+     * @param frame Frame object representing the Sudoku puzzle
+     * @param error Coordinates of candidate numbers to add background color to
+     * { index: (y * frame.width + x), shift: (number - 1) }
+     * if shift is -1, then add it to the whole cell instead
+     */
     private static renderError(frame: Frame, error: { index: number, shift: number }[]): void {
         for (let position of error) {
             let y = Math.floor(position.index / frame.width);
@@ -123,7 +168,6 @@ class StrategyEditor {
             let cell = frame.getCell(y, x);
             if (position.shift === -1) {
                 cell.addCellClass("background-error-big");
-                // cell.setTextBackgroundColor(null, "background-error", true);
             } else {
                 let found = cell.setTextBackgroundColor(`${position.shift + 1}`, "background-error-small", false);
                 if (! found) {
@@ -134,23 +178,22 @@ class StrategyEditor {
         }
     }
 
-    private static renderText(id: string, text: string): void {
-        let div = document.getElementById(id);
-        if (div !== null) {
-            div.textContent = text;
-        }
-    }
-
+    /**
+     * Render graphics of the result of a strategy.
+     * @param result StrategyResult object with data of the result of the strategy.
+     */
     private static renderStrategyResult(result: StrategyResult): void {
         let state = MainEditor.sudoku.solution;
         let frame = MainEditor.frame;
 
+        // rerender the State MainEditor.sudoku.solution
         Renderer.renderer.doSmallNumbersOnFullBinary = true;
         Renderer.renderer.doDifferentiateTaskBigNumber = true;
         Renderer.renderer.render(state, frame);
         Renderer.renderer.doSmallNumbersOnFullBinary = false;
         Renderer.renderer.doDifferentiateTaskBigNumber = false;
 
+        // render all color backgrounds
         if (result.colors.regions !== undefined) {
             for (let { region: region, css: css } of result.colors.regions) {
                 this.renderRegion(frame, region, css);
@@ -166,10 +209,15 @@ class StrategyEditor {
             this.renderError(frame, result.colors.error);
         }
 
-        this.renderText("strategy-text-1", result.name);
-        this.renderText("strategy-text-2", result.message);
+        // add the text generated by the strategy
+        document.getElementById("strategy-text-1")!.textContent = result.name;
+        document.getElementById("strategy-text-2")!.textContent = result.message;
     }
 
+    /**
+     * Check if there is no solution by running the strategies with StrategyTypeData.isValidator = true
+     * and see if any one of them returns that there is no solution.
+     */
     private static checkNoSolution(): boolean {
         for (let strategyId = 0; strategyId < this.isStrategyOn.length; strategyId++) {
             let strategyType = this.strategyTypeData[strategyId];
@@ -186,6 +234,9 @@ class StrategyEditor {
         return false;
     }
 
+    /**
+     * Check if every cell has exactly one candidate.
+     */
     private static checkIsSolution(): boolean {
         // check if the Sudoku state is a solution
         for (let binary of MainEditor.sudoku.solution.board) {
@@ -201,8 +252,10 @@ class StrategyEditor {
         return true;
     }
 
-
-
+    /**
+     * Apply all strategies from the simplest to the most complicated.
+     * Render the result of the first strategy that finds any progress in solving.
+     */
     private static tryAllStrategies(): void {
         for (let strategyId = 0; strategyId < this.isStrategyOn.length; strategyId++) {
             if (this.isStrategyOn[strategyId]) {
@@ -222,6 +275,9 @@ class StrategyEditor {
         this.removeLastResult();
     }
 
+    /**
+     * Remove candidate numbers from MainEditor.sudoku defined by this.lastResult.colors.removed.
+     */
     private static applyLastResult(): void {
         if (this.lastResult !== null) {
             if (this.lastResult.colors.removed !== undefined) {
@@ -235,6 +291,9 @@ class StrategyEditor {
         }
     }
 
+    /**
+     * Handle user pressing the "Apply Step" button
+     */
     public static solveNext(): void {
         if (this.lastResult === null) {
             let done = this.checkNoSolution();
@@ -251,6 +310,12 @@ class StrategyEditor {
         }
     }
 
+    /**
+     * Save data about the result of the last strategy.
+     * @param lastResult Result of the last strategy that was able to make progress, null if no progress was made.
+     * @param newStrategyId Id of the last strategy that made progress.
+     * @private
+     */
     private static setLastResult(lastResult: StrategyResult | null, newStrategyId: number | null): void {
         this.lastResult = lastResult;
 
@@ -261,6 +326,10 @@ class StrategyEditor {
         }
     }
 
+    /**
+     * Delete data about the result of last strategy,
+     * because it was already applied, or the user started to edit the task.
+     */
     public static removeLastResult(): void {
         this.setLastResult(null, null);
     }

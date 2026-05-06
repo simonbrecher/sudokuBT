@@ -1,4 +1,7 @@
 ﻿class EdgeVariantFactory {
+    /**
+     * You can add new Edge variant by adding the EdgeVariantFactory constructor and implementing the four parameters.
+     */
     public static variants = {
         consecutive: new EdgeVariantFactory(
             "Consecutive",
@@ -73,11 +76,44 @@
         ),
     };
 
+    /**
+     * string name of the variant, used in the button in editor
+     */
     public name: string;
+    /**
+     * For (size, value1, value2) return array of all label id that can be on the edge of two cells
+     * with numbers value1 and value2.
+     * If it is possible for multiple labels to be between the pair of numbers, return multiple ids.
+     * All label ids must be non-negative integers.
+     * @param size the sudoku size
+     * @param value1 number in the top/left cell of the edge-adjacent pair
+     * @param value2 number in the bottom/right cell of the edge-adjacent pair
+     * @return array of all label ids that can be on the edge of two cells with numbers value1 and value2
+     */
     public valueToLabels: (size: number, value1: number, value2: number) => number[];
+    /**
+     * Return list of all label styles ordered by the label ids.
+     * @param size the sudoku size
+     * @return array of label styles. null means that the label has no graphical element.
+     * @return output[i] is the graphics of label with id i
+     */
     public labelStyle: (size: number) => (EdgeLabelStyle | null)[];
+    /**
+     * Can the variant be added for Sudoku.
+     * @param size the sudoku size
+     */
     public canBeAdded: (size: number) => boolean;
 
+    /**
+     * Saves data needed to generate EdgeVariant.
+     * @param name string name of the variant, used in the button in editor
+     * @param valueToLabels For (size, value1, value2) return array of all label id that can be on the edge of two cells
+     * with numbers value1 and value2.
+     * If it is possible for multiple labels to be between the pair of numbers, return multiple ids.
+     * All label ids must be non-negative integers.
+     * @param labelStyle Return list of all label styles, null means there is no graphical element for the label.
+     * @param canBeAdded Can the variant be added for Sudoku.
+     */
     constructor(
         name: string,
         valueToLabels: (size: number, value1: number, value2: number) => number[],
@@ -90,6 +126,10 @@
         this.canBeAdded = canBeAdded;
     }
 
+    /**
+     * Convert the data to parameters of EdgeVariant and return an instance of it.
+     * @param sudoku Sudoku object that the variant will be added in the future (we need to know the size of it).
+     */
     public build(sudoku: Sudoku): EdgeVariant {
         if (! this.canBeAdded(sudoku.size)) {
             throw "EdgeVariantFactory.build: Cannot be added to sudoku";

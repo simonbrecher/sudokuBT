@@ -1,21 +1,38 @@
+/**
+ * Type used to specify coordinates of one line of backet border.
+ * mainY and mainX are coordinates of cells,
+ * subY and subX are what side of the cell the basket border is in, 0 is top/left 1 is bottom/right
+ */
 type BasketBorder = {
     start: { mainY: number, mainX: number, subY: number, subX: number },
     end: { mainY: number, mainX: number, subY: number, subX: number }
 }
 
+/**
+ * Type for saving access to HTML canvas element
+ */
 type CanvasContext = {
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
 }
 
+/**
+ * Style used to render a line
+ */
 type LineStyle = {
     thickness: number,
     color: string,
     cap: CanvasLineCap,
 }
 
+/**
+ * Style used to render a basket's border
+ */
 type BasketBorderStyle = {
     color: string,
+    /**
+     * null if full, [a, b] if dashed, a is length of the dash, b is length of the spaces
+     */
     dash: [number, number] | null,
     cap: CanvasLineCap,
 }
@@ -24,22 +41,56 @@ type BasketBorderStyle = {
  * Class managing canvas HTML element, used for drawing lines
  */
 class Canvas {
-    // space between basket borders and <td> border in pixels
+    /**
+     * space between basket borders and <td> border in pixels
+     */
     private static readonly BASKET_BORDER_OFFSET = 3;
-    // <canvas> bitmap is bigger than <canvas> by this factor
+    /**
+     * <canvas> bitmap is bigger than <canvas> by this factor
+     */
     private static readonly CANVAS_SCALE = 5;
 
+    /**
+     * Reference to the Frame object representing the Sudoku grid
+     */
     private readonly frame: Frame;
+    /**
+     * Reference to the Frame.puzzleWrapper, which contains the <table> and <canvas> HTML tags
+     */
     private readonly puzzleWrapper: HTMLElement;
 
+    /**
+     * Access to <canvas> used for drawing lines
+     */
     private lineCanvas: CanvasContext | null = null;
+        /**
+         * Coordinates of points of each line
+         */
         private lines: { y: number, x: number }[][] = [];
+        /**
+         * Styles of each line
+         */
         private linesStyle: LineStyle[] = [];
+    /**
+     * Access to <canvas> used for drawing basket borders
+     */
     private basketCanvas: CanvasContext | null = null;
+        /**
+         * Coordinates of start and end of each line of basket borders
+         */
         private basketBorders: BasketBorder[] = [];
+        /**
+         * Styles of each line of basket borders
+         */
         private basketBorderStyles: BasketBorderStyle[] = [];
 
+    /**
+     * Number of rows of the grid
+     */
     private readonly height: number;
+    /**
+     * Number of columns of the grid
+     */
     private readonly width: number;
 
     public constructor(frame: Frame, puzzleWrapper: HTMLElement) {
@@ -66,6 +117,7 @@ class Canvas {
 
     /**
      * Remove all lines
+     * this does not redraw lines, use Frame.update()
      */
     public removeLines(): void {
         this.lines = [];
@@ -73,7 +125,8 @@ class Canvas {
     }
 
     /**
-     * Add line to list of lines (does not redraw lines)
+     * Add line to list of lines
+     * this does not redraw lines, use Frame.update()
      */
     public addLine(line: { y: number, x: number }[], style: LineStyle): void {
         this.lines.push(line);
@@ -82,6 +135,7 @@ class Canvas {
 
     /**
      * Add line by 1d index (y * width + x)
+     * this does not redraw lines, use Frame.update()
      */
     public addLine1d(line1d: number[], style: LineStyle, offsetY: number, offsetX: number, width: number): void {
         let line = [];
@@ -99,6 +153,7 @@ class Canvas {
 
     /**
      * Redraw all lines in canvas
+     * Call Frame.update(), not this method
      */
     private drawLines(): void {
         if (this.lineCanvas === null) {
@@ -137,12 +192,17 @@ class Canvas {
 
     /**
      * Remove all basket lines
+     * this does not redraw lines, use Frame.update()
      */
     public removeBasketBorders(): void {
         this.basketBorders = [];
         this.basketBorderStyles = [];
     }
 
+    /**
+     * Add basket lines
+     * this does not redraw lines, use Frame.update()
+     */
     public addBasketBorder(line: BasketBorder, style: BasketBorderStyle): void {
         this.basketBorders.push(line);
         this.basketBorderStyles.push(style);
@@ -192,6 +252,7 @@ class Canvas {
 
     /**
      * Redraw all basket border lines in canvas
+     * Call Frame.update(), not this method
      */
     private drawBasketBorders(): void {
         if (this.basketCanvas === null) {
@@ -253,6 +314,8 @@ class Canvas {
 
     /**
      * Redraw all lines. If no lines exist anymore, hide canvas HTML element
+     * Call Frame.update instead of this method.
+     * You can call this method, if you have not made any change to size of any cells in Frame after the last call of Frame.update()
      */
     public update(): void {
         if (this.lines.length !== 0) {

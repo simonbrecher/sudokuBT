@@ -1,19 +1,55 @@
 ﻿type StrategyColors = {
-    removed?: { index: number, shift: number }[], // Numbers that will be removed (yellow)
-    reason?: { index: number, shift: number }[],  // Numbers that are the reason for other numbers being removed (green)
-    error?: { index: number, shift: number }[],   // Numbers that cause error (red)
+    /**
+     * Numbers that will be removed (yellow)
+     */
+    removed?: { index: number, shift: number }[],
+    /**
+     * Numbers that are the reason for other numbers being removed (green)
+     */
+    reason?: { index: number, shift: number }[],
+    /**
+     * Numbers that cause the Sudoku have no solution (red)
+     */
+    error?: { index: number, shift: number }[],
+    /**
+     * Custom styles for the cells in different types of regions (specified by the strategies)
+     */
     regions?: {
-        region: number[], // cells in the region
-        css: string // CSS style used for each cell
+        /**
+         * cells in the region
+         */
+        region: number[],
+        /**
+         * CSS style used for each cell
+         */
+        css: string
     }[],
 };
 
+/**
+ * Result returned by all implementations of strategies
+ */
 type StrategyResult = {
-    colors: StrategyColors, // Numbers and cells to color
-    name: string, // Name of strategy result (for example Region - Naked Pair)
-    message: string, // Message of explanation of the strategy result
-    isUpdated: boolean, // true iff the strategy can make any progress
-    isValid: boolean, // false iff no solution can exist
+    /**
+     * Numbers and cells to color
+     */
+    colors: StrategyColors,
+    /**
+     * Name of strategy result (for example "Naked Pair")
+     */
+    name: string,
+    /**
+     * Message of explanation of the strategy result
+     */
+    message: string,
+    /**
+     * true iff the strategy can make any progress
+     */
+    isUpdated: boolean,
+    /**
+     * false if no solution can exist (true if the strategy does not prove there is no solution)
+     */
+    isValid: boolean,
 };
 
 class StrategyUtils {
@@ -52,17 +88,6 @@ class StrategyUtils {
         return output;
     }
 
-    /**
-     * Convert StrategyRegionCoordinates2d[] to StrategyCoordinates3d[]
-     */
-    public static regionIndexToIndex(regionIndices: number[], region: number[]): number[] {
-        let output = [];
-        for (let regionIndex of regionIndices) {
-            output.push(region[regionIndex]);
-        }
-        return output;
-    }
-
     public static regionIndexShiftToIndexShift(
         positions: { index: number, shift: number }[], region: number[]
     ): { index: number, shift: number }[] {
@@ -84,6 +109,10 @@ class StrategyUtils {
         return output;
     }
 
+    /**
+     * Merge multiple numbers as A, B, and C.
+     * @param shifts (number - 1) for each number.
+     */
     public static joinShiftsToText(shifts: number[]): string {
         let copyShifts = ArrayUtils.deepcopyArray1d(shifts);
         copyShifts.sort((a, b) => a - b);

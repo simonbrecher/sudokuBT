@@ -1,34 +1,80 @@
 class MainEditor {
+    /**
+     * Minimum allowed Sudoku.size
+     */
     private static readonly MIN_SIZE = 3;
+    /**
+     * Maximum allowed Sudoku.size
+     */
     private static readonly MAX_SIZE = 16;
+    /**
+     * Maximum size of the Sudoku puzzle in pixels
+     */
     private static readonly MAX_BOARD_SIZE = 600;
+    /**
+     * Maximum size of one cell in pixels
+     */
     private static readonly MAX_CELL_SIZE = 70;
 
-    public static size: number = 9; // size of sudoku
+    /**
+     * Current Sudoku size - MainEditor.sudoku.size
+     */
+    public static size: number = 9;
 
+    /**
+     * Reference to the Frame object, that the Sudoku is supposed to be rendered into
+     */
     public static frame: Frame = null!;
 
+    /**
+     * Reference to the Sudoku object
+     */
     public static sudoku: Sudoku;
 
+    /**
+     * Current position in the menu
+     * Menu is divided in two parts, the left menu and the right menu
+     */
     public static menuPosition: {left: string | null, right: string | null} = {left: null, right: null};
 
+    /**
+     * 0 or 10, depending on if the user is adding an increment to be able to add numbers 10-16 with keys 0-6 on keyboard
+     */
     public static numberPlus: number = 0;
 
+    /**
+     * Is a confirmation window open in the editor, if so then no buttons can be pressed until the window is closed.
+     */
     public static isConfirmOpen: boolean = true;
 
+    /**
+     * List of confirmation windows that have been opened in the past, this is used to not open some windows multiple times
+     */
     private static windowsSeen: string[] = [];
+    /**
+     * List of confirmation windows that are currently open
+     */
     private static windowsOpen: string[] = [];
 
+    /**
+     * List of buttons (HTML id) that are only visible in the editor, if the user is configuring task.
+     */
     private static readonly VIEW_TASK_ONLY = [
         "menu-button-regions", "menu-button-numbers", "menu-button-solve-start", "menu-button-edge"
     ];
+    /**
+     * List of buttons (HTML id) that are only visible in the editor, if the user is solving.
+     */
     private static readonly VIEW_SOLVE_ONLY = [
         "menu-button-task-edit", "menu-button-solve-restart", "menu-button-solve-next", "strategy-text-wrapper"
     ];
+    /**
+     * Depending on what tab in the left menu is currently open, show some buttons in the right menu.
+     */
     private static readonly SHOW_SECTION: Record<string, string[]> = {
         regions: ["regions"],
         numbers: ["numbers"],
-        solve: ["numbers", "strategy"],
+        solve: ["numbers", "strategy"], // while solving, both list of strategies and the +0 +10 buttons are available
         edge: ["edge"],
     };
 
@@ -42,6 +88,9 @@ class MainEditor {
         this.render();
     }
 
+    /**
+     * Set the Sudoku's solution to its task, which resets the progress of solving to the beginning.
+     */
     private static resetSolution(): void {
         this.sudoku.solution = this.sudoku.task.deepcopy();
     }
@@ -71,7 +120,7 @@ class MainEditor {
     }
 
     /**
-     * Render sudoku
+     * The main render function, that can be called from anywhere
      */
     public static render(): void {
         StrategyEditor.removeLastResult();
@@ -197,7 +246,7 @@ class MainEditor {
     }
 
     /**
-     * Hide confirm window
+     * Hide currently opened confirm window
      */
     private static hideConfirmWindow(): void {
         for (let name of this.windowsOpen) {
@@ -314,6 +363,9 @@ class MainEditor {
         return leftPosition !== previousLeftPosition || rightPosition !== previousRightPosition;
     }
 
+    /**
+     * Based on what are the types of regions currently added to the Sudoku, check corresponding checkboxes.
+     */
     public static updateChecksRegions(): void {
         let isNone = ! this.sudoku.regions.hasRegions();
         let isRectangular = this.sudoku.regions.isRectangular();
@@ -331,12 +383,18 @@ class MainEditor {
         GraphicsUtils.addOrRemoveClass("check-regions-extraregions", "selected", isExtraRegions);
     }
 
+    /**
+     * Based on if the user is adding +0 or +10 to numbers (to add numbers 10-16) check the correct checkbox.
+     */
     private static updateChecksPlus(): void {
         for (let plus = 0; plus <= 20; plus += 10) {
             GraphicsUtils.addOrRemoveClass(`check-numbers-plus${plus}`, "selected", plus == this.numberPlus);
         }
     }
 
+    /**
+     * Based on what strategies are currently on check the correct checkbox.
+     */
     private static updateChecksStrategy(): void {
         for (let strategyId = 0; strategyId < StrategyEditor.isStrategyOn.length; strategyId++) {
             let check = document.getElementById(`check-strategy-${strategyId}`);
@@ -347,6 +405,9 @@ class MainEditor {
             }
         }
     }
+
+    // -------- Methods below are handlers for editor buttons in editor.html
+    // pressedXButton is when a button is pressed, confirmX is a confirmation button on confirm windows.
 
     public static pressedResizeButton(): void {
         if (! this.isConfirmOpen) {

@@ -2,17 +2,46 @@
  * Class managing graphics for one sudoku puzzle
  */
 class Frame {
-    public readonly height: number; // number of rows
-    public readonly width: number; // number of columns
+    /**
+     * Number of rows in the grid
+     */
+    public readonly height: number;
+    /**
+     * Number of columns in the grid
+     */
+    public readonly width: number;
 
-    public readonly cellSize: number; // size of td element
+    /**
+     * size of the <td> element in pixels
+     */
+    public readonly cellSize: number;
 
+    /**
+     * the <div> element wrapping the <table> and <canvas>es
+     */
     public readonly puzzleWrapper: HTMLElement;
+    /**
+     * the <table> element of the grid
+     */
     private readonly table: HTMLElement;
 
+    /**
+     * List of all Cell objects, one for each cell of the grid
+     * this.cells[y][x]
+     */
     private readonly cells: Cell[][];
+    /**
+     * List of all Edge objects, one for each edge between edge-adjacent cells of the grid
+     * this.cells[direction][y][x]
+     */
     private readonly edges: Edge[][][];
+        /**
+         * List of all coordinates for Edge elements [direction, y, x][]
+         */
         public readonly edgeCoordinates: [number, number, number][];
+    /**
+     * the Canvas object accessing writing into the <calvas> elements
+     */
     public readonly canvas: Canvas;
 
     /**
@@ -73,10 +102,21 @@ class Frame {
         }
     }
 
+    /**
+     * Access a Cell object by coordinates
+     * @param y the row, 0 is the top row
+     * @param x the column, 0 is the left-most column
+     */
     public getCell(y: number, x: number): Cell {
         return this.cells[y][x];
     }
 
+    /**
+     * Access an Edge object by coordinates
+     * @param direction 0 = on right side, 1 = on left side
+     * @param y the row of the cell next to which the edge label is, 0 is the top row
+     * @param x the column of the cell next to which the edge label is, 0 is the left-most column
+     */
     public getEdge(direction: number, y: number, x: number): Edge {
         return this.edges[direction][y][x];
     }
@@ -114,7 +154,10 @@ class Frame {
         this.canvas.update();
     }
 
+    /**
+     * Delete all HTML elements
+     */
     public delete(): void {
-        this.table.remove();
+        this.puzzleWrapper.remove();
     }
 }

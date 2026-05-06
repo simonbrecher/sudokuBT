@@ -1,3 +1,6 @@
+/**
+ * Return output of SudokuStrategy._region()
+ */
 type StrategyRegionProof = {
     isSource: boolean,
     isValid: boolean,
@@ -6,12 +9,18 @@ type StrategyRegionProof = {
     removed: { index: number; shift: number }[],
     priority: number, // lower number = higher priority, -1 for error and 1000 for non-updated
 }
+/**
+ * Return output of SudokuStrategy._pointing()
+ */
 type StrategyPointingProof = {
     region1: number[], // region that is missing a number
     region2: number[], // region that has a number that is supposed to be deleted
     intersection: number[], // intersection of both regions
     proof: number,
 }
+/**
+ * Return output of SudokuStrategy._intersection()
+ */
 type StrategyIntersectionProof = {
     isSource: boolean,
     isValid: boolean,
@@ -25,6 +34,9 @@ type StrategyIntersectionProof = {
 }
 
 class SudokuStrategy {
+    /**
+     * Text used for Naked and Hidden Candidates strategies.
+     */
     private static readonly REGION_SIZE_TEXT = ["Single", "Pair", "Triple", "Quadruple"];
 
     /**
@@ -177,7 +189,7 @@ class SudokuStrategy {
      * @return isValid:     false if region is known to have no solution
      */
     private static _hiddenSingle(binaries: number[]): {
-        reason?: { index: number, shift: number }[], removed?: { index: number, shift: number }[], // TODO regionIndex
+        reason?: { index: number, shift: number }[], removed?: { index: number, shift: number }[],
         multiple?: { cell: number, shifts: number[] }, missing?: number[],
         isUpdated: boolean, isValid: boolean,
     }
@@ -274,7 +286,7 @@ class SudokuStrategy {
                             isValid: false,
                         }
                     } else {
-                        throw "SudokuStrategy.hiddenSingle : result.missing === undefined && result.missing === undefined";
+                        return { colors: {  }, name: "", message: "", isUpdated: false, isValid: true };
                     }
                 }
             }
@@ -308,6 +320,12 @@ class SudokuStrategy {
         }
     }
 
+    /**
+     * Generate the message used for Naked and Hidden Candidates strategies.
+     * @param isSource Is the non-isolated sink/source from condensation C source?
+     * source = Naked Candidates, sink = Hidden Candidates.
+     * @param size Size of the non-isolated sink/source.
+     */
     private static getMessageNakedHidden(isSource: boolean, size: number): {name: string, message: string} {
         let sizeText = size <= this.REGION_SIZE_TEXT.length ? this.REGION_SIZE_TEXT[size - 1] : `${size}-tuple`;
         let number = size == 1 ? "number" : "numbers";
@@ -345,7 +363,7 @@ class SudokuStrategy {
         let hallProof = PerfectMatching.getHallProof(edges);
 
         if (hallProof == "no-matching") {
-            return []; // TODO
+            return [];
         }
         if (hallProof === "no-unmatchable-edge") {
             return [];
@@ -417,10 +435,13 @@ class SudokuStrategy {
             }
 
         } else {
-            throw "TODO invalid"; // TODO
+            return { colors: {}, name: "", message: "", isUpdated: false, isValid: true, }
         }
     }
 
+    /**
+     * Take two regions R1 and R2 and produce [R1 - R2, R2 - R1, R1 intersection R2].
+     */
     private static splitRegionsToIntersections(region1: number[], region2: number[]): number[][] {
         let set1 = new Set(region1);
         let set2 = new Set(region2);
@@ -430,6 +451,9 @@ class SudokuStrategy {
         return [r1, r2, intersection];
     }
 
+    /**
+     * Implementation of the Pointing strategy.
+     */
     private static _pointing(
         r1: number[], r2: number[], intersection: number[], board: number[]
     ): StrategyPointingProof | null {
@@ -449,6 +473,9 @@ class SudokuStrategy {
         return null;
     }
 
+    /**
+     * Implementation of the Pointing strategy.
+     */
     public static pointing(state: State): StrategyResult {
         let board = state.board;
         let regions = state.sudoku.regions.getAllRegions();
@@ -515,6 +542,9 @@ class SudokuStrategy {
         return { colors: {}, name: "", message: "", isUpdated: false, isValid: true, };
     }
 
+    /**
+     * Implementation of the Generalised X-Wing strategy.
+     */
     private static _intersection(
         board: number[], shift: number, regions1: number[][], regions2: number[][], size: number
     ): StrategyIntersectionProof | null {
@@ -551,7 +581,7 @@ class SudokuStrategy {
         let hallProof = PerfectMatching.getHallProof(edges);
 
         if (hallProof == "no-matching") {
-            return null; // TODO
+            return null;
         }
         if (hallProof === "no-unmatchable-edge") {
             return null;
@@ -604,6 +634,9 @@ class SudokuStrategy {
         };
     }
 
+    /**
+     * Implementation of the Generalised X-Wing strategy.
+     */
     public static intersection(state: State): StrategyResult {
         let size = state.sudoku.size;
         let board = state.board;
@@ -654,7 +687,7 @@ class SudokuStrategy {
             };
 
         } else {
-            throw "TODO invalid"; // TODO
+            return {colors: {}, isUpdated: false, isValid: true, name: "", message: "",};
         }
     }
 }

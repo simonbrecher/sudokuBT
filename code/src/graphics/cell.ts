@@ -2,26 +2,77 @@
  * Class managing graphics for one cell in sudoku puzzle
  */
 class Cell {
-    // constants used by this.setBorder() to specify direction of borders
+    /**
+     * constants used by this.setBorder() to specify direction of borders
+     */
     public static readonly DIRECTIONS = { top: 1, bottom: 2, left: 4, right: 8, topBottom: 3, leftRight: 12, all: 15 };
     private static readonly DIRECTIONS_CLASS = ["top", "bottom", "left", "right"];
 
-    public readonly y: number; // y coordinate inside Frame
-    public readonly x: number; // x coordinate inside Frame
+    /**
+     * row coordinate, 0 is the top row
+     */
+    public readonly y: number;
+    /**
+     * column coordinate, 0 is the left-most column
+     */
+    public readonly x: number;
 
+    /**
+     * td HTMLElement of the cell
+     */
     public readonly tdElement: HTMLElement;
+        /**
+         * CSS classes of the 4 sides of border, see Cell.DIRECTIONS_CLASS
+         */
         private tdBordersClass = ["", "", "", ""];
+    /**
+     * a <div> element inside the <td> element, it is to measure the space between the borders (they might have various thickness)
+     * everything is inside this element, everything is scaled based on the size of this element
+     */
     private readonly cellElement: HTMLElement;
+        /**
+         * background color of this.cellElement
+         */
         private backgroundColor: string = "";
+    /**
+     * element inside this.cellElement, which is used to wrap one or multiple elements with one character each
+     */
     private textWrapperElement: HTMLElement | null = null;
+        /**
+         * "single-text" or "multiple-text" used as CSS class for this.textWrapperElement to add different stying
+         * on text depending on if there is one or multiple characters
+         */
         private textWrapperCount: string = "";
+        /**
+         * list of <div> elements, each for one character
+         */
         private textElements: HTMLElement[] = [];
+        /**
+         * list of colors for background of the characters, each character gets one css class
+         */
         private textColorsCss: string[] = [];
+        /**
+         * list of the characters in the cell
+         */
         private texts: string[] = [];
+    /**
+     * list of classes that have been added to the cell by this.addCellClass()
+     * and can be removed by this.removeCellClass() or this.removeAllCellClasses()
+     */
     private cellClasses: Set<string> = new Set<string>();
 
+    /**
+     * Last recorded DOMRect of this.cellElement by this.getBoundingRect()
+     * This is needed by Frame.update() to correctly set positioning of all elements.
+     */
     public boundingRect: DOMRect | null = null;
 
+    /**
+     * @param tdElement reference to the <td> element in the <table>
+     * @param tdSize width and height of the <td> in pixels
+     * @param y row in which the cell is, 0 is top row
+     * @param x column in which the cell is, 0 is left-most column
+     */
     constructor(tdElement: HTMLElement, tdSize: number, y: number, x: number) {
         this.y = y;
         this.x = x;
@@ -216,16 +267,27 @@ class Cell {
         }
     }
 
+    /**
+     * Add css class to this.cellElement. It can be removed by this.removeCellClass() or this.removeAllCellClasses()
+     * @param css css class to add
+     */
     public addCellClass(css: string): void {
         this.cellElement.classList.add(css);
         this.cellClasses.add(css);
     }
 
+    /**
+     * Remove css class which was added by this.addCellClass() from this.cellElement.
+     * @param css css class to remove
+     */
     public removeCellClass(css: string): void {
         this.cellElement.classList.remove(css);
         this.cellClasses.delete(css);
     }
 
+    /**
+     * Remove all css classes which were added by this.addCellClass() from this.cellElement
+     */
     public removeAllCellClasses(): void {
         for (const css of Array.from(this.cellClasses)) {
             this.removeCellClass(css);

@@ -1,7 +1,19 @@
+/**
+ * Return type of Algorithm 1 from the thesis
+ */
 type GraphHallProof = {
-    set: number[], // S subset of A for source, P(S) subset of A for sink
-    matched: number[], // P(S) subset of B for source, S subset of B for sink
-    edges: number[][], // [a, b][] edges that can be proven perfectly-unmatchable, a from A, b from B
+    /**
+     * S subset of A for source, P(S) subset of A for sink
+     */
+    set: number[],
+    /**
+     * P(S) subset of B for source, S subset of B for sink
+     */
+    matched: number[],
+    /**
+     * [a, b][] edges that can be proven perfectly-unmatchable, a from A, b from B
+     */
+    edges: number[][],
 }
 
 class PerfectMatching {
