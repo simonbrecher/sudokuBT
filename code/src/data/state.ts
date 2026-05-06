@@ -7,36 +7,6 @@ class State {
         this.sudoku = sudoku;
     }
 
-    /**
-     * Count number of extra bits in this.board
-     * If this.board includes 0, return -1
-     * Else return sum of 1-bits in all cells minus 1 for every cell
-     */
-    public getExtraBitCount(): number | null {
-        let extraBitsCount = 0;
-        for (let binary of this.board) {
-            if (binary === 0) {
-                return null;
-            }
-            extraBitsCount += BinaryUtils.countBits32(binary) - 1;
-        }
-        return extraBitsCount;
-    }
-
-    /**
-     * Count solutions statically:
-     * Return 0:    State has 0 solutions.
-     * Return 1:    State has 0 or 1 solutions.
-     * Return 2:    State has 0, 1 or more solutions.
-     */
-    public countSolutions(): 0 | 1 | 2 {
-        switch (this.getExtraBitCount()) {
-            case null:  return 0;
-            case 0:     return 1;
-            default:    return 2;
-        }
-    }
-
     public deepcopy(): State {
         return new State(ArrayUtils.deepcopyArray1d(this.board), this.sudoku);
     }
